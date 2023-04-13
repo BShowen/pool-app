@@ -10,18 +10,18 @@ import Login, {
   action as loginAction,
   loader as loginLoader,
 } from "./routes/login";
-import Customers from "./routes/customers";
+import Customers from "./routes/customer/customers";
 import CustomerList, {
   loader as customerListLoader,
 } from "./components/customer/CustomerList";
 import NewCustomerForm, {
   action as newCustomerAction,
-} from "./routes/customers-new";
-import Customer, { loader as customerLoader } from "./routes/customer";
+} from "./routes/customer/customers-new";
+import Customer, { loader as customerLoader } from "./routes/customer/customer";
 import CustomerDashboard from "./components/customer/CustomerDashboard";
 import CustomerEdit, {
   action as customerEditAction,
-} from "./routes/customer-edit";
+} from "./routes/customer/customer-edit";
 
 const router = createBrowserRouter([
   {

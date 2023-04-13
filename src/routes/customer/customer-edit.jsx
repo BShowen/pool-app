@@ -1,7 +1,7 @@
 import { useActionData, useLoaderData, redirect } from "react-router-dom";
 
-import CustomerForm from "../components/customer/CustomerForm";
-import { deleteCustomer, updateCustomer } from "../utils/apiFetches";
+import CustomerForm from "../../components/customer/CustomerForm";
+import { deleteCustomer, updateCustomer } from "../../utils/apiFetches";
 
 export async function action({ request }) {
   const formData = await request.formData();

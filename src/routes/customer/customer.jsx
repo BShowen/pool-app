@@ -1,9 +1,9 @@
 import { useLoaderData, Outlet } from "react-router-dom";
 
-import CustomerTopNav from "../components/customer/CustomerTopNav";
+import CustomerTopNav from "../../components/customer/CustomerTopNav";
 
-import { formatAccountName } from "../utils/formatters";
-import { getCustomer } from "../utils/apiFetches";
+import { formatAccountName } from "../../utils/formatters";
+import { getCustomer } from "../../utils/apiFetches";
 
 export async function loader({ params }) {
   const response = await getCustomer({ customerId: params.customerId });
