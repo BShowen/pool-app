@@ -12,6 +12,7 @@ export default function CustomerTopNav() {
         }`}
         id="customerInfo"
         to=""
+        replace
       >
         Customer
       </Link>
@@ -20,6 +21,7 @@ export default function CustomerTopNav() {
         className={`tab ${page === "pool-reports" && "tab-active"}`}
         id="poolReports"
         to="pool-reports"
+        replace
       >
         Pool reports
       </Link>
@@ -28,6 +30,7 @@ export default function CustomerTopNav() {
         className={`tab ${page === "invoices" && "tab-active"}`}
         id="invoices"
         to="invoices"
+        replace
       >
         Invoices
       </Link>
