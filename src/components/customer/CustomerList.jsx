@@ -1,7 +1,7 @@
 import { useLoaderData, Link, useNavigate } from "react-router-dom";
-import { getCustomers } from "../utils/apiFetches";
+import { getCustomers } from "../../utils/apiFetches";
 
-import { formatAccountName } from "../utils/formatters";
+import { formatAccountName } from "../../utils/formatters";
 
 export async function loader() {
   return await getCustomers();

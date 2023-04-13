@@ -1,15 +1,9 @@
-import { redirect, useLoaderData, Outlet } from "react-router-dom";
+import { useLoaderData, Outlet } from "react-router-dom";
 
-import CustomerDisplay from "../components/CustomerDashboard";
-import CustomerTopNav from "../components/CustomerTopNav";
-import CustomerForm from "../components/CustomerForm";
+import CustomerTopNav from "../components/customer/CustomerTopNav";
 
 import { formatAccountName } from "../utils/formatters";
-import {
-  getCustomer,
-  updateCustomer,
-  deleteCustomer,
-} from "../utils/apiFetches";
+import { getCustomer } from "../utils/apiFetches";
 
 export async function loader({ params }) {
   const response = await getCustomer({ customerId: params.customerId });

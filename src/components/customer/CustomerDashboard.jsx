@@ -1,7 +1,7 @@
 import { useSubmit, useNavigate, useLoaderData } from "react-router-dom";
 import { useState } from "react";
-import { capitalizeName, formatAccountName } from "../utils/formatters";
-import { getCustomer } from "../utils/apiFetches";
+import { capitalizeName, formatAccountName } from "../../utils/formatters";
+import { getCustomer } from "../../utils/apiFetches";
 
 export default function CustomerDashboard() {
   const submit = useSubmit();

@@ -13,12 +13,12 @@ import Login, {
 import Customers from "./routes/customers";
 import CustomerList, {
   loader as customerListLoader,
-} from "./components/CustomerList";
+} from "./components/customer/CustomerList";
 import NewCustomerForm, {
   action as newCustomerAction,
 } from "./routes/customers-new";
 import Customer, { loader as customerLoader } from "./routes/customer";
-import CustomerDashboard from "./components/CustomerDashboard";
+import CustomerDashboard from "./components/customer/CustomerDashboard";
 import CustomerEdit, {
   action as customerEditAction,
 } from "./routes/customer-edit";
