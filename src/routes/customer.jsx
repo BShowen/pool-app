@@ -1,6 +1,6 @@
 import { redirect, useLoaderData, Outlet } from "react-router-dom";
 
-import CustomerDisplay from "../components/CustomerDisplay";
+import CustomerDisplay from "../components/CustomerDashboard";
 import CustomerTopNav from "../components/CustomerTopNav";
 import CustomerForm from "../components/CustomerForm";
 

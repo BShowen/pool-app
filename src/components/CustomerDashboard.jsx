@@ -3,7 +3,7 @@ import { useState } from "react";
 import { capitalizeName, formatAccountName } from "../utils/formatters";
 import { getCustomer } from "../utils/apiFetches";
 
-export default function CustomerDisplay() {
+export default function CustomerDashboard() {
   const submit = useSubmit();
   const navigate = useNavigate();
   const [replace, setReplace] = useState(false);

@@ -10,12 +10,15 @@ import Login, {
   action as loginAction,
   loader as loginLoader,
 } from "./routes/login";
-import Customers, { loader as customerRouteLoader } from "./routes/customers";
+import Customers from "./routes/customers";
+import CustomerList, {
+  loader as customerListLoader,
+} from "./components/CustomerList";
 import NewCustomerForm, {
   action as newCustomerAction,
 } from "./routes/customers-new";
 import Customer, { loader as customerLoader } from "./routes/customer";
-import CustomerDisplay from "./components/CustomerDisplay";
+import CustomerDashboard from "./components/CustomerDashboard";
 import CustomerEdit, {
   action as customerEditAction,
 } from "./routes/customer-edit";
@@ -27,44 +30,50 @@ const router = createBrowserRouter([
     loader: rootLoader,
     children: [
       {
-        path: "/technicians",
-        element: <p>Technicians page</p>,
-      },
-      {
         path: "/customers",
         element: <Customers />,
-        loader: customerRouteLoader,
-      },
-      {
-        path: "/customers/new",
-        element: <NewCustomerForm />,
-        action: newCustomerAction,
-      },
-      {
-        path: "/customers/:customerId",
-        element: <Customer />,
-        loader: customerLoader,
         children: [
           {
             index: true,
-            element: <CustomerDisplay />,
+            element: <CustomerList />,
+            loader: customerListLoader,
+          },
+          {
+            path: "/customers/new",
+            element: <NewCustomerForm />,
+            action: newCustomerAction,
+          },
+          {
+            path: "/customers/:customerId",
+            element: <Customer />,
             loader: customerLoader,
-          },
-          {
-            path: "/customers/:customerId/edit",
-            element: <CustomerEdit />,
-            action: customerEditAction,
-            loader: customerLoader,
-          },
-          {
-            path: "/customers/:customerId/pool-reports",
-            element: <p>Pool reports</p>,
-          },
-          {
-            path: "/customers/:customerId/invoices",
-            element: <p>Invoices</p>,
+            children: [
+              {
+                index: true,
+                element: <CustomerDashboard />,
+                loader: customerLoader,
+              },
+              {
+                path: "/customers/:customerId/edit",
+                element: <CustomerEdit />,
+                action: customerEditAction,
+                loader: customerLoader,
+              },
+              {
+                path: "/customers/:customerId/pool-reports",
+                element: <p>Pool reports</p>,
+              },
+              {
+                path: "/customers/:customerId/invoices",
+                element: <p>Invoices</p>,
+              },
+            ],
           },
         ],
+      },
+      {
+        path: "/technicians",
+        element: <p>Technicians page</p>,
       },
     ],
   },
