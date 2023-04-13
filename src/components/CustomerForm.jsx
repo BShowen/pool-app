@@ -13,6 +13,7 @@ export default function CustomerForm({
     customerAccount || { accountOwners: [{}] }
   );
   const navigate = useNavigate();
+  const accountOwnersCount = state.accountOwners.length - 1;
 
   function updateState(e) {
     const isSubForm = Object.keys(e.target.dataset).length;
@@ -197,6 +198,7 @@ export default function CustomerForm({
                   (errors.accountOwners && errors.accountOwners[index]) || {}
                 }
                 removeHandler={index > 0 ? removeAccountOwner : null}
+                shouldFocus={index !== 0 && index == accountOwnersCount}
               />
             );
           })}

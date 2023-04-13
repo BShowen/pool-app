@@ -5,6 +5,7 @@ export default function AccountOwnerForm({
   index,
   errors,
   removeHandler,
+  shouldFocus,
 }) {
   return (
     <div className="w-full rounded-lg px-2 py-3 bg-slate-100">
@@ -25,6 +26,7 @@ export default function AccountOwnerForm({
         }`}
         value={values.firstName || ""}
         onInput={changeHandler}
+        autoFocus={shouldFocus}
       />
 
       <label className="label">
