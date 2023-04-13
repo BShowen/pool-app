@@ -95,3 +95,18 @@ export async function deleteCustomer(data) {
     return { response, errors: json.errors };
   }
 }
+
+export async function getTechnicians() {
+  const apiToken = window.localStorage.getItem("apiToken");
+  if (!apiToken) return;
+  const url = "http://192.168.1.2:8080/companies/technicians/all";
+  const options = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: apiToken,
+    },
+  };
+  const response = await fetch(url, options);
+  return response.json();
+}

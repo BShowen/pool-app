@@ -23,6 +23,11 @@ import CustomerEdit, {
   action as customerEditAction,
 } from "./routes/customer/customer-edit";
 
+import Technicians from "./routes/technician/technicians";
+import TechnicianList, {
+  loader as technicianListLoader,
+} from "./components/technician/TechnicianList";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -73,7 +78,14 @@ const router = createBrowserRouter([
       },
       {
         path: "/technicians",
-        element: <p>Technicians page</p>,
+        element: <Technicians />,
+        children: [
+          {
+            index: true,
+            element: <TechnicianList />,
+            loader: technicianListLoader,
+          },
+        ],
       },
     ],
   },
