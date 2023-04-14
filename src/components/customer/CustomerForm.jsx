@@ -100,7 +100,7 @@ export default function CustomerForm({
             </label>
             <input
               type="text"
-              placeholder="Type here"
+              placeholder="Address"
               name="address"
               className={`input input-bordered w-full focus:outline-none ${
                 errors.address && "input-secondary"
