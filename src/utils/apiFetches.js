@@ -111,3 +111,34 @@ export async function getTechnicians() {
   const response = await fetch(url, options);
   return response.json();
 }
+
+export async function getTechnician({ technicianId }) {
+  const apiToken = window.localStorage.getItem("apiToken");
+  if (!apiToken) return;
+  const url = `${localHost}/companies/technicians/${technicianId}`;
+  const options = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: apiToken,
+    },
+  };
+  const response = await fetch(url, options);
+  return response.json();
+}
+
+export async function createNewTechnician(data) {
+  const apiToken = window.localStorage.getItem("apiToken");
+  if (!apiToken) return;
+  const url = `${localHost}/companies/technicians/new`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: apiToken,
+    },
+    body: JSON.stringify(data),
+  };
+  const response = await fetch(url, options);
+  return { response: await response.json(), status: response.status };
+}
