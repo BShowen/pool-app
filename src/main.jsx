@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 
 import "./index.css";
 
@@ -23,10 +23,17 @@ import CustomerEdit, {
   action as customerEditAction,
 } from "./routes/customer/customer-edit";
 
-import Technicians from "./routes/technician/technicians";
+import Technicians from "./routes/technician/Technicians";
+import Technician, {
+  loader as technicianLoader,
+} from "./routes/technician/Technician";
 import TechnicianList, {
   loader as technicianListLoader,
 } from "./components/technician/TechnicianList";
+import TechnicianDashboard from "./components/technician/TechnicianDashBoard";
+import NewTechnician, {
+  action as newTechnicianAction,
+} from "./routes/technician/NewTechnician";
 
 const router = createBrowserRouter([
   {
@@ -84,6 +91,31 @@ const router = createBrowserRouter([
             index: true,
             element: <TechnicianList />,
             loader: technicianListLoader,
+          },
+          {
+            path: "/technicians/new",
+            element: <NewTechnician />,
+            action: newTechnicianAction,
+          },
+          {
+            path: "/technicians/:technicianId",
+            element: <Technician />,
+            loader: technicianLoader,
+            children: [
+              {
+                index: true,
+                element: <TechnicianDashboard />,
+                loader: technicianLoader,
+              },
+              {
+                path: "/technicians/:technicianId/routes",
+                element: <p>Routes</p>,
+              },
+              {
+                path: "/technicians/:technicianId/edit",
+                element: <p>Edit technician</p>,
+              },
+            ],
           },
         ],
       },
