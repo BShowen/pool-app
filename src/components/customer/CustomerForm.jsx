@@ -13,6 +13,7 @@ export default function CustomerForm({
     customerAccount || { accountOwners: [{}] }
   );
   const navigate = useNavigate();
+  const [focus, setFocus] = useState(false);
   const accountOwnersCount = state.accountOwners.length - 1;
 
   function updateState(e) {
@@ -198,7 +199,7 @@ export default function CustomerForm({
                   (errors.accountOwners && errors.accountOwners[index]) || {}
                 }
                 removeHandler={index > 0 ? removeAccountOwner : null}
-                shouldFocus={index !== 0 && index == accountOwnersCount}
+                shouldFocus={focus && index == accountOwnersCount}
               />
             );
           })}
@@ -214,6 +215,7 @@ export default function CustomerForm({
                     accountOwners: [...prevState.accountOwners, {}],
                   };
                 });
+                setFocus(true);
               }}
             >
               Add contact
