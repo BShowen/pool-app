@@ -1,5 +1,7 @@
+const localHost = "http://192.168.1.74:8080";
+
 export async function getLoginToken(formData = {}) {
-  const url = "http://192.168.1.2:8080/companies/login";
+  const url = `${localHost}/companies/login`;
   const options = {
     method: "POST",
     headers: {
@@ -14,7 +16,7 @@ export async function getLoginToken(formData = {}) {
 export async function getCustomers() {
   const apiToken = window.localStorage.getItem("apiToken");
   if (!apiToken) return;
-  const url = "http://192.168.1.2:8080/companies/customer-accounts/all";
+  const url = `${localHost}/companies/customer-accounts/all`;
   const options = {
     method: "GET",
     headers: {
@@ -29,7 +31,7 @@ export async function getCustomers() {
 export async function getCustomer({ customerId }) {
   const apiToken = window.localStorage.getItem("apiToken");
   if (!apiToken || !customerId) return;
-  const url = `http://192.168.1.2:8080/companies/customer-accounts/${customerId}`;
+  const url = `${localHost}/companies/customer-accounts/${customerId}`;
   const options = {
     method: "GET",
     headers: {
@@ -44,7 +46,7 @@ export async function getCustomer({ customerId }) {
 export async function createNewAccount(data) {
   const apiToken = window.localStorage.getItem("apiToken");
   if (!apiToken) return;
-  const url = "http://192.168.1.2:8080/companies/customer-accounts/new";
+  const url = `${localHost}/companies/customer-accounts/new`;
   const options = {
     method: "POST",
     headers: {
@@ -60,8 +62,7 @@ export async function createNewAccount(data) {
 export async function updateCustomer(data) {
   const apiToken = window.localStorage.getItem("apiToken");
   if (!apiToken) return;
-  const url =
-    "http://192.168.1.2:8080/companies/customer-accounts/updateAccount";
+  const url = `${localHost}/companies/customer-accounts/updateAccount`;
   const options = {
     method: "POST",
     headers: {
@@ -77,7 +78,7 @@ export async function updateCustomer(data) {
 export async function deleteCustomer(data) {
   const apiToken = window.localStorage.getItem("apiToken");
   if (!apiToken) return;
-  const url = "http://192.168.1.2:8080/companies/customer-accounts/delete";
+  const url = `${localHost}/companies/customer-accounts/delete`;
   const options = {
     method: "POST",
     headers: {
@@ -99,7 +100,7 @@ export async function deleteCustomer(data) {
 export async function getTechnicians() {
   const apiToken = window.localStorage.getItem("apiToken");
   if (!apiToken) return;
-  const url = "http://192.168.1.2:8080/companies/technicians/all";
+  const url = `${localHost}/companies/technicians/all`;
   const options = {
     method: "GET",
     headers: {
