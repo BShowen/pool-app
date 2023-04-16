@@ -1,19 +1,28 @@
-import { useLoaderData, Link, useNavigate } from "react-router-dom";
-import { getCustomers } from "../../utils/apiFetches";
+import {
+  useLoaderData,
+  Link,
+  Await,
+  defer,
+  useAsyncValue,
+  useNavigate,
+} from "react-router-dom";
+import { Suspense } from "react";
 
+import { getCustomers } from "../../utils/apiFetches";
 import { formatAccountName } from "../../utils/formatters";
+import ErrorDisplay from "../ErrorDisplay";
+import Loading from "../Loading";
 
 export async function loader() {
-  const { status, errors, data } = await getCustomers();
-  return { errors, customerList: data.accountList };
+  const response = getCustomers();
+  return defer({ response });
 }
 
 export default function CustomerList() {
-  const { errors, customerList } = useLoaderData();
+  const { response } = useLoaderData();
 
-  const navigate = useNavigate();
   return (
-    <>
+    <div className="h-full lg:h-screen">
       <div className="sticky p-1 lg:p-5 top-0 z-50 bg-white shadow-sm">
         <div className="w-full flex flex-row justify-center">
           <h1 className="text-3xl font-bold">Customers</h1>
@@ -28,6 +37,29 @@ export default function CustomerList() {
           </Link>
         </div>
       </div>
+      <Suspense fallback={<Loading />}>
+        <Await
+          resolve={response}
+          errorElement={<ErrorDisplay message="Cannot load customers." />}
+        >
+          <CustomerListChildren />
+        </Await>
+      </Suspense>
+    </div>
+  );
+}
+
+function CustomerListChildren() {
+  const { status, data, errors } = useAsyncValue();
+  const navigate = useNavigate();
+
+  if (status === 503 && errors) {
+    return <p>{errors.message}</p>;
+  }
+
+  const customerList = data.accountList;
+  return (
+    <>
       <div className="overflow-x-auto w-full pt-5">
         <div className="p-2">
           <span className="badge badge-primary p-3">
