@@ -1,8 +1,8 @@
 import { redirect } from "react-router-dom";
 import { useState } from "react";
 
-import Sidebar from "../components/sideBar";
-import MobileBottomNav from "../components/mobileBottomNav";
+import Sidebar from "../components/SideBar";
+import MobileBottomNav from "../components/MobileBottomNav";
 export function loader() {
   const apiToken = window.localStorage.getItem("apiToken") || false;
   if (apiToken) {
