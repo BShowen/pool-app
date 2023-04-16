@@ -1,5 +1,15 @@
 const localHost = "http://192.168.1.74:8080";
 
+async function apiRequest({ url, options }) {
+  const response = await fetch(url, options);
+  const json = await response.json();
+  return {
+    status: response.status,
+    data: json.data,
+    errors: json.errors,
+  };
+}
+
 export async function getLoginToken(formData = {}) {
   const url = `${localHost}/companies/login`;
   const options = {
@@ -9,8 +19,8 @@ export async function getLoginToken(formData = {}) {
     },
     body: JSON.stringify(formData),
   };
-  const response = await fetch(url, options);
-  return response.json();
+
+  return apiRequest({ url, options });
 }
 
 export async function getCustomers() {
@@ -24,8 +34,8 @@ export async function getCustomers() {
       Authorization: apiToken,
     },
   };
-  const response = await fetch(url, options);
-  return response.json();
+
+  return apiRequest({ url, options });
 }
 
 export async function getCustomer({ customerId }) {
@@ -55,8 +65,8 @@ export async function createNewAccount(data) {
     },
     body: JSON.stringify(data),
   };
-  const response = await fetch(url, options);
-  return { response: await response.json(), status: response.status };
+
+  return apiRequest({ url, options });
 }
 
 export async function updateCustomer(data) {

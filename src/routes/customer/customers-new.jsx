@@ -6,23 +6,11 @@ import { createNewAccount } from "../../utils/apiFetches";
 export async function action({ request }) {
   const formData = await request.formData();
   const formObject = Object.fromEntries(formData);
-  const { response, status } = await createNewAccount(formObject);
+  const { status, data: customer, errors } = await createNewAccount(formObject);
   if (status === 201) {
-    return redirect(`/customers/${response.data._id}`);
+    return redirect(`/customers/${customer._id}`);
   } else {
-    const errorsObject = {};
-    response.errors.forEach((err) => {
-      if (err.field.includes(".")) {
-        const [_, index, field] = err.field.split(".");
-        errorsObject.accountOwners = errorsObject.accountOwners || [];
-        const subDocErrorsObject = errorsObject.accountOwners[index] || {};
-        subDocErrorsObject[field] = err.message;
-        errorsObject.accountOwners[index] = subDocErrorsObject;
-      } else {
-        errorsObject[err.field] = err.message;
-      }
-    });
-    return errorsObject;
+    return errors;
   }
 }
 

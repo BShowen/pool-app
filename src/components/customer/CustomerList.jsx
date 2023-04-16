@@ -4,14 +4,13 @@ import { getCustomers } from "../../utils/apiFetches";
 import { formatAccountName } from "../../utils/formatters";
 
 export async function loader() {
-  return await getCustomers();
+  const { status, errors, data } = await getCustomers();
+  return { errors, customerList: data.accountList };
 }
 
 export default function CustomerList() {
-  const {
-    errors,
-    data: { accounts: customerList },
-  } = useLoaderData();
+  const { errors, customerList } = useLoaderData();
+
   const navigate = useNavigate();
   return (
     <>

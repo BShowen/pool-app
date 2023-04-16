@@ -5,9 +5,7 @@ export async function action({ request, params }) {
   const formData = await request.formData();
   const { errors, data } = await getLoginToken(Object.fromEntries(formData));
   if (errors) {
-    // There is only ever one error message returned at a time when logging in.
-    const error = errors[0];
-    return { [error.field]: error.message };
+    return errors;
   } else {
     window.localStorage.setItem("apiToken", data.token);
     return redirect("/");
@@ -24,7 +22,7 @@ export function loader() {
 }
 
 export default function Login() {
-  const { email: emailError, password: passwordError } = useActionData() || {};
+  const { email, password } = useActionData() || {};
 
   return (
     <div className="pt-6">
@@ -34,10 +32,7 @@ export default function Login() {
       >
         <div>
           <div className="mb-2 block">
-            <label
-              htmlFor="email"
-              className={emailError ? "text-secondary" : undefined}
-            >
+            <label htmlFor="email" className={email ? "text-secondary" : ""}>
               Email
             </label>
           </div>
@@ -48,22 +43,22 @@ export default function Login() {
             placeholder="Email"
             name="email"
             className={`input input-bordered w-full ${
-              emailError ? "input-secondary" : undefined
+              email ? "input-secondary" : ""
             }`}
           />
           <p
             className={`mt-2 text-sm h-4 text-secondary ${
-              !emailError && "invisible"
+              (!email && "invisible") || ""
             }`}
           >
-            {emailError}
+            {email}
           </p>
         </div>
         <div>
           <div className="mb-2 block">
             <label
               htmlFor="password"
-              className={passwordError ? "text-secondary" : undefined}
+              className={password ? "text-secondary" : ""}
             >
               Password
             </label>
@@ -75,15 +70,15 @@ export default function Login() {
             placeholder="Password"
             name="password"
             className={`input input-bordered w-full ${
-              passwordError ? "input-secondary" : undefined
+              password ? "input-secondary" : ""
             }`}
           />
           <p
             className={`mt-2 text-sm h-4 text-secondary ${
-              !passwordError && "invisible"
+              !password && "invisible"
             }`}
           >
-            {passwordError}
+            {password}
           </p>
         </div>
         <button className="btn btn-primary" type="submit">
