@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import { useRef, useEffect } from "react";
 
 export default function MobileBottomNav({ isSidebarOpen, toggleSidebar }) {
   return (
-    <div className="btm-nav btm-nav-lg lg:hidden h-28">
+    <div className="btm-nav btm-nav-lg lg:hidden bg-slate-100">
+      {/* <div className="btm-nav btm-nav-lg lg:hidden h-28"> */}
       <Link as="button" to="/">
         <svg
           xmlns="http://www.w3.org/2000/svg"
