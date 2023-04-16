@@ -1,13 +1,48 @@
 const localHost = "http://192.168.1.74:8080";
 
+// Credit to Dmitri Pavlutin for this method.
+// https://dmitripavlutin.com/timeout-fetch-request/
+async function fetchWithTimeout(url, options = {}) {
+  const { timeout = 5000 } = options;
+  delete options.timeout;
+
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  const response = await fetch(url, {
+    ...options,
+    signal: controller.signal,
+  });
+  clearTimeout(id);
+  return response;
+}
+
 async function apiRequest({ url, options }) {
-  const response = await fetch(url, options);
-  const json = await response.json();
-  return {
-    status: response.status,
-    data: json.data,
-    errors: json.errors,
-  };
+  try {
+    const response = await fetchWithTimeout(url, options);
+    const json = await response.json();
+    return {
+      status: response.status,
+      data: json.data,
+      errors: json.errors,
+    };
+  } catch (error) {
+    // throw new Error("Request timed out.");
+    return {
+      status: 503, // 503 - service unavailable
+      data: undefined,
+      errors: { message: "Something went wrong. Please try that again." },
+    };
+  }
+}
+
+// Simulate a slow network.
+function delayedResponse(opts = {}) {
+  const { delay = 5000, url, options } = opts;
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(apiRequest({ url, options }));
+    }, delay);
+  });
 }
 
 export async function getLoginToken(formData = {}) {
@@ -35,6 +70,8 @@ export async function getCustomers() {
     },
   };
 
+  // Simulate a slow network.
+  // return delayedResponse({ delay: 500, url, options });
   return apiRequest({ url, options });
 }
 
@@ -49,8 +86,7 @@ export async function getCustomer({ customerId }) {
       Authorization: apiToken,
     },
   };
-  const response = await fetch(url, options);
-  return response.json();
+  return apiRequest({ url, options });
 }
 
 export async function createNewAccount(data) {
@@ -81,8 +117,7 @@ export async function updateCustomer(data) {
     },
     body: JSON.stringify(data),
   };
-  const response = await fetch(url, options);
-  return { response: await response.json(), status: response.status };
+  return apiRequest({ url, options });
 }
 
 export async function deleteCustomer(data) {
@@ -118,8 +153,7 @@ export async function getTechnicians() {
       Authorization: apiToken,
     },
   };
-  const response = await fetch(url, options);
-  return response.json();
+  return apiRequest({ url, options });
 }
 
 export async function getTechnician({ technicianId }) {
