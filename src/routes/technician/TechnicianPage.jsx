@@ -1,16 +1,18 @@
-import { useLoaderData, Outlet } from "react-router-dom";
+import { useLoaderData, Outlet, useAsyncValue } from "react-router-dom";
 
 import TechnicianTopNav from "./components/TechnicianTopNav";
 
 import { capitalizeName } from "../../utils/formatters";
-import { getTechnician } from "../../utils/apiFetches";
 
 export async function loader({ params }) {
-  const response = await getTechnician({ technicianId: params.technicianId });
-  return response.data.technician;
+  return { technicianId: params.technicianId };
 }
 export default function TechnicianPage() {
-  const technicianAccount = useLoaderData();
+  const { technicianId } = useLoaderData();
+  const { data, errors } = useAsyncValue();
+  const technicianAccount = data.technicianList.find(
+    (technician) => technician._id === technicianId
+  );
 
   return (
     <div className="w-full flex flex-col flex-wrap justify-start">
@@ -33,7 +35,7 @@ export default function TechnicianPage() {
 
       {/* Page body */}
       <div className="w-full flex flex-col justify-start items-center pt-5">
-        <Outlet />
+        <Outlet context={technicianAccount} />
       </div>
     </div>
   );

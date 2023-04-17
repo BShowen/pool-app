@@ -1,19 +1,12 @@
-import { useLoaderData, Link, useNavigate } from "react-router-dom";
-import { getTechnicians } from "../../../utils/apiFetches";
+import { useAsyncValue, Link, useNavigate } from "react-router-dom";
 
 import { capitalizeName } from "../../../utils/formatters";
 
-export async function loader() {
-  return await getTechnicians();
-}
-
 export default function TechnicianList() {
-  const {
-    errors,
-    data: { technicians: technicianList },
-  } = useLoaderData();
-
+  const { data, errors } = useAsyncValue();
   const navigate = useNavigate();
+  const technicianList = data.technicianList;
+
   return (
     <>
       <div className="sticky p-1 lg:p-5 top-0 z-50 bg-white shadow-sm">

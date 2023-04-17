@@ -30,7 +30,9 @@ import CustomerDashboard from "./routes/customer/components/CustomerDashboard";
 import CustomerList from "./routes/customer/components/CustomerList";
 
 /* -------------------- Technician routes -------------------- */
-import TechniciansPage from "./routes/technician/TechniciansPage";
+import TechniciansPage, {
+  loader as techniciansPageLoader,
+} from "./routes/technician/TechniciansPage";
 import TechnicianPage, {
   loader as technicianPageLoader,
 } from "./routes/technician/TechnicianPage";
@@ -39,9 +41,7 @@ import NewTechnicianPage, {
 } from "./routes/technician/NewTechnicianPage";
 
 /* -------------------- Technician components -------------------- */
-import TechnicianList, {
-  loader as technicianListLoader,
-} from "./routes/technician/components/TechnicianList";
+import TechnicianList from "./routes/technician/components/TechnicianList";
 import TechnicianDashboard from "./routes/technician/TechnicianDashBoard";
 
 const router = createBrowserRouter([
@@ -94,11 +94,12 @@ const router = createBrowserRouter([
       {
         path: "/technicians",
         element: <TechniciansPage />,
+        id: "technician-root",
+        loader: techniciansPageLoader,
         children: [
           {
             index: true,
             element: <TechnicianList />,
-            loader: technicianListLoader,
           },
           {
             path: "/technicians/new",
@@ -113,7 +114,6 @@ const router = createBrowserRouter([
               {
                 index: true,
                 element: <TechnicianDashboard />,
-                loader: technicianPageLoader,
               },
               {
                 path: "/technicians/:technicianId/edit",

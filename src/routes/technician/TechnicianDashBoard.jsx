@@ -1,4 +1,4 @@
-import { useSubmit, useNavigate, useLoaderData } from "react-router-dom";
+import { useSubmit, useNavigate, useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import { capitalizeName } from "../../utils/formatters";
 
@@ -6,7 +6,7 @@ export default function TechnicianDashboard() {
   const submit = useSubmit();
   const navigate = useNavigate();
   const [replace, setReplace] = useState(false);
-  const technician = useLoaderData();
+  const technician = useOutletContext();
 
   return (
     <div className="card bg-base-100 w-full lg:w-3/5 lg:shadow-lg">
