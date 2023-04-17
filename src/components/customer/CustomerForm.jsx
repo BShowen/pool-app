@@ -89,6 +89,7 @@ export default function CustomerForm({
               }`}
               value={state.accountName || ""}
               onInput={updateState}
+              autoFocus
             />
 
             <label className="label">
