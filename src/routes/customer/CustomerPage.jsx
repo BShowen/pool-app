@@ -1,13 +1,13 @@
 import { useLoaderData, Outlet, useAsyncValue } from "react-router-dom";
 
-import CustomerTopNav from "../../components/customer/CustomerTopNav";
+import CustomerTopNav from "./components/CustomerTopNav";
 
 import { formatAccountName } from "../../utils/formatters";
 
 export async function loader({ params }) {
   return { customerId: params.customerId };
 }
-export default function Customer() {
+export default function CustomerPage() {
   const { customerId } = useLoaderData();
   const { data, errors } = useAsyncValue();
   const customerAccount = data.accountList.find(

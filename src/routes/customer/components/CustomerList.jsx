@@ -5,7 +5,7 @@ import {
   useRouteLoaderData,
 } from "react-router-dom";
 
-import { formatAccountName } from "../../utils/formatters";
+import { formatAccountName } from "../../../utils/formatters";
 
 export default function CustomerList() {
   const navigate = useNavigate();

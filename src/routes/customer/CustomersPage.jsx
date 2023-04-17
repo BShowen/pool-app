@@ -12,7 +12,7 @@ export async function loader() {
     response,
   });
 }
-export default function Customers() {
+export default function CustomersPage() {
   const { response } = useLoaderData();
   return (
     <Suspense fallback={<Loading />}>

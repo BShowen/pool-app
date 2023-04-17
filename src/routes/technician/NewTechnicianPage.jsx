@@ -1,7 +1,7 @@
 import { redirect, useActionData } from "react-router-dom";
 
 import { createNewTechnician } from "../../utils/apiFetches";
-import TechnicianForm from "../../components/technician/TechnicianForm";
+import TechnicianForm from "./components/TechnicianForm";
 
 export async function action({ request }) {
   const formData = await request.formData();
@@ -18,7 +18,7 @@ export async function action({ request }) {
   }
 }
 
-export default function NewTechnicianForm() {
+export default function NewTechnicianPage() {
   const errors = useActionData() || {};
   return (
     <div className="w-full flex flex-row justify-center bg-white">

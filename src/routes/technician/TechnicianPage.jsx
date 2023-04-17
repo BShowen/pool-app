@@ -1,6 +1,6 @@
 import { useLoaderData, Outlet } from "react-router-dom";
 
-import TechnicianTopNav from "../../components/technician/TechnicianTopNav";
+import TechnicianTopNav from "./components/TechnicianTopNav";
 
 import { capitalizeName } from "../../utils/formatters";
 import { getTechnician } from "../../utils/apiFetches";
@@ -9,7 +9,7 @@ export async function loader({ params }) {
   const response = await getTechnician({ technicianId: params.technicianId });
   return response.data.technician;
 }
-export default function Technician() {
+export default function TechnicianPage() {
   const technicianAccount = useLoaderData();
 
   return (

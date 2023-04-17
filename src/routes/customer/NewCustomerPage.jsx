@@ -1,6 +1,6 @@
 import { redirect, useActionData } from "react-router-dom";
 
-import CustomerForm from "../../components/customer/CustomerForm";
+import CustomerForm from "./components/CustomerForm";
 import { createNewAccount } from "../../utils/apiFetches";
 
 export async function action({ request }) {
@@ -14,7 +14,7 @@ export async function action({ request }) {
   }
 }
 
-export default function newCustomerForm() {
+export default function NewCustomerPage() {
   const errors = useActionData() || {};
   return (
     <div className="w-full flex flex-row justify-center bg-white">

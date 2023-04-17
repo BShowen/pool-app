@@ -1,6 +1,6 @@
 import { useActionData, redirect, useOutletContext } from "react-router-dom";
 
-import CustomerForm from "../../components/customer/CustomerForm";
+import CustomerForm from "./components/CustomerForm";
 import { deleteCustomer, updateCustomer } from "../../utils/apiFetches";
 
 export async function action({ request }) {

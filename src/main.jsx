@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import "./index.css";
 
@@ -10,30 +10,39 @@ import Login, {
   action as loginAction,
   loader as loginLoader,
 } from "./routes/login";
-import Customers, {
-  loader as CustomerPageLoader,
-} from "./routes/customer/customers";
-import CustomerList from "./components/customer/CustomerList";
-import NewCustomerForm, {
-  action as newCustomerAction,
-} from "./routes/customer/customers-new";
-import Customer, { loader as customerLoader } from "./routes/customer/customer";
-import CustomerDashboard from "./components/customer/CustomerDashboard";
-import CustomerEdit, {
-  action as customerEditAction,
-} from "./routes/customer/customer-edit";
 
-import Technicians from "./routes/technician/Technicians";
-import Technician, {
-  loader as technicianLoader,
-} from "./routes/technician/Technician";
+/* -------------------- Customer routes -------------------- */
+import CustomersPage, {
+  loader as customersPageLoader,
+} from "./routes/customer/CustomersPage";
+import NewCustomerPage, {
+  action as newCustomerPageAction,
+} from "./routes/customer/NewCustomerPage";
+import CustomerPage, {
+  loader as customerPageLoader,
+} from "./routes/customer/CustomerPage";
+import CustomerEditPage, {
+  action as customerEditPageAction,
+} from "./routes/customer/CustomerEditPage";
+
+/* -------------------- Customer components -------------------- */
+import CustomerDashboard from "./routes/customer/components/CustomerDashboard";
+import CustomerList from "./routes/customer/components/CustomerList";
+
+/* -------------------- Technician routes -------------------- */
+import TechniciansPage from "./routes/technician/TechniciansPage";
+import TechnicianPage, {
+  loader as technicianPageLoader,
+} from "./routes/technician/TechnicianPage";
+import NewTechnicianPage, {
+  action as newTechnicianPageAction,
+} from "./routes/technician/NewTechnicianPage";
+
+/* -------------------- Technician components -------------------- */
 import TechnicianList, {
   loader as technicianListLoader,
-} from "./components/technician/TechnicianList";
-import TechnicianDashboard from "./components/technician/TechnicianDashBoard";
-import NewTechnician, {
-  action as newTechnicianAction,
-} from "./routes/technician/NewTechnician";
+} from "./routes/technician/components/TechnicianList";
+import TechnicianDashboard from "./routes/technician/TechnicianDashBoard";
 
 const router = createBrowserRouter([
   {
@@ -43,9 +52,9 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/customers",
-        element: <Customers />,
+        element: <CustomersPage />,
         id: "customer-root",
-        loader: CustomerPageLoader,
+        loader: customersPageLoader,
         children: [
           {
             index: true,
@@ -53,13 +62,13 @@ const router = createBrowserRouter([
           },
           {
             path: "/customers/new",
-            element: <NewCustomerForm />,
-            action: newCustomerAction,
+            element: <NewCustomerPage />,
+            action: newCustomerPageAction,
           },
           {
             path: "/customers/:customerId",
-            element: <Customer />,
-            loader: customerLoader,
+            element: <CustomerPage />,
+            loader: customerPageLoader,
             children: [
               {
                 index: true,
@@ -67,9 +76,8 @@ const router = createBrowserRouter([
               },
               {
                 path: "/customers/:customerId/edit",
-                element: <CustomerEdit />,
-                action: customerEditAction,
-                loader: customerLoader,
+                element: <CustomerEditPage />,
+                action: customerEditPageAction,
               },
               {
                 path: "/customers/:customerId/pool-reports",
@@ -85,7 +93,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/technicians",
-        element: <Technicians />,
+        element: <TechniciansPage />,
         children: [
           {
             index: true,
@@ -94,26 +102,26 @@ const router = createBrowserRouter([
           },
           {
             path: "/technicians/new",
-            element: <NewTechnician />,
-            action: newTechnicianAction,
+            element: <NewTechnicianPage />,
+            action: newTechnicianPageAction,
           },
           {
             path: "/technicians/:technicianId",
-            element: <Technician />,
-            loader: technicianLoader,
+            element: <TechnicianPage />,
+            loader: technicianPageLoader,
             children: [
               {
                 index: true,
                 element: <TechnicianDashboard />,
-                loader: technicianLoader,
-              },
-              {
-                path: "/technicians/:technicianId/routes",
-                element: <p>Routes</p>,
+                loader: technicianPageLoader,
               },
               {
                 path: "/technicians/:technicianId/edit",
                 element: <p>Edit technician</p>,
+              },
+              {
+                path: "/technicians/:technicianId/routes",
+                element: <p>Routes</p>,
               },
             ],
           },

@@ -1,7 +1,7 @@
 import { useLoaderData, Link, useNavigate } from "react-router-dom";
-import { getTechnicians } from "../../utils/apiFetches";
+import { getTechnicians } from "../../../utils/apiFetches";
 
-import { capitalizeName } from "../../utils/formatters";
+import { capitalizeName } from "../../../utils/formatters";
 
 export async function loader() {
   return await getTechnicians();
