@@ -1,16 +1,18 @@
-import { useLoaderData, Outlet } from "react-router-dom";
+import { useLoaderData, Outlet, useAsyncValue } from "react-router-dom";
 
 import CustomerTopNav from "../../components/customer/CustomerTopNav";
 
 import { formatAccountName } from "../../utils/formatters";
-import { getCustomer } from "../../utils/apiFetches";
 
 export async function loader({ params }) {
-  const response = await getCustomer({ customerId: params.customerId });
-  return response.data.customer;
+  return { customerId: params.customerId };
 }
 export default function Customer() {
-  const customerAccount = useLoaderData();
+  const { customerId } = useLoaderData();
+  const { data, errors } = useAsyncValue();
+  const customerAccount = data.accountList.find(
+    (customer) => customer._id === customerId
+  );
 
   return (
     <div className="w-full flex flex-col flex-wrap justify-start">
@@ -30,7 +32,7 @@ export default function Customer() {
 
       {/* Page body */}
       <div className="w-full flex flex-col justify-start items-center pt-5">
-        <Outlet />
+        <Outlet context={{ customerAccount }} />
       </div>
     </div>
   );

@@ -1,13 +1,12 @@
-import { useSubmit, useNavigate, useLoaderData } from "react-router-dom";
+import { useSubmit, useNavigate, useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import { capitalizeName, formatAccountName } from "../../utils/formatters";
-import { getCustomer } from "../../utils/apiFetches";
 
 export default function CustomerDashboard() {
   const submit = useSubmit();
   const navigate = useNavigate();
   const [replace, setReplace] = useState(false);
-  const customerAccount = useLoaderData();
+  const { customerAccount } = useOutletContext();
 
   return (
     <div className="card bg-base-100 w-full lg:w-3/5 lg:shadow-lg">

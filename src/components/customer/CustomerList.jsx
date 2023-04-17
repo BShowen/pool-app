@@ -1,25 +1,16 @@
 import {
-  useLoaderData,
   Link,
-  Await,
-  defer,
   useAsyncValue,
   useNavigate,
+  useRouteLoaderData,
 } from "react-router-dom";
-import { Suspense } from "react";
 
-import { getCustomers } from "../../utils/apiFetches";
 import { formatAccountName } from "../../utils/formatters";
-import ErrorDisplay from "../ErrorDisplay";
-import Loading from "../Loading";
-
-export async function loader() {
-  const response = getCustomers();
-  return defer({ response });
-}
 
 export default function CustomerList() {
-  const { response } = useLoaderData();
+  const navigate = useNavigate();
+  const { data, error } = useAsyncValue();
+  const customerList = data.accountList || [];
 
   return (
     <div className="h-full lg:h-screen">
@@ -37,29 +28,7 @@ export default function CustomerList() {
           </Link>
         </div>
       </div>
-      <Suspense fallback={<Loading />}>
-        <Await
-          resolve={response}
-          errorElement={<ErrorDisplay message="Cannot load customers." />}
-        >
-          <CustomerListChildren />
-        </Await>
-      </Suspense>
-    </div>
-  );
-}
 
-function CustomerListChildren() {
-  const { status, data, errors } = useAsyncValue();
-  const navigate = useNavigate();
-
-  if (status === 503 && errors) {
-    return <p>{errors.message}</p>;
-  }
-
-  const customerList = data.accountList;
-  return (
-    <>
       <div className="overflow-x-auto w-full pt-5">
         <div className="p-2">
           <span className="badge badge-primary p-3">
@@ -86,6 +55,6 @@ function CustomerListChildren() {
           </tbody>
         </table>
       </div>
-    </>
+    </div>
   );
 }

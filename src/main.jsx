@@ -10,10 +10,10 @@ import Login, {
   action as loginAction,
   loader as loginLoader,
 } from "./routes/login";
-import Customers from "./routes/customer/customers";
-import CustomerList, {
-  loader as customerListLoader,
-} from "./components/customer/CustomerList";
+import Customers, {
+  loader as CustomerPageLoader,
+} from "./routes/customer/customers";
+import CustomerList from "./components/customer/CustomerList";
 import NewCustomerForm, {
   action as newCustomerAction,
 } from "./routes/customer/customers-new";
@@ -44,11 +44,12 @@ const router = createBrowserRouter([
       {
         path: "/customers",
         element: <Customers />,
+        id: "customer-root",
+        loader: CustomerPageLoader,
         children: [
           {
             index: true,
             element: <CustomerList />,
-            loader: customerListLoader,
           },
           {
             path: "/customers/new",
@@ -63,7 +64,6 @@ const router = createBrowserRouter([
               {
                 index: true,
                 element: <CustomerDashboard />,
-                loader: customerLoader,
               },
               {
                 path: "/customers/:customerId/edit",

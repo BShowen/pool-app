@@ -1,4 +1,4 @@
-import { useActionData, useLoaderData, redirect } from "react-router-dom";
+import { useActionData, redirect, useOutletContext } from "react-router-dom";
 
 import CustomerForm from "../../components/customer/CustomerForm";
 import { deleteCustomer, updateCustomer } from "../../utils/apiFetches";
@@ -18,9 +18,9 @@ export async function action({ request }) {
       return false;
     }
   } else {
-    const { response, status } = await updateCustomer(formObject);
+    const { status, data, errors } = await updateCustomer(formObject);
     if (status === 200) {
-      return redirect(`/customers/${response.data._id}`);
+      return redirect(`/customers/${data._id}`);
     } else {
       const errorsObject = {};
       response.errors.forEach((err) => {
@@ -39,7 +39,7 @@ export async function action({ request }) {
   }
 }
 export default function CustomerEdit() {
-  const customerAccount = useLoaderData();
+  const { customerAccount } = useOutletContext();
   const errors = useActionData() || {};
   return (
     <CustomerForm
