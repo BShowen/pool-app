@@ -6,15 +6,11 @@ import TechnicianForm from "./components/TechnicianForm";
 export async function action({ request }) {
   const formData = await request.formData();
   const formObject = Object.fromEntries(formData);
-  const { response, status } = await createNewTechnician(formObject);
+  const { status, data, errors } = await createNewTechnician(formObject);
   if (status === 201) {
-    return redirect(`/technicians/${response.data.technician.id}`);
+    return redirect(`/technicians/${data.technician.id}`);
   } else {
-    const errorsObject = {};
-    response.errors.forEach((err) => {
-      errorsObject[err.field] = err.message;
-    });
-    return errorsObject;
+    return errors;
   }
 }
 
@@ -25,7 +21,6 @@ export default function NewTechnicianPage() {
       <TechnicianForm
         title={"New technician"}
         action={"/technicians/new"}
-        values={{}}
         errors={errors}
       />
     </div>
