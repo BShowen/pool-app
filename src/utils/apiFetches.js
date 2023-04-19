@@ -183,6 +183,5 @@ export async function createNewTechnician(data) {
     },
     body: JSON.stringify(data),
   };
-  const response = await fetch(url, options);
-  return { response: await response.json(), status: response.status };
+  return apiRequest({ url, options });
 }
