@@ -1,5 +1,7 @@
-import { useState } from "react";
 import { Form, useNavigate, useSubmit } from "react-router-dom";
+
+import useInput from "../../../hooks/useInput";
+import { useEffect, useState } from "react";
 export default function TechnicianForm({
   title,
   action,
@@ -12,162 +14,69 @@ export default function TechnicianForm({
 }) {
   const navigate = useNavigate();
   const submit = useSubmit();
-  const [state, setState] = useState({
-    firstName: {
-      value: defaultValues?.firstName || "",
-      validated: false,
-      valid: function () {
-        return this.value.trim().length > 0;
-      },
-      validatedAndInvalid: function () {
-        return this.validated && !this.valid();
-      },
-      label: function () {
-        return this.validated == this.valid()
-          ? "First name"
-          : "First name is required";
-      },
-      labelClassList: function () {
-        if (this.validatedAndInvalid()) {
-          return "text-secondary";
-        } else {
-          return "";
-        }
-      },
-      inputClassList: function (validationErrors) {
-        if (validationErrors.firstName || this.validatedAndInvalid()) {
-          return "input-secondary";
-        } else {
-          return "";
-        }
-      },
-    },
-    lastName: {
-      value: defaultValues?.lastName || "",
-      validated: false,
-      valid: function () {
-        return this.value.trim().length > 0;
-      },
-      validatedAndInvalid: function () {
-        return this.validated && !this.valid();
-      },
-      label: function () {
-        return this.validated == this.valid()
-          ? "Last name"
-          : "Last name is required";
-      },
-      labelClassList: function () {
-        if (this.validatedAndInvalid()) {
-          return "text-secondary";
-        } else {
-          return "";
-        }
-      },
-      inputClassList: function (validationErrors) {
-        if (validationErrors.lastName || this.validatedAndInvalid()) {
-          return "input-secondary";
-        } else {
-          return "";
-        }
-      },
-    },
-    emailAddress: {
-      value: defaultValues?.emailAddress || "",
-      validated: false,
-      valid: function () {
-        return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
-          this.value.trim()
-        );
-      },
-      validatedAndInvalid: function () {
-        return this.validated && !this.valid();
-      },
-      label: function () {
-        return this.validated == this.valid()
-          ? "Email address"
-          : "Email address is required";
-      },
-      labelClassList: function () {
-        if (this.validatedAndInvalid()) {
-          return "text-secondary";
-        } else {
-          return "";
-        }
-      },
-      inputClassList: function (validationErrors) {
-        if (validationErrors.emailAddress || this.validatedAndInvalid()) {
-          return "input-secondary";
-        } else {
-          return "";
-        }
-      },
-    },
-    password: {
-      value: defaultValues?.password || "",
-      validated: false,
-      valid: function () {
-        return this.value.trim().length > 0;
-      },
-      validatedAndInvalid: function () {
-        return this.validated && !this.valid();
-      },
-      label: function () {
-        return this.validated == this.valid()
-          ? "Password"
-          : "Password is required";
-      },
-      labelClassList: function () {
-        if (this.validatedAndInvalid()) {
-          return "text-secondary";
-        } else {
-          return "";
-        }
-      },
-      inputClassList: function (validationErrors) {
-        if (validationErrors.password || this.validatedAndInvalid()) {
-          return "input-secondary";
-        } else {
-          return "";
-        }
-      },
+
+  const [firstName] = useInput({
+    value: defaultValues?.firstName || "",
+    type: "text",
+    name: "firstName",
+    placeholder: "First name",
+    labelValue: "First name",
+    error: "First name is required",
+    autoFocus: true,
+  });
+
+  const [lastName] = useInput({
+    value: defaultValues?.lastName || "",
+    type: "text",
+    name: "lastName",
+    placeholder: "Last name",
+    labelValue: "Last name",
+    error: "Last name is required",
+  });
+
+  const [password] = useInput({
+    type: "password",
+    name: "password",
+    placeholder: "Password",
+    labelValue: "Password",
+    error: "Password is required",
+  });
+
+  const [email, setEmailError] = useInput({
+    value: defaultValues?.emailAddress || "",
+    type: "email",
+    name: "emailAddress",
+    placeholder: "Email address",
+    labelValue: "Email",
+    error: "Email is invalid",
+    validator: function () {
+      return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
+        this.value.trim()
+      );
     },
   });
 
-  function handleInput(e) {
-    e.preventDefault();
-    const name = e.target.name;
-    setState((prevState) => {
-      return {
-        ...prevState,
-        [name]: {
-          ...prevState[name],
-          value: e.target.value,
-          validated: true,
-        },
-      };
-    });
-  }
-
   function handleSubmit(e) {
     e.preventDefault();
-    let isValid = true;
-    for (const fieldName in state) {
-      if (state[fieldName].valid()) {
-        continue;
-      } else {
-        isValid = false;
-        setState((prevState) => {
-          return {
-            ...prevState,
-            [fieldName]: { ...prevState[fieldName], validated: true },
-          };
-        });
-      }
-    }
+
+    // make sure all fields are valid
+    const isValid = ![
+      firstName.validate(),
+      lastName.validate(),
+      email.validate(),
+      password.validate(),
+    ].includes(false);
+
     if (isValid) {
-      submit(e.currentTarget);
+      return submit(e.currentTarget);
     }
   }
+
+  useEffect(() => {
+    if (errors.emailAddress) {
+      setEmailError(errors.emailAddress);
+    }
+  }, [errors]);
 
   return (
     <Form
@@ -184,71 +93,42 @@ export default function TechnicianForm({
         <div className="w-full flex flex-col gap-10 lg:w-1/4 lg:mx-auto lg:pb-40">
           <div className="w-full rounded-lg px-2 py-3 bg-slate-100">
             <label className="label">
-              <span
-                className={`label-text ${state.firstName.labelClassList()}`}
-              >
-                {state.firstName.label()}
+              <span className={`label-text ${firstName.label.className}`}>
+                {firstName.label.value}
               </span>
             </label>
             <input
-              type="text"
-              placeholder="First name"
-              name="firstName"
-              className={`input input-bordered w-full focus:outline-none 
-              ${state.firstName.inputClassList(errors)}`}
-              value={state.firstName.value}
-              onChange={handleInput}
-              // onBlur={handleInput}
-              autoFocus
-            />
-
-            <label className="label">
-              <span className={`label-text ${state.lastName.labelClassList()}`}>
-                {errors.lastName || state.lastName.label()}
-              </span>
-            </label>
-            <input
-              type="text"
-              placeholder="Last name"
-              name="lastName"
-              className={`input input-bordered w-full focus:outline-none 
-              ${state.lastName.inputClassList(errors)}`}
-              value={state.lastName.value}
-              onChange={handleInput}
+              {...firstName.input}
               // onBlur={handleInput}
             />
 
             <label className="label">
-              <span
-                className={`label-text ${state.emailAddress.labelClassList()}`}
-              >
-                {errors.emailAddress || state.emailAddress.label()}
+              <span className={`label-text ${lastName.label.className}`}>
+                {lastName.label.value}
               </span>
             </label>
             <input
-              type="email"
-              placeholder="Email address"
-              name="emailAddress"
-              className={`input input-bordered w-full focus:outline-none
-                  ${state.emailAddress.inputClassList(errors)}`}
-              value={state.emailAddress.value}
-              onChange={handleInput}
+              {...lastName.input}
               // onBlur={handleInput}
             />
 
             <label className="label">
-              <span className={`label-text ${state.password.labelClassList()}`}>
-                {errors.password || state.password.label()}
+              <span className={`label-text ${email.label.className}`}>
+                {email.label.value}
               </span>
             </label>
             <input
-              type="password"
-              placeholder="Password"
-              name="password"
-              value={state.password.value}
-              className={`input input-bordered w-full focus:outline-none
-                  ${state.password.inputClassList(errors)}`}
-              onChange={handleInput}
+              {...email.input}
+              // onBlur={handleInput}
+            />
+
+            <label className="label">
+              <span className={`label-text ${password.label.className}`}>
+                {password.label.value}
+              </span>
+            </label>
+            <input
+              {...password.input}
               // onBlur={handleInput}
             />
           </div>
@@ -272,6 +152,15 @@ export default function TechnicianForm({
           </div>
         </div>
       </div>
+      <button
+        type="button"
+        onClick={() => {
+          console.log("works");
+          setEmailError("Works?");
+        }}
+      >
+        CLick me
+      </button>
     </Form>
   );
 }
