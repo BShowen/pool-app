@@ -152,15 +152,6 @@ export default function TechnicianForm({
           </div>
         </div>
       </div>
-      <button
-        type="button"
-        onClick={() => {
-          console.log("works");
-          setEmailError("Works?");
-        }}
-      >
-        CLick me
-      </button>
     </Form>
   );
 }
