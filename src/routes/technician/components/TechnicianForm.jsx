@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 export default function TechnicianForm({
   title,
   action,
-  defaultValues,
+  technician,
 
   // errors parameters are backend validation errors.
   // This is populated only when an invalid form has been submitted.
@@ -16,7 +16,7 @@ export default function TechnicianForm({
   const submit = useSubmit();
 
   const [firstName] = useInput({
-    value: defaultValues?.firstName || "",
+    value: technician?.firstName || "",
     type: "text",
     name: "firstName",
     placeholder: "First name",
@@ -26,7 +26,7 @@ export default function TechnicianForm({
   });
 
   const [lastName] = useInput({
-    value: defaultValues?.lastName || "",
+    value: technician?.lastName || "",
     type: "text",
     name: "lastName",
     placeholder: "Last name",
@@ -43,7 +43,7 @@ export default function TechnicianForm({
   });
 
   const [email, setEmailError] = useInput({
-    value: defaultValues?.emailAddress || "",
+    value: technician?.emailAddress || "",
     type: "email",
     name: "emailAddress",
     placeholder: "Email address",
@@ -68,7 +68,13 @@ export default function TechnicianForm({
     ].includes(false);
 
     if (isValid) {
-      return submit(e.currentTarget);
+      const formData = new FormData(e.currentTarget);
+      if (technician) {
+        // If technician is truthy then we are editing a technician
+        // and not creating a new one.
+        formData.set("technicianId", technician._id);
+      }
+      return submit(formData, { method: "post", action: action });
     }
   }
 
@@ -82,7 +88,7 @@ export default function TechnicianForm({
     <Form
       className="flex flex-col w-full px-5"
       method="post"
-      action={action}
+      action="/"
       onSubmit={handleSubmit}
     >
       <div>

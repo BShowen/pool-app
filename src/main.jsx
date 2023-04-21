@@ -40,6 +40,10 @@ import NewTechnicianPage, {
   action as newTechnicianPageAction,
 } from "./routes/technician/NewTechnicianPage";
 
+import TechnicianEditPage, {
+  action as technicianEditPageAction,
+} from "./routes/technician/TechnicianEditPage";
+
 /* -------------------- Technician components -------------------- */
 import TechnicianList from "./routes/technician/components/TechnicianList";
 import TechnicianDashboard from "./routes/technician/TechnicianDashBoard";
@@ -117,7 +121,8 @@ const router = createBrowserRouter([
               },
               {
                 path: "/technicians/:technicianId/edit",
-                element: <p>Edit technician</p>,
+                element: <TechnicianEditPage />,
+                action: technicianEditPageAction,
               },
               {
                 path: "/technicians/:technicianId/routes",

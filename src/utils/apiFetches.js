@@ -185,3 +185,18 @@ export async function createNewTechnician(data) {
   };
   return apiRequest({ url, options });
 }
+
+export async function updateTechnician(data) {
+  const apiToken = window.localStorage.getItem("apiToken");
+  if (!apiToken) return;
+  const url = `${localHost}/companies/technicians/update`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: apiToken,
+    },
+    body: JSON.stringify(data),
+  };
+  return apiRequest({ url, options });
+}
