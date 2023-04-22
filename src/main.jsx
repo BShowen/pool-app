@@ -44,6 +44,11 @@ import TechnicianEditPage, {
   action as technicianEditPageAction,
 } from "./routes/technician/TechnicianEditPage";
 
+import RegisterPage, {
+  loader as registerPageLoader,
+  action as registerPageAction,
+} from "./routes/technician/RegisterPage";
+
 /* -------------------- Technician components -------------------- */
 import TechnicianList from "./routes/technician/components/TechnicianList";
 import TechnicianDashboard from "./routes/technician/TechnicianDashBoard";
@@ -143,6 +148,12 @@ const router = createBrowserRouter([
     element: <Login />,
     loader: loginLoader,
     action: loginAction,
+  },
+  {
+    path: "/technicians/register",
+    element: <RegisterPage />,
+    loader: registerPageLoader,
+    action: registerPageAction,
   },
 ]);
 

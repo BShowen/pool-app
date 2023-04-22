@@ -200,3 +200,44 @@ export async function updateTechnician(data) {
   };
   return apiRequest({ url, options });
 }
+
+export async function getRegistrationTechnician({
+  technicianId,
+  registrationSecret,
+}) {
+  const url = `${localHost}/companies/technicians/get-technician-for-registration`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ technicianId, registrationSecret }),
+  };
+  const response = await apiRequest({ url, options });
+  return response;
+}
+
+export async function registerTechnician({
+  firstName,
+  lastName,
+  password,
+  technicianId,
+  registrationSecret,
+}) {
+  const url = `${localHost}/companies/technicians/confirm-technician-registration`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      technicianId,
+      registrationSecret,
+      firstName,
+      lastName,
+      password,
+    }),
+  };
+  const response = await apiRequest({ url, options });
+  return response;
+}
