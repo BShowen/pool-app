@@ -183,6 +183,7 @@ export async function createNewTechnician(data) {
     },
     body: JSON.stringify(data),
   };
+  // return delayedResponse({ delay: 1500, url, options });
   return apiRequest({ url, options });
 }
 

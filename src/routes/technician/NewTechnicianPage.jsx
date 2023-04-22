@@ -1,7 +1,8 @@
-import { redirect, useActionData } from "react-router-dom";
+import { redirect, useActionData, useNavigation } from "react-router-dom";
 import { useEffect } from "react";
 
 import TechnicianForm from "./components/TechnicianForm";
+import LoadingOverlay from "../../components/LoadingOverlay";
 import { createNewTechnician } from "../../utils/apiFetches";
 import useInput from "../../hooks/useInput";
 
@@ -21,6 +22,8 @@ export async function action({ request }) {
 
 export default function NewTechnicianPage() {
   const errors = useActionData() || {};
+  const navigation = useNavigation();
+
   const [firstName] = useInput({
     value: "",
     type: "text",
@@ -61,9 +64,14 @@ export default function NewTechnicianPage() {
   }, [errors]);
 
   return (
-    <TechnicianForm
-      inputs={[firstName, lastName, email]}
-      title={"New technician"}
-    />
+    <>
+      {/* LoadingOverlay is conditionally rendered. Only when submitting. */}
+      <LoadingOverlay />
+      <TechnicianForm
+        inputs={[firstName, lastName, email]}
+        title={"New technician"}
+      />
+    </>
   );
+  // }
 }
