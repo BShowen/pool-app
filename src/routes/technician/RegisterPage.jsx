@@ -6,6 +6,7 @@ import {
 } from "../../utils/apiFetches";
 import TechnicianForm from "./components/TechnicianForm";
 import ErrorDisplay from "../../components/ErrorDisplay";
+import useInput from "../../hooks/useInput";
 
 export async function loader({ request }) {
   const url = new URL(request.url);
@@ -28,8 +29,8 @@ export async function action({ request }) {
     ...formObject,
     registrationSecret,
   });
-  const { status, data, errors } = response;
-  if (Number.parseInt(status) === 200) {
+  const { status, errors } = response;
+  if (Number.parseInt(status) === 204) {
     return redirect("/login");
   } else {
     return errors;
@@ -37,8 +38,51 @@ export async function action({ request }) {
 }
 export default function RegisterPage() {
   const response = useLoaderData();
-  const technician = response.data?.technician;
+  const technician = response.data?.technician || {};
   const errors = response.errors;
+
+  const [firstName] = useInput({
+    value: technician.firstName,
+    type: "text",
+    name: "firstName",
+    placeholder: "First name",
+    labelValue: "First name",
+    error: "First name is required",
+    autoFocus: true,
+  });
+
+  const [lastName] = useInput({
+    value: technician.lastName,
+    type: "text",
+    name: "lastName",
+    placeholder: "Last name",
+    labelValue: "Last name",
+    error: "Last name is required",
+  });
+
+  const [email] = useInput({
+    value: technician.emailAddress,
+    type: "email",
+    name: "emailAddress",
+    placeholder: "Email address",
+    labelValue: "Email",
+    error: "Email is invalid",
+    disabled: true,
+    validator: function () {
+      return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
+        this.value.trim()
+      );
+    },
+  });
+
+  const [password] = useInput({
+    value: "",
+    type: "password",
+    name: "password",
+    placeholder: "Password",
+    labelValue: "Password",
+    error: "Password is required",
+  });
 
   if (errors) {
     return <ErrorDisplay message={errors.message} />;
@@ -46,9 +90,9 @@ export default function RegisterPage() {
     return (
       <TechnicianForm
         title="Registration"
-        action=""
         technician={technician}
         errors={{}}
+        inputs={[firstName, lastName, email, password]}
       />
     );
   }
