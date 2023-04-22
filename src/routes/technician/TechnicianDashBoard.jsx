@@ -47,7 +47,7 @@ export default function TechnicianDashboard() {
               );
               if (canDelete) {
                 const formData = new FormData();
-                formData.set("_id", technician._id);
+                formData.set("technicianId", technician._id);
                 formData.set("intent", "DELETE");
                 submit(formData, {
                   method: "post",

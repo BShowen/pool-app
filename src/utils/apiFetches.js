@@ -242,3 +242,25 @@ export async function registerTechnician({
   const response = await apiRequest({ url, options });
   return response;
 }
+
+export async function deleteTechnician({ technicianId }) {
+  const apiToken = window.localStorage.getItem("apiToken");
+  if (!apiToken) return;
+  const url = `${localHost}/companies/technicians/delete`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: apiToken,
+    },
+    body: JSON.stringify({ technicianId }),
+  };
+  const response = await fetch(url, options);
+  if (response.status == "204") {
+    return { response, errors: null };
+  } else {
+    console.log("errors");
+    const json = await response.json();
+    return { response, errors: json.errors };
+  }
+}

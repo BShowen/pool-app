@@ -1,7 +1,7 @@
 import { useActionData, redirect, useOutletContext } from "react-router-dom";
 import { useEffect } from "react";
 
-import { updateTechnician } from "../../utils/apiFetches";
+import { updateTechnician, deleteTechnician } from "../../utils/apiFetches";
 import TechnicianForm from "./components/TechnicianForm";
 import useInput from "../../hooks/useInput";
 
@@ -10,9 +10,11 @@ export async function action({ request }) {
   const formObject = Object.fromEntries(formData);
 
   if (formObject.intent === "DELETE") {
-    const { response, errors } = await deleteCustomer(formObject);
+    const { response, errors } = await deleteTechnician({
+      technicianId: formObject.technicianId,
+    });
     if (response.status == "204") {
-      return redirect("/customers");
+      return redirect("/technicians");
     } else {
       console.log("error deleting customer", errors);
       return false;
