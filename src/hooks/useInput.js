@@ -101,6 +101,7 @@ export default function useInput(options = {}) {
         name: options.name || "",
         className: `input input-bordered w-full focus:outline-none  ${inputClassList()}`,
         autoFocus: options.autoFocus || false,
+        disabled: options.disabled || false,
         onChange,
       },
       /**

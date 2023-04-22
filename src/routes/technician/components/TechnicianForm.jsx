@@ -1,71 +1,12 @@
 import { Form, useNavigate, useSubmit } from "react-router-dom";
-
-import useInput from "../../../hooks/useInput";
-import { useEffect, useState } from "react";
-export default function TechnicianForm({
-  title,
-  action,
-  technician,
-
-  // errors parameters are backend validation errors.
-  // This is populated only when an invalid form has been submitted.
-  // Backend validates form and responds with error messages for each field.
-  errors,
-}) {
+export default function TechnicianForm({ inputs, title, technician }) {
   const navigate = useNavigate();
   const submit = useSubmit();
-
-  const [firstName] = useInput({
-    value: technician?.firstName || "",
-    type: "text",
-    name: "firstName",
-    placeholder: "First name",
-    labelValue: "First name",
-    error: "First name is required",
-    autoFocus: true,
-  });
-
-  const [lastName] = useInput({
-    value: technician?.lastName || "",
-    type: "text",
-    name: "lastName",
-    placeholder: "Last name",
-    labelValue: "Last name",
-    error: "Last name is required",
-  });
-
-  const [password] = useInput({
-    type: "password",
-    name: "password",
-    placeholder: "Password",
-    labelValue: "Password",
-    error: "Password is required",
-  });
-
-  const [email, setEmailError] = useInput({
-    value: technician?.emailAddress || "",
-    type: "email",
-    name: "emailAddress",
-    placeholder: "Email address",
-    labelValue: "Email",
-    error: "Email is invalid",
-    validator: function () {
-      return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
-        this.value.trim()
-      );
-    },
-  });
 
   function handleSubmit(e) {
     e.preventDefault();
 
-    // make sure all fields are valid
-    const isValid = ![
-      firstName.validate(),
-      lastName.validate(),
-      email.validate(),
-      password.validate(),
-    ].includes(false);
+    const isValid = !inputs.map((input) => input.validate()).includes(false);
 
     if (isValid) {
       const formData = new FormData(e.currentTarget);
@@ -74,21 +15,14 @@ export default function TechnicianForm({
         // and not creating a new one.
         formData.set("technicianId", technician._id);
       }
-      return submit(formData, { method: "post", action: action });
+      return submit(formData, { method: "post" });
     }
   }
-
-  useEffect(() => {
-    if (errors.emailAddress) {
-      setEmailError(errors.emailAddress);
-    }
-  }, [errors]);
 
   return (
     <Form
       className="flex flex-col w-full px-5"
       method="post"
-      action="/"
       onSubmit={handleSubmit}
     >
       <div>
@@ -98,45 +32,16 @@ export default function TechnicianForm({
 
         <div className="w-full flex flex-col gap-10 lg:w-1/4 lg:mx-auto lg:pb-40">
           <div className="w-full rounded-lg px-2 py-3 bg-slate-100">
-            <label className="label">
-              <span className={`label-text ${firstName.label.className}`}>
-                {firstName.label.value}
-              </span>
-            </label>
-            <input
-              {...firstName.input}
-              // onBlur={handleInput}
-            />
-
-            <label className="label">
-              <span className={`label-text ${lastName.label.className}`}>
-                {lastName.label.value}
-              </span>
-            </label>
-            <input
-              {...lastName.input}
-              // onBlur={handleInput}
-            />
-
-            <label className="label">
-              <span className={`label-text ${email.label.className}`}>
-                {email.label.value}
-              </span>
-            </label>
-            <input
-              {...email.input}
-              // onBlur={handleInput}
-            />
-
-            <label className="label">
-              <span className={`label-text ${password.label.className}`}>
-                {password.label.value}
-              </span>
-            </label>
-            <input
-              {...password.input}
-              // onBlur={handleInput}
-            />
+            {inputs.map((input, index) => (
+              <div key={index}>
+                <label className="label">
+                  <span className={`label-text ${input.label.className}`}>
+                    {input.label.value}
+                  </span>
+                </label>
+                <input {...input.input} />
+              </div>
+            ))}
           </div>
 
           <div className="w-full flex flex-col justify-start gap-3">

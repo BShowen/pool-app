@@ -1,7 +1,9 @@
 import { redirect, useActionData } from "react-router-dom";
+import { useEffect } from "react";
 
-import { createNewTechnician } from "../../utils/apiFetches";
 import TechnicianForm from "./components/TechnicianForm";
+import { createNewTechnician } from "../../utils/apiFetches";
+import useInput from "../../hooks/useInput";
 
 export async function action({ request }) {
   const formData = await request.formData();
@@ -19,13 +21,49 @@ export async function action({ request }) {
 
 export default function NewTechnicianPage() {
   const errors = useActionData() || {};
+  const [firstName] = useInput({
+    value: "",
+    type: "text",
+    name: "firstName",
+    placeholder: "First name",
+    labelValue: "First name",
+    error: "First name is required",
+    autoFocus: true,
+  });
+
+  const [lastName] = useInput({
+    value: "",
+    type: "text",
+    name: "lastName",
+    placeholder: "Last name",
+    labelValue: "Last name",
+    error: "Last name is required",
+  });
+
+  const [email, setEmailError] = useInput({
+    value: "",
+    type: "email",
+    name: "emailAddress",
+    placeholder: "Email address",
+    labelValue: "Email",
+    error: "Email is invalid",
+    validator: function () {
+      return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
+        this.value.trim()
+      );
+    },
+  });
+
+  useEffect(() => {
+    if (errors.emailAddress) {
+      setEmailError(errors.emailAddress);
+    }
+  }, [errors]);
+
   return (
-    <div className="w-full flex flex-row justify-center bg-white">
-      <TechnicianForm
-        title={"New technician"}
-        action={"/technicians/new"}
-        errors={errors}
-      />
-    </div>
+    <TechnicianForm
+      inputs={[firstName, lastName, email]}
+      title={"New technician"}
+    />
   );
 }
