@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import "./index.css";
-
+import routes from "./routes/routeDefinitions";
 import Root, { loader as rootLoader } from "./routes/root";
 import { loader as logoutLoader } from "./routes/logout";
 import Login, {
@@ -58,13 +58,13 @@ import ErrorDisplay from "./components/ErrorDisplay";
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: routes.root,
     element: <Root />,
     loader: rootLoader,
     errorElement: <ErrorDisplay />,
     children: [
       {
-        path: "/customers",
+        path: routes.customers,
         element: <CustomersPage />,
         id: "customer-root",
         loader: customersPageLoader,
@@ -74,12 +74,12 @@ const router = createBrowserRouter([
             element: <CustomerList />,
           },
           {
-            path: "/customers/new",
+            path: routes.newCustomer,
             element: <NewCustomerPage />,
             action: newCustomerPageAction,
           },
           {
-            path: "/customers/:customerId",
+            path: routes.customer,
             element: <CustomerPage />,
             loader: customerPageLoader,
             children: [
@@ -88,16 +88,16 @@ const router = createBrowserRouter([
                 element: <CustomerDashboard />,
               },
               {
-                path: "/customers/:customerId/edit",
+                path: routes.editCustomer,
                 element: <CustomerEditPage />,
                 action: customerEditPageAction,
               },
               {
-                path: "/customers/:customerId/pool-reports",
+                path: routes.customerPoolReports,
                 element: <p>Pool reports</p>,
               },
               {
-                path: "/customers/:customerId/invoices",
+                path: routes.customerInvoices,
                 element: <p>Invoices</p>,
               },
             ],
@@ -105,7 +105,7 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "/technicians",
+        path: routes.technicians,
         element: <TechniciansPage />,
         id: "technician-root",
         loader: techniciansPageLoader,
@@ -115,7 +115,7 @@ const router = createBrowserRouter([
             element: <TechnicianList />,
           },
           {
-            path: "/technicians/:technicianId",
+            path: routes.technician,
             element: <TechnicianPage />,
             loader: technicianPageLoader,
             children: [
@@ -124,12 +124,12 @@ const router = createBrowserRouter([
                 element: <TechnicianDashboard />,
               },
               {
-                path: "/technicians/:technicianId/edit",
+                path: routes.editTechnician,
                 element: <TechnicianEditPage />,
                 action: technicianEditPageAction,
               },
               {
-                path: "/technicians/:technicianId/routes",
+                path: routes.technicianRoutes,
                 element: <p>Routes</p>,
               },
             ],
@@ -137,7 +137,7 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "/technicians/new",
+        path: routes.newTechnician,
         element: <NewTechnicianPage />,
         action: newTechnicianPageAction,
         errorElement: <ErrorDisplay />,
@@ -145,17 +145,17 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/logout",
+    path: routes.logout,
     loader: logoutLoader,
   },
   {
-    path: "/login",
+    path: routes.login,
     element: <Login />,
     loader: loginLoader,
     action: loginAction,
   },
   {
-    path: "/technicians/register",
+    path: routes.registerTechnician,
     element: <RegisterPage />,
     loader: registerPageLoader,
     action: registerPageAction,
