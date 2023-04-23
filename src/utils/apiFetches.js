@@ -26,12 +26,18 @@ async function apiRequest({ url, options }) {
       errors: json.errors,
     };
   } catch (error) {
-    // throw new Error("Request timed out.");
-    return {
-      status: 503, // 503 - service unavailable
-      data: undefined,
-      errors: { message: "Something went wrong. Please try that again." },
-    };
+    // Abort error means the request timed out.
+    // Return a message signifying the request timed out.
+    // Rethrow any other type of error for the route error element to catch.
+    if (error.name === "AbortError") {
+      return {
+        status: 503, // 503 - service unavailable
+        data: undefined,
+        errors: { message: "Request timed out. Please try again." },
+      };
+    } else {
+      throw error;
+    }
   }
 }
 
@@ -183,8 +189,9 @@ export async function createNewTechnician(data) {
     },
     body: JSON.stringify(data),
   };
-  // return delayedResponse({ delay: 1500, url, options });
-  return apiRequest({ url, options });
+
+  const response = await apiRequest({ url, options });
+  return response;
 }
 
 export async function updateTechnician(data) {
