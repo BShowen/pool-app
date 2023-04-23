@@ -1,8 +1,9 @@
-import { redirect, useActionData, useNavigation } from "react-router-dom";
-import { useEffect } from "react";
+import { redirect, useActionData } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import TechnicianForm from "./components/TechnicianForm";
 import LoadingOverlay from "../../components/LoadingOverlay";
+import AnimatedToast from "../../components/AnimatedToast";
 import { createNewTechnician } from "../../utils/apiFetches";
 import useInput from "../../hooks/useInput";
 
@@ -22,7 +23,7 @@ export async function action({ request }) {
 
 export default function NewTechnicianPage() {
   const errors = useActionData() || {};
-  const navigation = useNavigation();
+  const [alertVisible, setAlertVisibility] = useState(false);
 
   const [firstName] = useInput({
     value: "",
@@ -61,10 +62,18 @@ export default function NewTechnicianPage() {
     if (errors.emailAddress) {
       setEmailError(errors.emailAddress);
     }
+    if (errors.message) {
+      // Render the alert for three seconds
+      setAlertVisibility(true);
+      setTimeout(() => {
+        setAlertVisibility(false);
+      }, 3000);
+    }
   }, [errors]);
 
   return (
     <>
+      <AnimatedToast show={alertVisible} message={errors.message} />
       {/* LoadingOverlay is conditionally rendered. Only when submitting. */}
       <LoadingOverlay />
       <TechnicianForm

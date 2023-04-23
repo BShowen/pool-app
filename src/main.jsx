@@ -53,11 +53,15 @@ import RegisterPage, {
 import TechnicianList from "./routes/technician/components/TechnicianList";
 import TechnicianDashboard from "./routes/technician/TechnicianDashBoard";
 
+/* -------------------- Error components -------------------- */
+import ErrorDisplay from "./components/ErrorDisplay";
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
     loader: rootLoader,
+    errorElement: <ErrorDisplay />,
     children: [
       {
         path: "/customers",
@@ -111,11 +115,6 @@ const router = createBrowserRouter([
             element: <TechnicianList />,
           },
           {
-            path: "/technicians/new",
-            element: <NewTechnicianPage />,
-            action: newTechnicianPageAction,
-          },
-          {
             path: "/technicians/:technicianId",
             element: <TechnicianPage />,
             loader: technicianPageLoader,
@@ -136,6 +135,12 @@ const router = createBrowserRouter([
             ],
           },
         ],
+      },
+      {
+        path: "/technicians/new",
+        element: <NewTechnicianPage />,
+        action: newTechnicianPageAction,
+        errorElement: <ErrorDisplay />,
       },
     ],
   },
