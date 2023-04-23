@@ -6,16 +6,18 @@ import LoadingOverlay from "../../components/LoadingOverlay";
 import AnimatedToast from "../../components/AnimatedToast";
 import { createNewTechnician } from "../../utils/apiFetches";
 import useInput from "../../hooks/useInput";
-
+import routes from "../routeDefinitions";
 export async function action({ request }) {
   const formData = await request.formData();
   const formObject = Object.fromEntries(formData);
   const { protocol, host } = window.location;
   // This is the url that brings the user from their email to the app.
-  formObject.registrationUrl = `${protocol}//${host}/technicians/register`;
+  formObject.registrationUrl = `${protocol}//${host}${routes.registerTechnician}`;
   const { status, data, errors } = await createNewTechnician(formObject);
   if (status === 201) {
-    return redirect(`/technicians/${data.technician.id}`);
+    return redirect(
+      routes.getDynamicRoute({ route: "technician", id: data.technician.id })
+    );
   } else {
     return errors;
   }

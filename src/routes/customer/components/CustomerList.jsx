@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import { formatAccountName } from "../../../utils/formatters";
+import routes from "../../routeDefinitions";
 
 export default function CustomerList() {
   const navigate = useNavigate();
@@ -43,7 +44,12 @@ export default function CustomerList() {
                   key={customer._id}
                   className="hover:cursor-pointer"
                   onClick={() => {
-                    navigate(`/customers/${customer._id}`);
+                    navigate(
+                      routes.getDynamicRoute({
+                        route: "customer",
+                        id: customer._id,
+                      })
+                    );
                   }}
                 >
                   <td className="hover:bg-gray-50">

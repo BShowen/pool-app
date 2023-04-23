@@ -1,7 +1,7 @@
 import { useSubmit, useNavigate, useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import { capitalizeName, formatAccountName } from "../../../utils/formatters";
-
+import routes from "../../routeDefinitions";
 export default function CustomerDashboard() {
   const submit = useSubmit();
   const navigate = useNavigate();
@@ -64,7 +64,13 @@ export default function CustomerDashboard() {
               if (!replace) {
                 setReplace(true);
               }
-              navigate(`/customers/${customerAccount._id}/edit`, { replace });
+              navigate(
+                routes.getDynamicRoute({
+                  route: "editCustomer",
+                  id: customerAccount._id,
+                }),
+                { replace }
+              );
             }}
           >
             Edit
@@ -81,7 +87,10 @@ export default function CustomerDashboard() {
                 formData.set("intent", "DELETE");
                 submit(formData, {
                   method: "post",
-                  action: `/customers/${customerAccount._d}/edit`,
+                  action: routes.getDynamicRoute({
+                    route: "editCustomer",
+                    id: customerAccount._id,
+                  }),
                 });
               }
             }}

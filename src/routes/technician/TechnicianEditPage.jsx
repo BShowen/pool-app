@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { updateTechnician, deleteTechnician } from "../../utils/apiFetches";
 import TechnicianForm from "./components/TechnicianForm";
 import useInput from "../../hooks/useInput";
-
+import routes from "../routeDefinitions";
 export async function action({ request }) {
   const formData = await request.formData();
   const formObject = Object.fromEntries(formData);
@@ -14,7 +14,7 @@ export async function action({ request }) {
       technicianId: formObject.technicianId,
     });
     if (response.status == "204") {
-      return redirect("/technicians");
+      return redirect(routes.technicians);
     } else {
       console.log("error deleting customer", errors);
       return false;
@@ -22,7 +22,9 @@ export async function action({ request }) {
   } else {
     const { status, data, errors } = await updateTechnician(formObject);
     if (status === 200) {
-      return redirect(`/technicians/${data._id}`);
+      return redirect(
+        routes.getDynamicRoute({ route: "technician", id: data._id })
+      );
     } else {
       return errors;
     }

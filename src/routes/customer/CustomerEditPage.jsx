@@ -2,6 +2,7 @@ import { useActionData, redirect, useOutletContext } from "react-router-dom";
 
 import CustomerForm from "./components/CustomerForm";
 import { deleteCustomer, updateCustomer } from "../../utils/apiFetches";
+import routes from "../routeDefinitions";
 
 export async function action({ request }) {
   const formData = await request.formData();
@@ -12,7 +13,7 @@ export async function action({ request }) {
   if (formObject.intent === "DELETE") {
     const { response, errors } = await deleteCustomer(formObject);
     if (response.status == "204") {
-      return redirect("/customers");
+      return redirect(routes.customers);
     } else {
       console.log("error deleting customer", errors);
       return false;
@@ -20,7 +21,9 @@ export async function action({ request }) {
   } else {
     const { status, data, errors } = await updateCustomer(formObject);
     if (status === 200) {
-      return redirect(`/customers/${data._id}`);
+      return redirect(
+        routes.getDynamicRoute({ route: "customer", id: data._id })
+      );
     } else {
       const errorsObject = {};
       response.errors.forEach((err) => {
@@ -41,11 +44,15 @@ export async function action({ request }) {
 export default function CustomerEdit() {
   const { customerAccount } = useOutletContext();
   const errors = useActionData() || {};
+  const actionUrl = routes.getDynamicRoute({
+    route: "editCustomer",
+    id: customerAccount._id,
+  });
   return (
     <CustomerForm
       title={"Edit customer"}
       customerAccount={customerAccount}
-      action={`/customers/${customerAccount._id}/edit`}
+      action={actionUrl}
       errors={errors}
     />
   );

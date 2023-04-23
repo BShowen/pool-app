@@ -7,6 +7,7 @@ import {
 import TechnicianForm from "./components/TechnicianForm";
 import ErrorDisplay from "../../components/ErrorDisplay";
 import useInput from "../../hooks/useInput";
+import routes from "../routeDefinitions";
 
 export async function loader({ request }) {
   const url = new URL(request.url);
@@ -31,7 +32,7 @@ export async function action({ request }) {
   });
   const { status, errors } = response;
   if (Number.parseInt(status) === 204) {
-    return redirect("/login");
+    return redirect(routes.login);
   } else {
     return errors;
   }

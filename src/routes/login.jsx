@@ -1,6 +1,6 @@
 import { Form, useActionData, redirect } from "react-router-dom";
 import { getLoginToken } from "../utils/apiFetches";
-
+import routes from "./routeDefinitions";
 export async function action({ request, params }) {
   const formData = await request.formData();
   const { errors, data } = await getLoginToken(Object.fromEntries(formData));
@@ -8,7 +8,7 @@ export async function action({ request, params }) {
     return errors;
   } else {
     window.localStorage.setItem("apiToken", data.token);
-    return redirect("/");
+    return redirect(routes.root);
   }
 }
 
@@ -16,7 +16,7 @@ export function loader() {
   // Redirect the user if they are already logged in.
   const apiToken = window.localStorage.getItem("apiToken") || false;
   if (apiToken) {
-    return redirect("/");
+    return redirect(routes.root);
   }
   return null;
 }

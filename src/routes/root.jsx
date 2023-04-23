@@ -3,12 +3,13 @@ import { useState } from "react";
 
 import Sidebar from "../components/SideBar";
 import MobileBottomNav from "../components/MobileBottomNav";
+import routes from "./routeDefinitions";
 export function loader() {
   const apiToken = window.localStorage.getItem("apiToken") || false;
   if (apiToken) {
     return apiToken;
   } else {
-    return redirect("/login");
+    return redirect(routes.login);
   }
 }
 

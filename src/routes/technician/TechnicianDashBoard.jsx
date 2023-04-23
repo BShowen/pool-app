@@ -1,12 +1,17 @@
 import { useSubmit, useNavigate, useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import { capitalizeName } from "../../utils/formatters";
+import routes from "../routeDefinitions";
 
 export default function TechnicianDashboard() {
   const submit = useSubmit();
   const navigate = useNavigate();
   const [replace, setReplace] = useState(false);
   const technician = useOutletContext();
+  const editTechnicianRoute = routes.getDynamicRoute({
+    route: "editTechnician",
+    id: technician._id,
+  });
 
   return (
     <div className="card bg-base-100 w-full lg:w-3/5 lg:shadow-lg">
@@ -31,7 +36,7 @@ export default function TechnicianDashboard() {
               if (!replace) {
                 setReplace(true);
               }
-              navigate(`/technicians/${technician._id}/edit`, { replace });
+              navigate(editTechnicianRoute, { replace });
             }}
           >
             Edit
@@ -51,7 +56,7 @@ export default function TechnicianDashboard() {
                 formData.set("intent", "DELETE");
                 submit(formData, {
                   method: "post",
-                  action: `/technicians/${technician._d}/edit`,
+                  action: editTechnicianRoute,
                 });
               }
             }}

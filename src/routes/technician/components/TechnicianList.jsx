@@ -2,6 +2,7 @@ import { useAsyncValue, Link, useNavigate } from "react-router-dom";
 
 import { capitalizeName } from "../../../utils/formatters";
 
+import routes from "../../routeDefinitions";
 export default function TechnicianList() {
   const { data, errors } = useAsyncValue();
   const navigate = useNavigate();
@@ -37,7 +38,12 @@ export default function TechnicianList() {
                   key={technician._id}
                   className="hover:cursor-pointer"
                   onClick={() => {
-                    navigate(`/technicians/${technician._id}`);
+                    navigate(
+                      routes.getDynamicRoute({
+                        route: "technician",
+                        id: technician._id,
+                      })
+                    );
                   }}
                 >
                   <td className="hover:bg-gray-50">
