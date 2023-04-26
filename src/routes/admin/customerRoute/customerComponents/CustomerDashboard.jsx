@@ -1,7 +1,10 @@
 import { useSubmit, useNavigate, useOutletContext } from "react-router-dom";
 import { useState } from "react";
-import { capitalizeName, formatAccountName } from "../../../utils/formatters";
-import routes from "../../routeDefinitions";
+import {
+  capitalizeName,
+  formatAccountName,
+} from "../../../../utils/formatters";
+import routes from "../../../routeDefinitions";
 export default function CustomerDashboard() {
   const submit = useSubmit();
   const navigate = useNavigate();

@@ -1,8 +1,8 @@
 import { redirect, useActionData } from "react-router-dom";
 
-import CustomerForm from "./components/CustomerForm";
-import { createNewAccount } from "../../utils/apiFetches";
-import routes from "../routeDefinitions";
+import CustomerForm from "./customerComponents/CustomerForm";
+import { createNewAccount } from "../../../utils/apiFetches";
+import routes from "../../routeDefinitions";
 
 export async function action({ request }) {
   const formData = await request.formData();
@@ -21,11 +21,7 @@ export default function NewCustomerPage() {
   const errors = useActionData() || {};
   return (
     <div className="w-full flex flex-row justify-center bg-white">
-      <CustomerForm
-        title={"New customer"}
-        action={"/customers/new"}
-        errors={errors}
-      />
+      <CustomerForm title={"New customer"} errors={errors} />
     </div>
   );
 }

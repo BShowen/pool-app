@@ -1,5 +1,7 @@
 import { Outlet, Link } from "react-router-dom";
 
+import routes from "../../routeDefinitions";
+
 export default function Sidebar({ isSidebarOpen, toggleSidebar }) {
   return (
     <div className="drawer drawer-mobile bg-white">
@@ -18,12 +20,12 @@ export default function Sidebar({ isSidebarOpen, toggleSidebar }) {
         <label className="drawer-overlay" onClick={toggleSidebar}></label>
         <ul className="menu p-4 w-80 bg-base-100 text-base-content bg-inherit pb-32 lg:pb-4">
           <li>
-            <Link to="/customers" onClick={toggleSidebar}>
+            <Link to={routes.customers} onClick={toggleSidebar}>
               Customers
             </Link>
           </li>
           <li className="mb-auto">
-            <Link to="/technicians" onClick={toggleSidebar}>
+            <Link to={routes.technicians} onClick={toggleSidebar}>
               Technicians
             </Link>
           </li>

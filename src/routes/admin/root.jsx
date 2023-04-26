@@ -1,9 +1,9 @@
 import { redirect } from "react-router-dom";
 import { useState } from "react";
 
-import Sidebar from "../components/SideBar";
-import MobileBottomNav from "../components/MobileBottomNav";
-import routes from "./routeDefinitions";
+import Sidebar from "./adminComponents/SideBar";
+import MobileBottomNav from "./adminComponents/MobileBottomNav";
+import routes from "../routeDefinitions";
 export function loader() {
   const apiToken = window.localStorage.getItem("apiToken") || false;
   if (apiToken) {

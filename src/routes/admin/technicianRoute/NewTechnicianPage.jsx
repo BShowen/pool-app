@@ -1,12 +1,12 @@
 import { redirect, useActionData } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-import TechnicianForm from "./components/TechnicianForm";
-import LoadingOverlay from "../../components/LoadingOverlay";
-import AnimatedToast from "../../components/AnimatedToast";
-import { createNewTechnician } from "../../utils/apiFetches";
-import useInput from "../../hooks/useInput";
-import routes from "../routeDefinitions";
+import TechnicianForm from "./technicianComponents/TechnicianForm";
+import LoadingOverlay from "../../../components/LoadingOverlay";
+import AnimatedToast from "../../../components/AnimatedToast";
+import { createNewTechnician } from "../../../utils/apiFetches";
+import useInput from "../../../hooks/useInput";
+import routes from "../../routeDefinitions";
 export async function action({ request }) {
   const formData = await request.formData();
   const formObject = Object.fromEntries(formData);

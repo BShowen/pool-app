@@ -1,10 +1,10 @@
 import { useActionData, redirect, useOutletContext } from "react-router-dom";
 import { useEffect } from "react";
 
-import { updateTechnician, deleteTechnician } from "../../utils/apiFetches";
-import TechnicianForm from "./components/TechnicianForm";
-import useInput from "../../hooks/useInput";
-import routes from "../routeDefinitions";
+import { updateTechnician, deleteTechnician } from "../../../utils/apiFetches";
+import TechnicianForm from "./technicianComponents/TechnicianForm";
+import useInput from "../../../hooks/useInput";
+import routes from "../../routeDefinitions";
 export async function action({ request }) {
   const formData = await request.formData();
   const formObject = Object.fromEntries(formData);

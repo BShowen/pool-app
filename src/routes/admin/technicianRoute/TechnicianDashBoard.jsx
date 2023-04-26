@@ -1,7 +1,7 @@
 import { useSubmit, useNavigate, useOutletContext } from "react-router-dom";
 import { useState } from "react";
-import { capitalizeName } from "../../utils/formatters";
-import routes from "../routeDefinitions";
+import { capitalizeName } from "../../../utils/formatters";
+import routes from "../../routeDefinitions";
 
 export default function TechnicianDashboard() {
   const submit = useSubmit();

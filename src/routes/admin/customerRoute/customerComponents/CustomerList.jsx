@@ -1,12 +1,7 @@
-import {
-  Link,
-  useAsyncValue,
-  useNavigate,
-  useRouteLoaderData,
-} from "react-router-dom";
+import { Link, useAsyncValue, useNavigate } from "react-router-dom";
 
-import { formatAccountName } from "../../../utils/formatters";
-import routes from "../../routeDefinitions";
+import { formatAccountName } from "../../../../utils/formatters";
+import routes from "../../../routeDefinitions";
 
 export default function CustomerList() {
   const navigate = useNavigate();
@@ -22,7 +17,7 @@ export default function CustomerList() {
         <div className="w-full p-5 lg:px-5 flex flex-row justify-end">
           <Link
             as="button"
-            to="/customers/new"
+            to={routes.newCustomer}
             className="btn btn-primary btn-sm lg:btn-md"
           >
             New customer

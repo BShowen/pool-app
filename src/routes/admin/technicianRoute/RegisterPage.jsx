@@ -3,11 +3,11 @@ import { useLoaderData, redirect } from "react-router-dom";
 import {
   getRegistrationTechnician,
   registerTechnician,
-} from "../../utils/apiFetches";
-import TechnicianForm from "./components/TechnicianForm";
-import ErrorDisplay from "../../components/ErrorDisplay";
-import useInput from "../../hooks/useInput";
-import routes from "../routeDefinitions";
+} from "../../../utils/apiFetches";
+import TechnicianForm from "./technicianComponents/TechnicianForm";
+import ErrorDisplay from "../../../components/ErrorDisplay";
+import useInput from "../../../hooks/useInput";
+import routes from "../../routeDefinitions";
 
 export async function loader({ request }) {
   const url = new URL(request.url);

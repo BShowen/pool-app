@@ -1,8 +1,8 @@
 import { useActionData, redirect, useOutletContext } from "react-router-dom";
 
-import CustomerForm from "./components/CustomerForm";
-import { deleteCustomer, updateCustomer } from "../../utils/apiFetches";
-import routes from "../routeDefinitions";
+import CustomerForm from "./customerComponents/CustomerForm";
+import { deleteCustomer, updateCustomer } from "../../../utils/apiFetches";
+import routes from "../../routeDefinitions";
 
 export async function action({ request }) {
   const formData = await request.formData();
@@ -25,19 +25,7 @@ export async function action({ request }) {
         routes.getDynamicRoute({ route: "customer", id: data._id })
       );
     } else {
-      const errorsObject = {};
-      response.errors.forEach((err) => {
-        if (err.field.includes(".")) {
-          const [_, index, field] = err.field.split(".");
-          errorsObject.accountOwners = errorsObject.accountOwners || [];
-          const subDocErrorsObject = errorsObject.accountOwners[index] || {};
-          subDocErrorsObject[field] = err.message;
-          errorsObject.accountOwners[index] = subDocErrorsObject;
-        } else {
-          errorsObject[err.field] = err.message;
-        }
-      });
-      return errorsObject;
+      return errors;
     }
   }
 }
@@ -52,7 +40,6 @@ export default function CustomerEdit() {
     <CustomerForm
       title={"Edit customer"}
       customerAccount={customerAccount}
-      action={actionUrl}
       errors={errors}
     />
   );

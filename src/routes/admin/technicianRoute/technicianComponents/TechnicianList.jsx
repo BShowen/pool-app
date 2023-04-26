@@ -1,8 +1,8 @@
 import { useAsyncValue, Link, useNavigate } from "react-router-dom";
 
-import { capitalizeName } from "../../../utils/formatters";
+import { capitalizeName } from "../../../../utils/formatters";
 
-import routes from "../../routeDefinitions";
+import routes from "../../../routeDefinitions";
 export default function TechnicianList() {
   const { data, errors } = useAsyncValue();
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ export default function TechnicianList() {
         <div className="w-full p-5 lg:px-5 flex flex-row justify-end">
           <Link
             as="button"
-            to="/technicians/new"
+            to={routes.newTechnician}
             className="btn btn-primary btn-sm lg:btn-md"
           >
             New technician

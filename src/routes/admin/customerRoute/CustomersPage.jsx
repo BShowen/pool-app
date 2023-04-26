@@ -1,10 +1,10 @@
 import { Await, Outlet, defer, useLoaderData } from "react-router-dom";
 import { Suspense } from "react";
 
-import { getCustomers } from "../../utils/apiFetches";
+import { getCustomers } from "../../../utils/apiFetches";
 
-import Loading from "../../components/Loading";
-import ErrorDisplay from "../../components/ErrorDisplay";
+import Loading from "../../../components/Loading";
+import ErrorDisplay from "../../../components/ErrorDisplay";
 
 export async function loader() {
   const response = getCustomers();

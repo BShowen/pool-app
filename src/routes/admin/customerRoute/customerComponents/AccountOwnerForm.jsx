@@ -1,4 +1,3 @@
-import { TiDeleteOutline } from "react-icons/ti";
 export default function AccountOwnerForm({
   changeHandler,
   values,

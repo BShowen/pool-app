@@ -1,19 +1,19 @@
 const customerRoutes = {
-  customers: "/customers",
-  newCustomer: "/customers/new",
-  customer: "/customers/:customerId",
-  editCustomer: "/customers/:customerId/edit",
-  customerPoolReports: "/customers/:customerId/pool-reports",
-  customerInvoices: "/customers/:customerId/invoices",
+  customers: "/admin/customers",
+  newCustomer: "/admin/customers/new",
+  customer: "/admin/customers/:customerId",
+  editCustomer: "/admin/customers/:customerId/edit",
+  customerPoolReports: "/admin/customers/:customerId/pool-reports",
+  customerInvoices: "/admin/customers/:customerId/invoices",
 };
 
 const technicianRoutes = {
-  technicians: "/technicians",
-  technician: "/technicians/:technicianId",
-  editTechnician: "/technicians/:technicianId/edit",
-  technicianRoutes: "/technicians/:technicianId/routes",
-  newTechnician: "/technicians/new",
-  registerTechnician: "/technicians/register",
+  technicians: "/admin/technicians",
+  technician: "/admin/technicians/:technicianId",
+  editTechnician: "/admin/technicians/:technicianId/edit",
+  technicianRoutes: "/admin/technicians/:technicianId/routes",
+  newTechnician: "/admin/technicians/new",
+  registerTechnician: "/admin/technicians/register",
 };
 
 const rootRoutes = {
@@ -22,12 +22,17 @@ const rootRoutes = {
   root: "/",
 };
 
+const adminRoutes = {
+  adminRoot: "/admin",
+};
+
 const dynamicSegment = /:([a-zA-Z]+)(?=\/|$)/;
 
 const routes = {
   ...customerRoutes,
   ...technicianRoutes,
   ...rootRoutes,
+  ...adminRoutes,
   getDynamicRoute({ route, id }) {
     return this[route].replace(dynamicSegment, id);
   },
