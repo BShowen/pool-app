@@ -17,7 +17,16 @@ import RegisterPage, {
 
 import adminRoutes from "./routes/admin/adminRouter";
 
+import { loader as rootLoader } from "./routes/root";
+
+import ErrorDisplay from "./components/ErrorDisplay";
+
 const router = createBrowserRouter([
+  {
+    path: routes.root,
+    loader: rootLoader,
+    errorElement: <ErrorDisplay />,
+  },
   { ...adminRoutes },
   {
     path: routes.logout,
