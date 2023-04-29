@@ -8,6 +8,7 @@ import TechnicianForm from "./technicianComponents/TechnicianForm";
 import ErrorDisplay from "../../../components/ErrorDisplay";
 import useInput from "../../../hooks/useInput";
 import routes from "../../routeDefinitions";
+import store from "../../../utils/store";
 
 export async function loader({ request }) {
   const url = new URL(request.url);
@@ -32,6 +33,7 @@ export async function action({ request }) {
   });
   const { status, errors } = response;
   if (Number.parseInt(status) === 204) {
+    store.save(routes.login, "Registration successful.");
     return redirect(routes.login);
   } else {
     return errors;
@@ -40,7 +42,7 @@ export async function action({ request }) {
 export default function RegisterPage() {
   const response = useLoaderData();
   const technician = response.data?.technician || {};
-  const errors = response.errors;
+  const loaderError = response.loaderError;
 
   const [firstName] = useInput({
     value: technician.firstName,
@@ -85,8 +87,8 @@ export default function RegisterPage() {
     error: "Password is required",
   });
 
-  if (errors) {
-    return <ErrorDisplay message={errors.message} />;
+  if (loaderError) {
+    return <ErrorDisplay message={loaderError.message} />;
   } else {
     return (
       <TechnicianForm

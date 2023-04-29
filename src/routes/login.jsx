@@ -1,6 +1,8 @@
 import { Form, useActionData, redirect } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { getLoginToken } from "../utils/apiFetches";
 import routes from "./routeDefinitions";
+import store from "../utils/store";
 export async function action({ request, params }) {
   const formData = await request.formData();
   const { errors, data } = await getLoginToken(Object.fromEntries(formData));
@@ -23,6 +25,14 @@ export function loader() {
 
 export default function Login() {
   const { email, password } = useActionData() || {};
+  const [messageList] = useState(store.get()); //Get any messages associated with this route
+
+  useEffect(() => {
+    return () => {
+      // Clear the store only when unmounting.
+      store.clear();
+    };
+  });
 
   return (
     <div className="pt-6">
@@ -30,6 +40,7 @@ export default function Login() {
         method="post"
         className="flex flex-col gap-4 w-full p-5 md:w-96 md:mx-auto"
       >
+        <p>{messageList[0]}</p>
         <div>
           <div className="mb-2 block">
             <label htmlFor="email" className={email ? "text-secondary" : ""}>
