@@ -19,11 +19,19 @@ async function fetchWithTimeout(url, options = {}) {
 async function apiRequest({ url, options }) {
   try {
     const response = await fetchWithTimeout(url, options);
-    const json = await response.json();
+    const contentType = response.headers.get("content-type");
+    const contentLength = response.headers.get("content-length");
+
+    // If the headers contains content-length and content-type is application/json
+    // the parse the body.
+    // Else don't parse the body but still return {status, data,errors}
+
+    const json = contentType && contentLength ? await response.json() : null;
+
     return {
       status: response.status,
-      data: json.data,
-      errors: json.errors,
+      data: json?.data,
+      errors: json?.errors,
     };
   } catch (error) {
     // Abort error means the request timed out.
