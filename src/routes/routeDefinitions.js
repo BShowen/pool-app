@@ -13,7 +13,7 @@ const technicianRoutes = {
   editTechnician: "/admin/technicians/:technicianId/edit",
   technicianRoutes: "/admin/technicians/:technicianId/routes",
   newTechnician: "/admin/technicians/new",
-  registerTechnician: "/admin/technicians/register",
+  registerTechnician: "/technicians/register",
 };
 
 const rootRoutes = {
