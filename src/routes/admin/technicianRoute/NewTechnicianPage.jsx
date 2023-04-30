@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 
 import TechnicianForm from "./technicianComponents/TechnicianForm";
 import LoadingOverlay from "../../../components/LoadingOverlay";
-import AnimatedToast from "../../../components/AnimatedToast";
 import { createNewTechnician } from "../../../utils/apiFetches";
 import useInput from "../../../hooks/useInput";
 import routes from "../../routeDefinitions";
@@ -25,7 +24,6 @@ export async function action({ request }) {
 
 export default function NewTechnicianPage() {
   const errors = useActionData() || {};
-  const [alertVisible, setAlertVisibility] = useState(false);
 
   const [firstName] = useInput({
     value: "",
@@ -75,7 +73,6 @@ export default function NewTechnicianPage() {
 
   return (
     <>
-      <AnimatedToast show={alertVisible} message={errors.message} />
       {/* LoadingOverlay is conditionally rendered. Only when submitting. */}
       <LoadingOverlay />
       <TechnicianForm
