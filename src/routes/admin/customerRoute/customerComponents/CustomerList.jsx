@@ -6,13 +6,19 @@ import {
 } from "react-router-dom";
 
 import { formatAccountName } from "../../../../utils/formatters";
-import { getTechnicians } from "../../../../utils/apiFetches";
+import { getTechnicians, updateCustomer } from "../../../../utils/apiFetches";
 import routes from "../../../routeDefinitions";
 import TechnicianSelector from "./TechnicianSelector";
 
 export async function loader() {
   const response = await getTechnicians();
   return response.data.technicianList;
+}
+
+export async function action({ request }) {
+  const formData = await request.formData();
+  const response = await updateCustomer(Object.fromEntries(formData));
+  return response;
 }
 
 export default function CustomerList() {

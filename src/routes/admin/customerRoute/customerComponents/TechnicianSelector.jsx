@@ -1,32 +1,40 @@
-import { Form } from "react-router-dom";
-import { useRef } from "react";
-
-import { updateCustomer } from "../../../../utils/apiFetches";
-
-async function action({ technicianId, customerAccountId }) {
-  const response = updateCustomer({ technicianId, customerAccountId });
-}
+import { useFetcher } from "react-router-dom";
 export default function TechnicianSelector({
   customerAccountId,
   technician,
   technicianList,
 }) {
-  const form = useRef(null);
+  const fetcher = useFetcher();
+
+  /**
+   * fetcher.formData is available when the form is submitting. Use that value
+   * first to take advantage of optimistic UI. fetcher.data is what is the
+   * finalized value returned from the backend server. fetcher.formData is not
+   * available once fetcher.data is available. Use fetcher.data (finalized value)
+   * once the request has completed. If either of these isn't available then
+   * the user hasn't submitted a form and/or this is the initial render and we
+   * use the value passed in from props.
+   */
+  const selectionValue =
+    fetcher?.formData?.get("technicianId") ||
+    fetcher?.data?.technicianId ||
+    technician._id;
 
   function handleClick(e) {
-    e.preventDefault();
     e.stopPropagation();
   }
 
-  function handleSubmit() {
-    const formData = new FormData(form.current);
-    const formObject = Object.fromEntries(formData);
-    action(formObject);
+  async function handleChange(e) {
+    e.preventDefault();
+    const formData = Object.fromEntries(new FormData(e.target.parentElement));
+    fetcher.submit(formData, {
+      method: "post",
+    });
   }
 
   return (
-    <div className="h-full" onClick={handleClick}>
-      <Form meth="post" ref={form}>
+    <div className="h-full flex flex-col justify-center" onClick={handleClick}>
+      <fetcher.Form method="post">
         <input
           hidden
           readOnly
@@ -34,22 +42,23 @@ export default function TechnicianSelector({
           value={customerAccountId}
         />
         <select
-          className="select select-ghost w-full max-w-xs"
-          defaultValue={technician?._id || 0}
-          onChange={handleSubmit}
+          className="focus:outline-none focus:bg-transparent bg-transparent w-min hover:cursor-pointer"
+          readOnly
+          value={selectionValue}
+          onChange={handleChange}
           name="technicianId"
         >
           <option disabled>Technicians</option>
-          {technicianList.map((technician) => {
+          {technicianList.map((tech) => {
             return (
-              <option key={technician._id} value={technician._id}>
-                {technician.firstName}
+              <option key={tech._id} value={tech._id}>
+                {tech.firstName}
               </option>
             );
           })}
           <option value="0">Unassigned</option>
         </select>
-      </Form>
+      </fetcher.Form>
     </div>
   );
 }
