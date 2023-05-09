@@ -32,14 +32,13 @@ export async function action({ request }) {
 export default function CustomerEdit() {
   const { customerAccount } = useOutletContext();
   const errors = useActionData() || {};
-  const actionUrl = routes.getDynamicRoute({
-    route: "editCustomer",
-    id: customerAccount._id,
-  });
   return (
     <CustomerForm
       title={"Edit customer"}
-      customerAccount={customerAccount}
+      customerAccount={{
+        ...customerAccount,
+        technicianId: customerAccount.technicianId._id,
+      }}
       errors={errors}
     />
   );

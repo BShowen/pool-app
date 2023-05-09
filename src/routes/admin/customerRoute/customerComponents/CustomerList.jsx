@@ -1,9 +1,22 @@
-import { Link, useAsyncValue, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useAsyncValue,
+  useLoaderData,
+  useNavigate,
+} from "react-router-dom";
 
 import { formatAccountName } from "../../../../utils/formatters";
+import { getTechnicians } from "../../../../utils/apiFetches";
 import routes from "../../../routeDefinitions";
+import TechnicianSelector from "./TechnicianSelector";
+
+export async function loader() {
+  const response = await getTechnicians();
+  return response.data.technicianList;
+}
 
 export default function CustomerList() {
+  const technicianList = useLoaderData();
   const navigate = useNavigate();
   const { data, error } = useAsyncValue();
   const customerList = data.accountList || [];
@@ -25,19 +38,25 @@ export default function CustomerList() {
         </div>
       </div>
 
-      <div className="overflow-x-auto w-full pt-5">
+      <div className="w-full pt-5">
         <div className="p-2">
           <span className="badge badge-primary p-3">
             {customerList.length} customers
           </span>
         </div>
-        <table className="table w-full">
+        <table className="table w-full h-full">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Technician</th>
+            </tr>
+          </thead>
           <tbody>
             {customerList.map((customer) => {
               return (
                 <tr
                   key={customer._id}
-                  className="hover:cursor-pointer"
+                  className="hover:cursor-pointer hover h-full"
                   onClick={() => {
                     navigate(
                       routes.getDynamicRoute({
@@ -47,8 +66,13 @@ export default function CustomerList() {
                     );
                   }}
                 >
-                  <td className="hover:bg-gray-50">
-                    {formatAccountName(customer.accountName)}
+                  <td>{formatAccountName(customer.accountName)}</td>
+                  <td className="p-0 m-0 h-full">
+                    <TechnicianSelector
+                      customerAccountId={customer._id}
+                      technician={customer.technicianId}
+                      technicianList={technicianList}
+                    />
                   </td>
                 </tr>
               );
