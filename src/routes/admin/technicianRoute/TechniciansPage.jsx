@@ -17,7 +17,7 @@ export default function TechniciansPage() {
     <Suspense fallback={<Loading />}>
       <Await
         resolve={response}
-        errorElement={<ErrorDisplay message="Cannot load technicians." />}
+        errorElement={<ErrorDisplay message="Cannot load technician routes." />}
       >
         <Outlet />
       </Await>

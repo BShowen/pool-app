@@ -170,10 +170,10 @@ export async function getTechnicians() {
   return apiRequest({ url, options });
 }
 
-export async function getTechnician({ technicianId }) {
+export async function getTechnicianRoutes({ technicianId }) {
   const apiToken = window.localStorage.getItem("apiToken");
   if (!apiToken) return;
-  const url = `${localHost}/companies/technicians/${technicianId}`;
+  const url = `${localHost}/companies/customer-accounts/routes/${technicianId}`;
   const options = {
     method: "GET",
     headers: {

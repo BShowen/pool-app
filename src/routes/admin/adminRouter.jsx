@@ -34,6 +34,10 @@ import TechnicianEditPage, {
   action as technicianEditPageAction,
 } from "./technicianRoute/TechnicianEditPage";
 
+import TechnicianRoutes, {
+  loader as technicianRoutesLoader,
+} from "./technicianRoute/TechnicianRoutes";
+
 /* -------------------- Technician components -------------------- */
 import TechnicianList from "./technicianRoute/technicianComponents/TechnicianList";
 import TechnicianDashboard from "./technicianRoute/TechnicianDashBoard";
@@ -114,7 +118,8 @@ export default {
             },
             {
               path: routes.technicianRoutes,
-              element: <p>Routes</p>,
+              element: <TechnicianRoutes />,
+              loader: technicianRoutesLoader,
             },
           ],
         },

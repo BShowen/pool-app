@@ -16,6 +16,10 @@ const technicianRoutes = {
   registerTechnician: "/technicians/register",
 };
 
+const serviceDays = {
+  serviceDays: "/admin/service-days",
+};
+
 const rootRoutes = {
   logout: "/logout",
   login: "/login",
@@ -31,6 +35,7 @@ const dynamicSegment = /:([a-zA-Z]+)(?=\/|$)/;
 const routes = {
   ...customerRoutes,
   ...technicianRoutes,
+  ...serviceDays,
   ...rootRoutes,
   ...adminRoutes,
   getDynamicRoute({ route, id }) {

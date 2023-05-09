@@ -24,12 +24,17 @@ export default function Sidebar({ isSidebarOpen, toggleSidebar }) {
               Customers
             </Link>
           </li>
-          <li className="mb-auto">
+          <li>
             <Link to={routes.technicians} onClick={toggleSidebar}>
               Technicians
             </Link>
           </li>
           <li>
+            <Link to={routes.serviceDays} onClick={toggleSidebar}>
+              Service Days
+            </Link>
+          </li>
+          <li className="mt-auto">
             <Link to="/logout">Logout</Link>
           </li>
         </ul>

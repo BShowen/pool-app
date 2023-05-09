@@ -22,3 +22,7 @@ export function capitalizeName(firstName, lastName) {
     })
     .join(" ");
 }
+
+export function capitalize(string) {
+  return string.trim().split("")[0].toUpperCase() + string.trim().slice(1);
+}
