@@ -5,10 +5,12 @@ import {
   useNavigate,
   useFetcher,
 } from "react-router-dom";
+import { useState } from "react";
 
 import { formatAccountName, capitalize } from "../../../../utils/formatters";
 import { getTechnicians, updateCustomer } from "../../../../utils/apiFetches";
 import routes from "../../../routeDefinitions";
+import BannerAlert from "../../../../components/BannerAlert";
 
 export async function loader() {
   const response = await getTechnicians();
@@ -29,7 +31,7 @@ export default function CustomerList() {
 
   return (
     <div className="h-full lg:h-screen">
-      <div className="sticky p-1 lg:p-5 top-0 z-50 bg-white shadow-sm">
+      <div className="sticky p-1 lg:p-5 top-0 z-40 bg-white shadow-sm">
         <div className="w-full flex flex-row justify-center">
           <h1 className="text-3xl font-bold">Customers</h1>
         </div>
@@ -92,7 +94,6 @@ export default function CustomerList() {
 
 function TechnicianSelector({ customerAccountId, technician, technicianList }) {
   const fetcher = useFetcher();
-
   /**
    * fetcher.formData is available when the form is submitting. Use that value
    * first to take advantage of optimistic UI. fetcher.data is what is the
@@ -108,8 +109,15 @@ function TechnicianSelector({ customerAccountId, technician, technicianList }) {
     technician?._id ||
     0;
 
-  function handleClick(e) {
-    e.stopPropagation();
+  let [showErrorAlert, setErrorAlert] = useState(false);
+
+  if (
+    fetcher?.data?.status &&
+    fetcher.state === "idle" &&
+    fetcher.data.status === 400
+  ) {
+    fetcher.data = undefined; //This is in order to prevent an infinite loop.
+    setErrorAlert(true);
   }
 
   async function handleChange(e) {
@@ -121,32 +129,47 @@ function TechnicianSelector({ customerAccountId, technician, technicianList }) {
   }
 
   return (
-    <div className="h-full flex flex-col justify-center" onClick={handleClick}>
-      <fetcher.Form method="post">
-        <input
-          hidden
-          readOnly
-          name="customerAccountId"
-          value={customerAccountId}
+    <>
+      {showErrorAlert && (
+        <BannerAlert
+          message={"Something went wrong"}
+          onDismiss={() => {
+            setErrorAlert(false);
+          }}
         />
-        <select
-          className="focus:outline-none focus:bg-transparent bg-transparent w-min hover:cursor-pointer"
-          readOnly
-          value={selectionValue}
-          onChange={handleChange}
-          name="technicianId"
-        >
-          <option disabled>Technicians</option>
-          {technicianList.map((tech) => {
-            return (
-              <option key={tech._id} value={tech._id}>
-                {capitalize(tech.firstName)} {capitalize(tech.lastName[0])}.
-              </option>
-            );
-          })}
-          <option value="0">Unassigned</option>
-        </select>
-      </fetcher.Form>
-    </div>
+      )}
+      <div
+        className="h-full flex flex-col justify-center"
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        <fetcher.Form method="post">
+          <input
+            hidden
+            readOnly
+            name="customerAccountId"
+            value={customerAccountId}
+          />
+          <select
+            className="focus:outline-none focus:bg-transparent bg-transparent w-min hover:cursor-pointer"
+            readOnly
+            value={selectionValue}
+            onChange={handleChange}
+            name="technicianId"
+          >
+            <option disabled>Technicians</option>
+            {technicianList.map((tech) => {
+              return (
+                <option key={tech._id} value={tech._id}>
+                  {capitalize(tech.firstName)} {capitalize(tech.lastName[0])}.
+                </option>
+              );
+            })}
+            <option value="0">Unassigned</option>
+          </select>
+        </fetcher.Form>
+      </div>
+    </>
   );
 }
