@@ -6,7 +6,7 @@ import {
   useFetcher,
 } from "react-router-dom";
 
-import { formatAccountName } from "../../../../utils/formatters";
+import { formatAccountName, capitalize } from "../../../../utils/formatters";
 import { getTechnicians, updateCustomer } from "../../../../utils/apiFetches";
 import routes from "../../../routeDefinitions";
 
@@ -140,7 +140,7 @@ function TechnicianSelector({ customerAccountId, technician, technicianList }) {
           {technicianList.map((tech) => {
             return (
               <option key={tech._id} value={tech._id}>
-                {tech.firstName}
+                {capitalize(tech.firstName)} {capitalize(tech.lastName[0])}.
               </option>
             );
           })}
