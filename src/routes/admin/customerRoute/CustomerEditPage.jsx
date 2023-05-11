@@ -35,10 +35,7 @@ export default function CustomerEdit() {
   return (
     <CustomerForm
       title={"Edit customer"}
-      customerAccount={{
-        ...customerAccount,
-        technicianId: customerAccount.technicianId._id,
-      }}
+      customerAccount={customerAccount}
       errors={errors}
     />
   );

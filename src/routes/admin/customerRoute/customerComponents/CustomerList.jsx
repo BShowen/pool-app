@@ -78,7 +78,7 @@ export default function CustomerList() {
                   <td className="p-0 m-0 h-full">
                     <TechnicianSelector
                       customerAccountId={customer._id}
-                      technician={customer.technicianId}
+                      technicianId={customer.technicianId}
                       technicianList={technicianList}
                     />
                   </td>
@@ -92,7 +92,11 @@ export default function CustomerList() {
   );
 }
 
-function TechnicianSelector({ customerAccountId, technician, technicianList }) {
+function TechnicianSelector({
+  customerAccountId,
+  technicianId,
+  technicianList,
+}) {
   const fetcher = useFetcher();
   /**
    * fetcher.formData is available when the form is submitting. Use that value
@@ -106,7 +110,7 @@ function TechnicianSelector({ customerAccountId, technician, technicianList }) {
   const selectionValue =
     fetcher?.formData?.get("technicianId") ||
     fetcher?.data?.technicianId ||
-    technician?._id ||
+    technicianId ||
     0;
 
   let [showErrorAlert, setErrorAlert] = useState(false);
