@@ -45,6 +45,12 @@ import TechnicianRoutes, {
 import TechnicianList from "./technicianRoute/technicianComponents/TechnicianList";
 import TechnicianDashboard from "./technicianRoute/TechnicianDashBoard";
 
+/* -------------------- Service Days routes -------------------- */
+import {
+  ServiceDayList,
+  loader as serviceDayListLoader,
+} from "./serviceDayRoute/serviceDayList";
+
 /* -------------------- Error components -------------------- */
 import ErrorDisplay from "../../components/ErrorDisplay";
 
@@ -135,6 +141,11 @@ export default {
       element: <NewTechnicianPage />,
       action: newTechnicianPageAction,
       errorElement: <ErrorDisplay />,
+    },
+    {
+      path: routes.serviceDays,
+      element: <ServiceDayList />,
+      loader: serviceDayListLoader,
     },
   ],
 };

@@ -185,6 +185,21 @@ export async function getTechnicianRoutes({ technicianId }) {
   return response.json();
 }
 
+export async function getAllServiceRoutes() {
+  const apiToken = window.localStorage.getItem("apiToken");
+  if (!apiToken) return;
+  const url = `${localHost}/companies/service-routes/all`;
+  const options = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: apiToken,
+    },
+  };
+  const response = await fetch(url, options);
+  return { ...(await response.json()), status: response.status };
+}
+
 export async function createNewTechnician(data) {
   const apiToken = window.localStorage.getItem("apiToken");
   if (!apiToken) return;
