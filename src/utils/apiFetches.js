@@ -173,7 +173,7 @@ export async function getTechnicians() {
 export async function getTechnicianRoutes({ technicianId }) {
   const apiToken = window.localStorage.getItem("apiToken");
   if (!apiToken) return;
-  const url = `${localHost}/companies/customer-accounts/routes/${technicianId}`;
+  const url = `${localHost}/companies/service-routes/${technicianId}`;
   const options = {
     method: "GET",
     headers: {
