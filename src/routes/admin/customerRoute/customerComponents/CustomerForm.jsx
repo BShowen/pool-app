@@ -38,10 +38,16 @@ export default function CustomerForm({
     }
   }
 
-  function removeAccountOwner() {
+  function removeAccountOwner(itemIndex) {
     setState((prevState) => {
-      prevState.accountOwners.pop();
-      return { ...prevState };
+      const accountOwners = [
+        ...prevState.accountOwners.filter((item, index) => {
+          if (index === itemIndex) return;
+          return item;
+        }),
+      ];
+      const newState = { ...prevState, accountOwners };
+      return newState;
     });
   }
 

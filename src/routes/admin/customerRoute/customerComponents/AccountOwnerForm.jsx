@@ -91,7 +91,7 @@ export default function AccountOwnerForm({
         <button
           type="button"
           className=" w-full btn btn-error btn-sm"
-          onClick={index > 0 ? removeHandler : null}
+          onClick={index > 0 ? () => removeHandler(index) : null}
         >
           Remove
         </button>
