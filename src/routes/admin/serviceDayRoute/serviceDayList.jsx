@@ -78,9 +78,9 @@ function TechnicianDisclosure({ route }) {
               <table className="table w-full border-separate border-spacing-0 border-2 border-t-0 rounded-b-2xl overflow-hidden">
                 <thead>
                   <tr>
-                    <th>
+                    <th className="rounded-none">
                       <span
-                        className="rounded-none hover:cursor-pointer"
+                        className="hover:cursor-pointer"
                         onClick={() => sortBy({ category: "accountName" })}
                         onMouseEnter={(e) =>
                           e.target.classList.add("text-blue-500")
@@ -92,9 +92,9 @@ function TechnicianDisclosure({ route }) {
                         Customer
                       </span>
                     </th>
-                    <th>
+                    <th className="rounded-none">
                       <span
-                        className="rounded-none hover:cursor-pointer"
+                        className="hover:cursor-pointer"
                         onClick={() => sortBy({ category: "serviceDay" })}
                         onMouseEnter={(e) =>
                           e.target.classList.add("text-blue-500")
