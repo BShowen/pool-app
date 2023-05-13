@@ -5,12 +5,13 @@ import {
   useNavigate,
   useFetcher,
 } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { formatAccountName, capitalize } from "../../../../utils/formatters";
 import { getTechnicians, updateCustomer } from "../../../../utils/apiFetches";
 import routes from "../../../routeDefinitions";
 import BannerAlert from "../../../../components/BannerAlert";
+import useSorter from "../../../../hooks/useSorter";
 
 export async function loader() {
   const response = await getTechnicians();
@@ -24,10 +25,9 @@ export async function action({ request }) {
 }
 
 export default function CustomerList() {
-  const technicianList = useLoaderData();
   const navigate = useNavigate();
   const { data, error } = useAsyncValue();
-  const customerList = data.accountList || [];
+  const [customerList, sortBy] = useSorter(data.accountList || []);
 
   return (
     <div className="h-full lg:h-screen">
@@ -55,7 +55,20 @@ export default function CustomerList() {
         <table className="table w-full h-full">
           <thead>
             <tr>
-              <th>Customer</th>
+              <th>
+                <span
+                  className="rounded-none hover:cursor-pointer"
+                  onClick={() => {
+                    sortBy({ category: "accountName" });
+                  }}
+                  onMouseEnter={(e) => e.target.classList.add("text-blue-500")}
+                  onMouseLeave={(e) =>
+                    e.target.classList.remove("text-blue-500")
+                  }
+                >
+                  Customer
+                </span>
+              </th>
               <th>Technician</th>
             </tr>
           </thead>
@@ -79,7 +92,6 @@ export default function CustomerList() {
                     <TechnicianSelector
                       customerAccountId={customer._id}
                       technicianId={customer.technicianId}
-                      technicianList={technicianList}
                     />
                   </td>
                 </tr>
@@ -92,11 +104,8 @@ export default function CustomerList() {
   );
 }
 
-function TechnicianSelector({
-  customerAccountId,
-  technicianId,
-  technicianList,
-}) {
+function TechnicianSelector({ customerAccountId, technicianId }) {
+  const technicianList = useLoaderData();
   const fetcher = useFetcher();
   /**
    * fetcher.formData is available when the form is submitting. Use that value
