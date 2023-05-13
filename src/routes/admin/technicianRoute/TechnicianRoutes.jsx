@@ -1,12 +1,13 @@
 import { Disclosure, Transition } from "@headlessui/react";
 import { BsArrowsExpand, BsArrowsCollapse } from "react-icons/bs";
-import { useLoaderData, Await, defer } from "react-router-dom";
+import { useLoaderData, Await, defer, useNavigate } from "react-router-dom";
 import { Suspense } from "react";
 
 import { formatAccountName, capitalize } from "../../../utils/formatters";
 import { getTechnicianRoutes } from "../../../utils/apiFetches";
 import Loading from "../../../components/Loading";
 import ErrorDisplay from "../../../components/ErrorDisplay";
+import routes from "../../routeDefinitions";
 
 export async function loader({ params }) {
   const response = getTechnicianRoutes({
@@ -16,6 +17,7 @@ export async function loader({ params }) {
 }
 
 export default function TechnicianRoutes() {
+  const navigate = useNavigate();
   const { response } = useLoaderData();
   const defaultOpen = false;
 

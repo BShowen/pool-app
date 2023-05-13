@@ -1,4 +1,4 @@
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import { Disclosure, Transition } from "@headlessui/react";
 import { BsArrowsExpand, BsArrowsCollapse } from "react-icons/bs";
 
@@ -12,8 +12,9 @@ export async function loader() {
 }
 
 export function ServiceDayList() {
+  const navigate = useNavigate();
   const { data, errors, status } = useLoaderData();
-  console.log(data);
+
   if (errors) {
     // Handle error.
   }
