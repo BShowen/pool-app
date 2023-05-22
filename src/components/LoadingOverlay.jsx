@@ -1,14 +1,12 @@
 import { useNavigation } from "react-router-dom";
 import { Transition } from "@headlessui/react";
 
-export default function Loading() {
+export default function Loading({ show }) {
   const navigation = useNavigation();
-
-  const isSubmitting = navigation.state === "submitting";
 
   return (
     <Transition
-      show={navigation.state === "submitting"}
+      show={show || navigation.state === "submitting"}
       enter="transition-bg-opacity duration-150"
       enterFrom="bg-slate-500 bg-opacity-0"
       enterTo="bg-slate-500 bg-opacity-75"

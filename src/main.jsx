@@ -1,14 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { ApolloProvider } from "@apollo/client";
 
+import client from "./apolloServer";
 import "./index.css";
 import routes from "./routes/routeDefinitions";
 import { loader as logoutLoader } from "./routes/logout";
-import Login, {
-  action as loginAction,
-  loader as loginLoader,
-} from "./routes/login";
+import Login, { loader as loginLoader } from "./routes/login";
 
 import RegisterPage, {
   loader as registerPageLoader,
@@ -36,7 +35,6 @@ const router = createBrowserRouter([
     path: routes.login,
     element: <Login />,
     loader: loginLoader,
-    action: loginAction,
   },
   {
     path: routes.registerTechnician,
@@ -47,7 +45,9 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
+  // <React.StrictMode>
+  <ApolloProvider client={client}>
     <RouterProvider router={router} />
-  </React.StrictMode>
+  </ApolloProvider>
+  // </React.StrictMode>
 );

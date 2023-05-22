@@ -1,20 +1,11 @@
-import { Form, useActionData, redirect } from "react-router-dom";
+import { Form, redirect, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getLoginToken } from "../utils/apiFetches";
+import { useMutation, gql } from "@apollo/client";
+
 import routes from "./routeDefinitions";
 import store from "../utils/store";
 import BannerAlert from "../components/BannerAlert";
-
-export async function action({ request, params }) {
-  const formData = await request.formData();
-  const { errors, data } = await getLoginToken(Object.fromEntries(formData));
-  if (errors) {
-    return errors;
-  } else {
-    window.localStorage.setItem("apiToken", data.token);
-    return redirect(routes.root);
-  }
-}
+import LoadingOverlay from "../components/LoadingOverlay";
 
 export function loader() {
   // Redirect the user if they are already logged in.
@@ -25,9 +16,20 @@ export function loader() {
   return null;
 }
 
+const LOGIN = gql`
+  mutation Login($email: String, $password: String) {
+    login(email: $email, password: $password)
+  }
+`;
+
 export default function Login() {
-  const { email, password } = useActionData() || {};
+  const navigate = useNavigate();
+  const [mutateFunction, { data, loading }] = useMutation(LOGIN);
   const [messageList] = useState(store.get()); //Get any messages associated with this route
+  const [formErrors, setFormErrors] = useState({
+    email: undefined,
+    password: undefined,
+  });
 
   useEffect(() => {
     return () => {
@@ -36,17 +38,48 @@ export default function Login() {
     };
   });
 
+  useEffect(() => {
+    // Place apiToken in local storage
+    if (data?.login) {
+      window.localStorage.setItem("apiToken", data.login);
+      // Redirect to dashboard
+      navigate(routes.root);
+    }
+  }, [data]);
+
+  async function submitForm(formData) {
+    try {
+      await mutateFunction({ variables: formData });
+    } catch (error) {
+      const errorMessages = {};
+      error.graphQLErrors.forEach((er) => {
+        const { field } = er.extensions;
+        errorMessages[field] = er.message;
+      });
+      setFormErrors(errorMessages);
+    }
+  }
+
   return (
     <>
       <BannerAlert message={messageList[0]} />
+      <LoadingOverlay show={loading} />
       <div className="pt-6">
         <Form
           method="post"
           className="flex flex-col gap-4 w-full p-5 md:w-96 md:mx-auto"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formData = Object.fromEntries(new FormData(e.target));
+            submitForm(formData);
+          }}
         >
           <div>
             <div className="mb-2 block">
-              <label htmlFor="email" className={email ? "text-secondary" : ""}>
+              <label
+                htmlFor="email"
+                className={formErrors.email ? "text-secondary" : ""}
+              >
                 Email
               </label>
             </div>
@@ -57,22 +90,22 @@ export default function Login() {
               placeholder="Email"
               name="email"
               className={`input input-bordered w-full ${
-                email ? "input-secondary" : ""
+                formErrors.email ? "input-secondary" : ""
               }`}
             />
             <p
               className={`mt-2 text-sm h-4 text-secondary ${
-                (!email && "invisible") || ""
+                (!formErrors.email && "invisible") || ""
               }`}
             >
-              {email}
+              {formErrors.email}
             </p>
           </div>
           <div>
             <div className="mb-2 block">
               <label
                 htmlFor="password"
-                className={password ? "text-secondary" : ""}
+                className={formErrors.password ? "text-secondary" : ""}
               >
                 Password
               </label>
@@ -84,15 +117,15 @@ export default function Login() {
               placeholder="Password"
               name="password"
               className={`input input-bordered w-full ${
-                password ? "input-secondary" : ""
+                formErrors.password ? "input-secondary" : ""
               }`}
             />
             <p
               className={`mt-2 text-sm h-4 text-secondary ${
-                !password && "invisible"
+                !formErrors.password && "invisible"
               }`}
             >
-              {password}
+              {formErrors.password}
             </p>
           </div>
           <button className="btn btn-primary" type="submit">
