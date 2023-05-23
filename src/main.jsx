@@ -45,9 +45,9 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  // <React.StrictMode>
-  <ApolloProvider client={client}>
-    <RouterProvider router={router} />
-  </ApolloProvider>
-  // </React.StrictMode>
+  <React.StrictMode>
+    <ApolloProvider client={client}>
+      <RouterProvider router={router} />
+    </ApolloProvider>
+  </React.StrictMode>
 );
