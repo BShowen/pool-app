@@ -2,9 +2,7 @@ import routes from "../routeDefinitions";
 import Root, { loader as rootLoader } from "./root";
 
 /* -------------------- Customer routes -------------------- */
-import CustomersPage, {
-  loader as customersPageLoader,
-} from "./customerRoute/CustomersPage";
+import CustomersPage from "./customerRoute/CustomersPage";
 import NewCustomerPage, {
   action as newCustomerPageAction,
 } from "./customerRoute/NewCustomerPage";
@@ -18,7 +16,6 @@ import CustomerEditPage, {
 /* -------------------- Customer components -------------------- */
 import CustomerDashboard from "./customerRoute/customerComponents/CustomerDashboard";
 import CustomerList, {
-  loader as customerListLoader,
   action as customerListAction,
 } from "./customerRoute/customerComponents/CustomerList";
 
@@ -63,13 +60,11 @@ export default {
     {
       path: routes.customers,
       element: <CustomersPage />,
-      id: "customer-root",
-      loader: customersPageLoader,
+      errorElement: <ErrorDisplay />,
       children: [
         {
           index: true,
           element: <CustomerList />,
-          loader: customerListLoader,
           action: customerListAction,
         },
         {

@@ -1,22 +1,17 @@
 import {
   Link,
-  useAsyncValue,
-  useLoaderData,
   useNavigate,
   useFetcher,
+  useOutletContext,
 } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery, gql } from "@apollo/client";
 
 import { formatAccountName, capitalize } from "../../../../utils/formatters";
-import { getTechnicians, updateCustomer } from "../../../../utils/apiFetches";
+import { updateCustomer } from "../../../../utils/apiFetches";
 import routes from "../../../routeDefinitions";
 import BannerAlert from "../../../../components/BannerAlert";
 import useSorter from "../../../../hooks/useSorter";
-
-export async function loader() {
-  const response = await getTechnicians();
-  return response.data.technicianList;
-}
 
 export async function action({ request }) {
   const formData = await request.formData();
@@ -26,8 +21,12 @@ export async function action({ request }) {
 
 export default function CustomerList() {
   const navigate = useNavigate();
-  const { data, error } = useAsyncValue();
-  const [customerList, sortBy] = useSorter(data.accountList || []);
+  const {
+    getCustomerAccountList: customerAccountList,
+    getTechnicianList: technicianList,
+  } = useOutletContext();
+
+  const [sortedCustomerAccountList, sortBy] = useSorter(customerAccountList);
 
   return (
     <div className="h-full lg:h-screen">
@@ -49,7 +48,7 @@ export default function CustomerList() {
       <div className="w-full pt-5">
         <div className="p-2">
           <span className="badge badge-primary p-3">
-            {customerList.length} customers
+            {sortedCustomerAccountList.length} customers
           </span>
         </div>
         <table className="table w-full h-full">
@@ -73,16 +72,16 @@ export default function CustomerList() {
             </tr>
           </thead>
           <tbody>
-            {customerList.map((customer) => {
+            {sortedCustomerAccountList.map((customer) => {
               return (
                 <tr
-                  key={customer._id}
+                  key={customer.id}
                   className="hover:cursor-pointer hover h-full"
                   onClick={() => {
                     navigate(
                       routes.getDynamicRoute({
                         route: "customer",
-                        id: customer._id,
+                        id: customer.id,
                       })
                     );
                   }}
@@ -90,8 +89,9 @@ export default function CustomerList() {
                   <td>{formatAccountName(customer.accountName)}</td>
                   <td className="p-0 m-0 h-full">
                     <TechnicianSelector
-                      customerAccountId={customer._id}
-                      technicianId={customer.technicianId}
+                      customerAccountId={customer.id}
+                      technicianId={customer.technician?.id}
+                      technicianList={technicianList || []}
                     />
                   </td>
                 </tr>
@@ -104,8 +104,11 @@ export default function CustomerList() {
   );
 }
 
-function TechnicianSelector({ customerAccountId, technicianId }) {
-  const technicianList = useLoaderData();
+function TechnicianSelector({
+  customerAccountId,
+  technicianId,
+  technicianList,
+}) {
   const fetcher = useFetcher();
   /**
    * fetcher.formData is available when the form is submitting. Use that value
@@ -174,7 +177,7 @@ function TechnicianSelector({ customerAccountId, technicianId }) {
             <option disabled>Technicians</option>
             {technicianList.map((tech) => {
               return (
-                <option key={tech._id} value={tech._id}>
+                <option key={tech.id} value={tech.id}>
                   {capitalize(tech.firstName)} {capitalize(tech.lastName[0])}.
                 </option>
               );
