@@ -5,7 +5,6 @@ import {
   useOutletContext,
 } from "react-router-dom";
 import { useState } from "react";
-import { useQuery, gql } from "@apollo/client";
 
 import { formatAccountName, capitalize } from "../../../../utils/formatters";
 import { updateCustomer } from "../../../../utils/apiFetches";
@@ -90,7 +89,7 @@ export default function CustomerList() {
                   <td className="p-0 m-0 h-full">
                     <TechnicianSelector
                       customerAccountId={customer.id}
-                      technicianId={customer.technician?.id}
+                      technicianId={customer.technicianId}
                       technicianList={technicianList || []}
                     />
                   </td>

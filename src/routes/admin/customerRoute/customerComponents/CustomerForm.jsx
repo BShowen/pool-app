@@ -7,8 +7,11 @@ export default function CustomerForm({
   action,
   customerAccount,
   errors,
+  onSubmit,
 }) {
-  const submit = useSubmit();
+  // If a submit handler is passed in then use that to submit the form.
+  // Otherwise use useSubmit() to submit the form.
+  const submit = onSubmit || useSubmit();
   const [state, setState] = useState(
     customerAccount || { accountOwners: [{}] }
   );
@@ -16,12 +19,16 @@ export default function CustomerForm({
   const [focus, setFocus] = useState(false);
   const accountOwnersCount = state.accountOwners.length - 1;
 
+  // If errors is undefined then assign a blank object {} to it.
+  // This is because the form expects errors to always be ab object.
+  errors = errors ? errors : {};
+
   function updateState(e) {
     const isSubForm = Object.keys(e.target.dataset).length;
     if (isSubForm) {
       const index = e.target.dataset.index;
       setState((prevState) => {
-        const updatedAccountOwners = prevState.accountOwners;
+        const updatedAccountOwners = [...prevState.accountOwners];
         updatedAccountOwners[index] = {
           ...prevState.accountOwners[index],
           [e.target.name]: e.target.value,
@@ -33,7 +40,11 @@ export default function CustomerForm({
       });
     } else {
       setState((prevState) => {
-        return { ...prevState, [e.target.name]: e.target.value };
+        let value =
+          e.target.type === "number"
+            ? Number.parseFloat(e.target.value)
+            : e.target.value;
+        return { ...prevState, [e.target.name]: value };
       });
     }
   }
@@ -56,15 +67,7 @@ export default function CustomerForm({
       className="flex flex-col w-full px-5"
       onSubmit={(e) => {
         e.preventDefault();
-        const formData = new FormData();
-        for (const [key, value] of Object.entries(state)) {
-          if (Array.isArray(value)) {
-            formData.set(key, JSON.stringify(value));
-          } else {
-            formData.set(key, value);
-          }
-        }
-        submit(formData, { method: "post", action: action });
+        submit({ formData: state });
       }}
     >
       <div>
@@ -127,6 +130,7 @@ export default function CustomerForm({
               type="number"
               placeholder="Price"
               name="price"
+              step="0.01"
               className={`input input-bordered w-full focus:outline-none ${
                 errors.price && "input-secondary"
               }`}

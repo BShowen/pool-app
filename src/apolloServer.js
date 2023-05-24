@@ -1,6 +1,12 @@
 // GraphQL packages.
-import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client";
+import {
+  ApolloClient,
+  createHttpLink,
+  InMemoryCache,
+  from,
+} from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
+import { removeTypenameLink } from "./utils/removeTypenameLink";
 
 const httpLink = createHttpLink({
   uri: "http://192.168.1.138:8080/",
@@ -18,6 +24,6 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 export default new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: from([removeTypenameLink, authLink.concat(httpLink)]),
   cache: new InMemoryCache(),
 });

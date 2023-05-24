@@ -13,6 +13,7 @@ const QUERY = gql`
         firstName
         lastName
         phoneNumber
+        id
       }
       address
       companyId
@@ -21,11 +22,7 @@ const QUERY = gql`
       serviceDay
       serviceFrequency
       serviceType
-      technician {
-        id
-        firstName
-        lastName
-      }
+      technicianId
     }
     getTechnicianList {
       companyId

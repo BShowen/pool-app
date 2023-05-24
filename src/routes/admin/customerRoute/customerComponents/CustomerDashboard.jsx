@@ -19,7 +19,7 @@ export default function CustomerDashboard() {
             <h1 className="card-title">Contacts</h1>
             {customerAccount.accountOwners.map((contact) => {
               return (
-                <div key={contact._id} className="py-2">
+                <div key={contact.id} className="py-2">
                   <p className="font-semibold">
                     {capitalizeName(contact.firstName, contact.lastName)}
                   </p>
@@ -70,7 +70,7 @@ export default function CustomerDashboard() {
               navigate(
                 routes.getDynamicRoute({
                   route: "editCustomer",
-                  id: customerAccount._id,
+                  id: customerAccount.id,
                 }),
                 { replace }
               );

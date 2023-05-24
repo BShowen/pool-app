@@ -9,9 +9,7 @@ import NewCustomerPage, {
 import CustomerPage, {
   loader as customerPageLoader,
 } from "./customerRoute/CustomerPage";
-import CustomerEditPage, {
-  action as customerEditPageAction,
-} from "./customerRoute/CustomerEditPage";
+import CustomerEditPage from "./customerRoute/CustomerEditPage";
 
 /* -------------------- Customer components -------------------- */
 import CustomerDashboard from "./customerRoute/customerComponents/CustomerDashboard";
@@ -84,7 +82,6 @@ export default {
             {
               path: routes.editCustomer,
               element: <CustomerEditPage />,
-              action: customerEditPageAction,
             },
             {
               path: routes.customerPoolReports,
