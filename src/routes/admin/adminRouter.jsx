@@ -13,9 +13,7 @@ import CustomerEditPage from "./customerRoute/CustomerEditPage";
 
 /* -------------------- Customer components -------------------- */
 import CustomerDashboard from "./customerRoute/customerComponents/CustomerDashboard";
-import CustomerList, {
-  action as customerListAction,
-} from "./customerRoute/customerComponents/CustomerList";
+import CustomerList from "./customerRoute/customerComponents/CustomerList";
 
 /* -------------------- Technician routes -------------------- */
 import TechniciansPage, {
@@ -63,7 +61,6 @@ export default {
         {
           index: true,
           element: <CustomerList />,
-          action: customerListAction,
         },
         {
           path: routes.newCustomer,

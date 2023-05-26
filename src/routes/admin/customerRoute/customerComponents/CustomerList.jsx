@@ -1,22 +1,11 @@
-import {
-  Link,
-  useNavigate,
-  useFetcher,
-  useOutletContext,
-} from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { useState } from "react";
+import { gql, useMutation } from "@apollo/client";
 
 import { formatAccountName, capitalize } from "../../../../utils/formatters";
-import { updateCustomer } from "../../../../utils/apiFetches";
 import routes from "../../../routeDefinitions";
 import BannerAlert from "../../../../components/BannerAlert";
 import useSorter from "../../../../hooks/useSorter";
-
-export async function action({ request }) {
-  const formData = await request.formData();
-  const response = await updateCustomer(Object.fromEntries(formData));
-  return response;
-}
 
 export default function CustomerList() {
   const navigate = useNavigate();
@@ -103,44 +92,48 @@ export default function CustomerList() {
   );
 }
 
+// export async function action({ request }) {
+//   const formData = await request.formData();
+//   const response = await updateCustomer(Object.fromEntries(formData));
+//   return response;
+// }
+
+const UPDATE_CUSTOMER = gql`
+  mutation Mutation($customerAccountInput: UpdateCustomerAccountInput) {
+    updateCustomerAccount(customerAccountInput: $customerAccountInput) {
+      id
+      technicianId
+    }
+  }
+`;
 function TechnicianSelector({
   customerAccountId,
   technicianId,
   technicianList,
 }) {
-  const fetcher = useFetcher();
-  /**
-   * fetcher.formData is available when the form is submitting. Use that value
-   * first to take advantage of optimistic UI. fetcher.data is what is the
-   * finalized value returned from the backend server. fetcher.formData is not
-   * available once fetcher.data is available. Use fetcher.data (finalized value)
-   * once the request has completed. If either of these isn't available then
-   * the user hasn't submitted a form and/or this is the initial render and we
-   * use the value passed in from props.
-   */
-  const selectionValue =
-    fetcher?.formData?.get("technicianId") ||
-    fetcher?.data?.technicianId ||
-    technicianId ||
-    0;
-
-  let [showErrorAlert, setErrorAlert] = useState(false);
-
-  if (
-    fetcher?.data?.status &&
-    fetcher.state === "idle" &&
-    fetcher.data.status === 400
-  ) {
-    fetcher.data = undefined; //This is in order to prevent an infinite loop.
-    setErrorAlert(true);
-  }
+  const [showErrorAlert, setErrorAlert] = useState(false);
+  const [updateCustomer] = useMutation(UPDATE_CUSTOMER);
 
   async function handleChange(e) {
     e.preventDefault();
-    const formData = Object.fromEntries(new FormData(e.target.parentElement));
-    fetcher.submit(formData, {
-      method: "post",
-    });
+    const variables = {
+      customerAccountInput: Object.fromEntries(
+        new FormData(e.target.parentElement)
+      ),
+    };
+    try {
+      await updateCustomer({
+        variables,
+        optimisticResponse: {
+          updateCustomerAccount: {
+            ...variables.customerAccountInput,
+            __typename: "CustomerAccount",
+          },
+        },
+      });
+    } catch (error) {
+      setErrorAlert(true);
+    }
   }
 
   return (
@@ -159,17 +152,12 @@ function TechnicianSelector({
           e.stopPropagation();
         }}
       >
-        <fetcher.Form method="post">
-          <input
-            hidden
-            readOnly
-            name="customerAccountId"
-            value={customerAccountId}
-          />
+        <form method="post">
+          <input hidden readOnly name="id" value={customerAccountId} />
           <select
             className="focus:outline-none focus:bg-transparent bg-transparent w-min hover:cursor-pointer"
             readOnly
-            value={selectionValue}
+            value={technicianId || 0}
             onChange={handleChange}
             name="technicianId"
           >
@@ -183,7 +171,7 @@ function TechnicianSelector({
             })}
             <option value="0">Unassigned</option>
           </select>
-        </fetcher.Form>
+        </form>
       </div>
     </>
   );
