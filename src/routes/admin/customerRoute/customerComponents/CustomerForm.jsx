@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Form, useSubmit, useNavigate } from "react-router-dom";
 
 import AccountOwnerForm from "./AccountOwnerForm";
+import { accountOwnerType } from "../../../../utils/types";
+
 export default function CustomerForm({
   title,
   action,
@@ -223,7 +225,10 @@ export default function CustomerForm({
                 setState((prevState) => {
                   return {
                     ...prevState,
-                    accountOwners: [...prevState.accountOwners, {}],
+                    accountOwners: [
+                      ...prevState.accountOwners,
+                      { ...accountOwnerType },
+                    ],
                   };
                 });
                 setFocus(true);
