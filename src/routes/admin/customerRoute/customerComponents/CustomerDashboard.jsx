@@ -1,15 +1,63 @@
-import { useSubmit, useNavigate, useOutletContext } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { gql, useMutation } from "@apollo/client";
+
 import {
   capitalizeName,
   formatAccountName,
 } from "../../../../utils/formatters";
 import routes from "../../../routeDefinitions";
+
+const DELETE_CUSTOMER_ACCOUNT = gql`
+  mutation DeleteCustomerAccount($id: ID) {
+    deleteCustomerAccount(id: $id)
+  }
+`;
+
+const CUSTOMER_LIST = gql`
+  query getCustomerAccountList {
+    getCustomerAccountList {
+      accountName
+      accountOwners {
+        emailAddress
+        firstName
+        lastName
+        phoneNumber
+        id
+      }
+      address
+      companyId
+      id
+      price
+      serviceDay
+      serviceFrequency
+      serviceType
+      technicianId
+    }
+  }
+`;
 export default function CustomerDashboard() {
-  const submit = useSubmit();
+  const [deleteAccount, { data }] = useMutation(DELETE_CUSTOMER_ACCOUNT, {
+    // ----------------------------------------------------
+    // No need to cache the results for deleting an account.
+    fetchPolicy: "no-cache",
+    // ----------------------------------------------------
+
+    // ----------------------------------------------------
+    // Refetch the list of customers to update the Apollo cache.
+    // This is easier than manually updating the cache.
+    refetchQueries: [{ query: CUSTOMER_LIST }],
+    // ----------------------------------------------------
+  });
   const navigate = useNavigate();
   const [replace, setReplace] = useState(false);
   const { customerAccount } = useOutletContext();
+
+  useEffect(() => {
+    if (data?.deleteCustomerAccount === true) {
+      navigate(routes.customers);
+    }
+  }, [data]);
 
   return (
     <div className="card bg-base-100 w-full lg:w-3/5 lg:shadow-lg">
@@ -80,21 +128,18 @@ export default function CustomerDashboard() {
           </button>
           <button
             className="btn btn-error btn-md lg:btn-sm"
-            onClick={() => {
-              let canDelete = confirm(
+            onClick={async () => {
+              const canDelete = confirm(
                 `Delete ${formatAccountName(customerAccount.accountName)}?`
               );
               if (canDelete) {
-                const formData = new FormData();
-                formData.set("_id", customerAccount._id);
-                formData.set("intent", "DELETE");
-                submit(formData, {
-                  method: "post",
-                  action: routes.getDynamicRoute({
-                    route: "editCustomer",
-                    id: customerAccount._id,
-                  }),
-                });
+                try {
+                  await deleteAccount({
+                    variables: { id: customerAccount.id },
+                  });
+                } catch (error) {
+                  console.log("Error deleting customer: ", error.message);
+                }
               }
             }}
           >
