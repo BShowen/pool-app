@@ -3,39 +3,9 @@ import { gql, useQuery } from "@apollo/client";
 
 import LoadingOverlay from "../../../components/LoadingOverlay";
 import ErrorDisplay from "../../../components/ErrorDisplay";
-
-const QUERY = gql`
-  query Query {
-    getCustomerAccountList {
-      accountName
-      accountOwners {
-        emailAddress
-        firstName
-        lastName
-        phoneNumber
-        id
-      }
-      address
-      companyId
-      id
-      price
-      serviceDay
-      serviceFrequency
-      serviceType
-      technicianId
-    }
-    getTechnicianList {
-      companyId
-      emailAddress
-      lastName
-      id
-      firstName
-      password
-    }
-  }
-`;
+import { CUSTOMER_TECHNICIAN_LIST } from "../../../queries/index.js";
 export default function CustomersPage() {
-  const { loading, error, data } = useQuery(QUERY);
+  const { loading, error, data } = useQuery(CUSTOMER_TECHNICIAN_LIST);
 
   if (error) {
     return <ErrorDisplay message={error.message} />;

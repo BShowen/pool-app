@@ -1,6 +1,6 @@
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 
 import {
   capitalizeName,
@@ -8,34 +8,14 @@ import {
 } from "../../../../utils/formatters";
 import routes from "../../../routeDefinitions";
 
-const DELETE_CUSTOMER_ACCOUNT = gql`
-  mutation DeleteCustomerAccount($id: ID) {
-    deleteCustomerAccount(id: $id)
-  }
-`;
+// -----------------------------------------------------------------------------
+// Queries
+import {
+  CUSTOMER_LIST,
+  DELETE_CUSTOMER_ACCOUNT,
+} from "../../../../queries/index.js";
+// -----------------------------------------------------------------------------
 
-const CUSTOMER_LIST = gql`
-  query getCustomerAccountList {
-    getCustomerAccountList {
-      accountName
-      accountOwners {
-        emailAddress
-        firstName
-        lastName
-        phoneNumber
-        id
-      }
-      address
-      companyId
-      id
-      price
-      serviceDay
-      serviceFrequency
-      serviceType
-      technicianId
-    }
-  }
-`;
 export default function CustomerDashboard() {
   const [deleteAccount, { data }] = useMutation(DELETE_CUSTOMER_ACCOUNT, {
     // ----------------------------------------------------
