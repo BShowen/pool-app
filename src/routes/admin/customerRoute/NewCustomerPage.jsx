@@ -1,27 +1,50 @@
-import { redirect, useActionData } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "@apollo/client";
 
+import { CREATE_NEW_CUSTOMER } from "../../../queries/index.js";
 import CustomerForm from "./customerComponents/CustomerForm";
-import { createNewAccount } from "../../../utils/apiFetches";
 import routes from "../../routeDefinitions";
+import { useEffect } from "react";
 
-export async function action({ request }) {
-  const formData = await request.formData();
-  const formObject = Object.fromEntries(formData);
-  const { status, data: customer, errors } = await createNewAccount(formObject);
-  if (status === 201) {
-    return redirect(
-      routes.getDynamicRoute({ route: "customer", id: customer._id })
-    );
-  } else {
-    return errors;
+async function createNewCustomer(formData, sendMutation) {
+  try {
+    const variables = { customerAccountInput: formData };
+    await sendMutation({ variables });
+  } catch (error) {
+    // Errors are handled by the component (below).
+    // This catch statement is here to silence the browser from logging
+    // that there is an uncaught error.
+    return false;
   }
 }
 
 export default function NewCustomerPage() {
-  const errors = useActionData() || {};
+  const navigate = useNavigate();
+  const [createCustomer, { data, error }] = useMutation(CREATE_NEW_CUSTOMER);
+  const formErrors = error?.graphQLErrors[0]?.extensions?.fields;
+
+  useEffect(() => {
+    if (data) {
+      const customerId = data.createNewCustomerAccount.id;
+      const route = routes.getDynamicRoute({
+        route: "customer",
+        id: customerId,
+      });
+      navigate(route);
+    }
+  }, [data]);
+
   return (
     <div className="w-full flex flex-row justify-center bg-white">
-      <CustomerForm title={"New customer"} errors={errors} />
+      <CustomerForm
+        title={"New customer"}
+        errors={formErrors}
+        onSubmit={({ formData }) => {
+          createNewCustomer(formData, createCustomer);
+        }}
+      />
     </div>
   );
 }
+
+// You are here. You need to implement crate new customer form

@@ -3,9 +3,7 @@ import Root, { loader as rootLoader } from "./root";
 
 /* -------------------- Customer routes -------------------- */
 import CustomersPage from "./customerRoute/CustomersPage";
-import NewCustomerPage, {
-  action as newCustomerPageAction,
-} from "./customerRoute/NewCustomerPage";
+import NewCustomerPage from "./customerRoute/NewCustomerPage";
 import CustomerPage, {
   loader as customerPageLoader,
 } from "./customerRoute/CustomerPage";
@@ -65,7 +63,6 @@ export default {
         {
           path: routes.newCustomer,
           element: <NewCustomerPage />,
-          action: newCustomerPageAction,
         },
         {
           path: routes.customer,

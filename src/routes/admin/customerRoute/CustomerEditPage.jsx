@@ -33,11 +33,7 @@ const UPDATE_CUSTOMER_MUTATION = gql`
 async function updateCustomer(formData, sendMutation) {
   try {
     const variables = { customerAccountInput: formData };
-    const { data } = await sendMutation({ variables });
-    const customerAccount = data.updateCustomerAccount;
-    return redirect(
-      routes.getDynamicRoute({ route: "customer", id: customerAccount.id })
-    );
+    await sendMutation({ variables });
   } catch (error) {
     // Errors are handled by CustomerEdit component (below).
     // This catch statement is here to silence the browser from logging
