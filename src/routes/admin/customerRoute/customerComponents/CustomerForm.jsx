@@ -1,19 +1,18 @@
 import { useState } from "react";
-import { Form, useSubmit, useNavigate } from "react-router-dom";
+import { Form, useNavigate } from "react-router-dom";
 
 import AccountOwnerForm from "./AccountOwnerForm";
 import { accountOwnerType } from "../../../../utils/types";
 
 export default function CustomerForm({
   title,
-  action,
   customerAccount,
   errors,
   onSubmit,
 }) {
   // If a submit handler is passed in then use that to submit the form.
   // Otherwise use useSubmit() to submit the form.
-  const submit = onSubmit || useSubmit();
+  const submit = onSubmit;
   const [state, setState] = useState(
     customerAccount || { accountOwners: [{}] }
   );

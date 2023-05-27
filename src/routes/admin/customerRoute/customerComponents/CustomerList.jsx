@@ -7,6 +7,8 @@ import routes from "../../../routeDefinitions";
 import BannerAlert from "../../../../components/BannerAlert";
 import useSorter from "../../../../hooks/useSorter";
 import { CUSTOMER_TECHNICIAN_LIST } from "../../../../queries";
+import ErrorDisplay from "../../../../components/ErrorDisplay";
+import Loading from "../../../../components/Loading";
 
 export default function CustomerList() {
   const navigate = useNavigate();
@@ -17,80 +19,88 @@ export default function CustomerList() {
   } = data;
   const [sortedCustomerAccountList, sortBy] = useSorter(customerAccountList);
 
-  return (
-    <div className="h-full lg:h-screen">
-      <div className="sticky p-1 lg:p-5 top-0 z-40 bg-white shadow-sm">
-        <div className="w-full flex flex-row justify-center">
-          <h1 className="text-3xl font-bold">Customers</h1>
+  if (loading) {
+    return <Loading />;
+  } else if (error) {
+    return <ErrorDisplay message={error.message} />;
+  } else {
+    return (
+      <div className="h-full lg:h-screen">
+        <div className="sticky p-1 lg:p-5 top-0 z-40 bg-white shadow-sm">
+          <div className="w-full flex flex-row justify-center">
+            <h1 className="text-3xl font-bold">Customers</h1>
+          </div>
+          <div className="w-full p-5 lg:px-5 flex flex-row justify-end">
+            <Link
+              as="button"
+              to={routes.newCustomer}
+              className="btn btn-primary btn-sm lg:btn-md"
+            >
+              New customer
+            </Link>
+          </div>
         </div>
-        <div className="w-full p-5 lg:px-5 flex flex-row justify-end">
-          <Link
-            as="button"
-            to={routes.newCustomer}
-            className="btn btn-primary btn-sm lg:btn-md"
-          >
-            New customer
-          </Link>
-        </div>
-      </div>
 
-      <div className="w-full pt-5">
-        <div className="p-2">
-          <span className="badge badge-primary p-3">
-            {sortedCustomerAccountList.length} customers
-          </span>
+        <div className="w-full pt-5">
+          <div className="p-2">
+            <span className="badge badge-primary p-3">
+              {sortedCustomerAccountList.length} customers
+            </span>
+          </div>
+          <table className="table w-full h-full">
+            <thead>
+              <tr>
+                <th>
+                  <span
+                    className="rounded-none hover:cursor-pointer"
+                    onClick={() => {
+                      sortBy({ category: "accountName" });
+                    }}
+                    onMouseEnter={(e) =>
+                      e.target.classList.add("text-blue-500")
+                    }
+                    onMouseLeave={(e) =>
+                      e.target.classList.remove("text-blue-500")
+                    }
+                  >
+                    Customer
+                  </span>
+                </th>
+                <th>Technician</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedCustomerAccountList.map((customer) => {
+                return (
+                  <tr
+                    key={customer.id}
+                    className="hover:cursor-pointer hover h-full"
+                    onClick={() => {
+                      navigate(
+                        routes.getDynamicRoute({
+                          route: "customer",
+                          id: customer.id,
+                        })
+                      );
+                    }}
+                  >
+                    <td>{formatAccountName(customer.accountName)}</td>
+                    <td className="p-0 m-0 h-full">
+                      <TechnicianSelector
+                        customerAccountId={customer.id}
+                        technicianId={customer.technicianId}
+                        technicianList={technicianList || []}
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-        <table className="table w-full h-full">
-          <thead>
-            <tr>
-              <th>
-                <span
-                  className="rounded-none hover:cursor-pointer"
-                  onClick={() => {
-                    sortBy({ category: "accountName" });
-                  }}
-                  onMouseEnter={(e) => e.target.classList.add("text-blue-500")}
-                  onMouseLeave={(e) =>
-                    e.target.classList.remove("text-blue-500")
-                  }
-                >
-                  Customer
-                </span>
-              </th>
-              <th>Technician</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedCustomerAccountList.map((customer) => {
-              return (
-                <tr
-                  key={customer.id}
-                  className="hover:cursor-pointer hover h-full"
-                  onClick={() => {
-                    navigate(
-                      routes.getDynamicRoute({
-                        route: "customer",
-                        id: customer.id,
-                      })
-                    );
-                  }}
-                >
-                  <td>{formatAccountName(customer.accountName)}</td>
-                  <td className="p-0 m-0 h-full">
-                    <TechnicianSelector
-                      customerAccountId={customer.id}
-                      technicianId={customer.technicianId}
-                      technicianList={technicianList || []}
-                    />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 // export async function action({ request }) {

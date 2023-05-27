@@ -5,6 +5,7 @@ import { CREATE_NEW_CUSTOMER, CUSTOMER_LIST } from "../../../queries/index.js";
 import CustomerForm from "./customerComponents/CustomerForm";
 import routes from "../../routeDefinitions";
 import { useEffect } from "react";
+import LoadingOverlay from "../../../components/LoadingOverlay";
 
 async function createNewCustomer(formData, sendMutation) {
   try {
@@ -20,9 +21,10 @@ async function createNewCustomer(formData, sendMutation) {
 
 export default function NewCustomerPage() {
   const navigate = useNavigate();
-  const [createCustomer, { data, error }] = useMutation(CREATE_NEW_CUSTOMER, {
-    refetchQueries: [{ query: CUSTOMER_LIST }],
-  });
+  const [createCustomer, { data, error, loading }] = useMutation(
+    CREATE_NEW_CUSTOMER,
+    { refetchQueries: [{ query: CUSTOMER_LIST }] }
+  );
   const formErrors = error?.graphQLErrors[0]?.extensions?.fields;
 
   useEffect(() => {
@@ -37,7 +39,8 @@ export default function NewCustomerPage() {
   }, [data]);
 
   return (
-    <div className="w-full flex flex-row justify-center bg-white">
+    <>
+      <LoadingOverlay show={loading} />
       <CustomerForm
         title={"New customer"}
         errors={formErrors}
@@ -45,8 +48,6 @@ export default function NewCustomerPage() {
           createNewCustomer(formData, createCustomer);
         }}
       />
-    </div>
+    </>
   );
 }
-
-// You are here. You need to implement crate new customer form

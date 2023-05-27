@@ -5,6 +5,7 @@ import { CUSTOMER_ACCOUNT } from "../../../queries/index.js";
 import CustomerTopNav from "./customerComponents/CustomerTopNav";
 import { formatAccountName } from "../../../utils/formatters";
 import Loading from "../../../components/Loading.jsx";
+import ErrorDisplay from "../../../components/ErrorDisplay.jsx";
 export async function loader({ params }) {
   // Retrieve and return the id from the url.
   return { customerId: params.customerId };
@@ -19,6 +20,8 @@ export default function CustomerPage() {
 
   if (loading) {
     return <Loading />;
+  } else if (error) {
+    return <ErrorDisplay message={error.message} />;
   } else {
     const { getCustomerAccount: customerAccount } = data;
     return (

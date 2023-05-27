@@ -13,25 +13,30 @@ import {
   DELETE_CUSTOMER_ACCOUNT,
   CUSTOMER_ACCOUNT,
 } from "../../../../queries/index.js";
+import ErrorDisplay from "../../../../components/ErrorDisplay";
 
 export default function CustomerDashboard() {
   const { customerId } = useLoaderData();
-  const [deleteAccount, { data: mutationData }] = useMutation(
-    DELETE_CUSTOMER_ACCOUNT,
-    {
-      // ----------------------------------------------------
-      // No need to cache the results for deleting an account.
-      fetchPolicy: "no-cache",
-      // ----------------------------------------------------
+  const [
+    deleteAccount,
+    { data: mutationData, error: mutationError, loading: mutationLoading },
+  ] = useMutation(DELETE_CUSTOMER_ACCOUNT, {
+    // ----------------------------------------------------
+    // No need to cache the results for deleting an account.
+    fetchPolicy: "no-cache",
+    // ----------------------------------------------------
 
-      // ----------------------------------------------------
-      // Refetch the list of customers to update the Apollo cache.
-      // This is easier than manually updating the cache.
-      refetchQueries: [{ query: CUSTOMER_LIST }],
-      // ----------------------------------------------------
-    }
-  );
-  const { loading, data: queryData } = useQuery(CUSTOMER_ACCOUNT, {
+    // ----------------------------------------------------
+    // Refetch the list of customers to update the Apollo cache.
+    // This is easier than manually updating the cache.
+    refetchQueries: [{ query: CUSTOMER_LIST }],
+    // ----------------------------------------------------
+  });
+  const {
+    loading: queryLoading,
+    data: queryData,
+    error: queryError,
+  } = useQuery(CUSTOMER_ACCOUNT, {
     variables: { id: customerId },
   });
   const navigate = useNavigate();
@@ -44,8 +49,11 @@ export default function CustomerDashboard() {
     }
   }, [mutationData]);
 
-  if (loading) {
+  if (queryLoading || mutationLoading) {
     return <Loading />;
+  } else if (queryError || mutationError) {
+    const errorMessage = queryError?.message || mutationError?.message;
+    return <ErrorDisplay message={errorMessage} />;
   } else {
     const { getCustomerAccount: customerAccount } = queryData;
     return (

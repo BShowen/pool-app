@@ -2,12 +2,12 @@ import { useNavigate, useLoaderData } from "react-router-dom";
 import { useEffect } from "react";
 
 import CustomerForm from "./customerComponents/CustomerForm";
-import LoadingOverlay from "../../../components/LoadingOverlay";
 import routes from "../../routeDefinitions";
 import { useMutation, useQuery } from "@apollo/client";
 
 import { UPDATE_CUSTOMER, CUSTOMER_ACCOUNT } from "../../../queries/index.js";
-import Loading from "../../../components/Loading";
+import LoadingOverlay from "../../../components/LoadingOverlay.jsx";
+import ErrorDisplay from "../../../components/ErrorDisplay";
 
 async function updateCustomer(formData, sendMutation) {
   try {
@@ -24,16 +24,17 @@ async function updateCustomer(formData, sendMutation) {
 export default function CustomerEdit() {
   const { customerId } = useLoaderData();
   const navigate = useNavigate();
-  const [sendMutation, { data: mutationData, loading, error }] =
-    useMutation(UPDATE_CUSTOMER);
-  const { loading: queryLoading, data: queryData } = useQuery(
-    CUSTOMER_ACCOUNT,
-    { variables: { id: customerId } }
-  );
-  const formErrors =
-    error?.message === "MONGOOSE_VALIDATION_ERROR"
-      ? error?.graphQLErrors[0]?.extensions?.fields
-      : {};
+  const [
+    sendMutation,
+    { data: mutationData, loading: mutationLoading, error: mutationError },
+  ] = useMutation(UPDATE_CUSTOMER);
+  const {
+    loading: queryLoading,
+    data: queryData,
+    error: queryError,
+  } = useQuery(CUSTOMER_ACCOUNT, { variables: { id: customerId } });
+
+  const formErrors = mutationError?.graphQLErrors[0]?.extensions?.fields;
 
   useEffect(() => {
     // After submitting the form, redirect to the user account dashboard.
@@ -48,13 +49,13 @@ export default function CustomerEdit() {
     }
   }, [mutationData]);
 
-  if (queryLoading) {
-    return <Loading />;
+  if (queryError) {
+    return <ErrorDisplay message={queryError.message} />;
   } else {
     const { getCustomerAccount: customerAccount } = queryData;
     return (
       <>
-        <LoadingOverlay show={loading} />
+        <LoadingOverlay show={mutationLoading} />
         <CustomerForm
           title={"Edit customer"}
           customerAccount={customerAccount}
