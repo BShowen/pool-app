@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 
-import { CREATE_NEW_CUSTOMER } from "../../../queries/index.js";
+import { CREATE_NEW_CUSTOMER, CUSTOMER_LIST } from "../../../queries/index.js";
 import CustomerForm from "./customerComponents/CustomerForm";
 import routes from "../../routeDefinitions";
 import { useEffect } from "react";
@@ -20,7 +20,9 @@ async function createNewCustomer(formData, sendMutation) {
 
 export default function NewCustomerPage() {
   const navigate = useNavigate();
-  const [createCustomer, { data, error }] = useMutation(CREATE_NEW_CUSTOMER);
+  const [createCustomer, { data, error }] = useMutation(CREATE_NEW_CUSTOMER, {
+    refetchQueries: [{ query: CUSTOMER_LIST }],
+  });
   const formErrors = error?.graphQLErrors[0]?.extensions?.fields;
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const CUSTOMER_TECHNICIAN_LIST = gql`
-  query Query {
+  query customerTechnicianList {
     getCustomerAccountList {
       accountName
       accountOwners {

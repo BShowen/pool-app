@@ -72,10 +72,12 @@ export default {
             {
               index: true,
               element: <CustomerDashboard />,
+              loader: customerPageLoader,
             },
             {
               path: routes.editCustomer,
               element: <CustomerEditPage />,
+              loader: customerPageLoader,
             },
             {
               path: routes.customerPoolReports,

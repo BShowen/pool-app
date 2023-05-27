@@ -1,19 +1,20 @@
-import { Link, useNavigate, useOutletContext } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 
 import { formatAccountName, capitalize } from "../../../../utils/formatters";
 import routes from "../../../routeDefinitions";
 import BannerAlert from "../../../../components/BannerAlert";
 import useSorter from "../../../../hooks/useSorter";
+import { CUSTOMER_TECHNICIAN_LIST } from "../../../../queries";
 
 export default function CustomerList() {
   const navigate = useNavigate();
+  const { loading, error, data } = useQuery(CUSTOMER_TECHNICIAN_LIST);
   const {
     getCustomerAccountList: customerAccountList,
     getTechnicianList: technicianList,
-  } = useOutletContext();
-
+  } = data;
   const [sortedCustomerAccountList, sortBy] = useSorter(customerAccountList);
 
   return (

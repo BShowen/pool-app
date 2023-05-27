@@ -1,34 +1,13 @@
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useLoaderData } from "react-router-dom";
 import { useEffect } from "react";
 
 import CustomerForm from "./customerComponents/CustomerForm";
 import LoadingOverlay from "../../../components/LoadingOverlay";
 import routes from "../../routeDefinitions";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
-const UPDATE_CUSTOMER_MUTATION = gql`
-  mutation UpdateCustomerAccount(
-    $customerAccountInput: UpdateCustomerAccountInput
-  ) {
-    updateCustomerAccount(customerAccountInput: $customerAccountInput) {
-      accountName
-      address
-      companyId
-      id
-      price
-      serviceDay
-      serviceFrequency
-      serviceType
-      accountOwners {
-        emailAddress
-        firstName
-        id
-        lastName
-        phoneNumber
-      }
-    }
-  }
-`;
+import { UPDATE_CUSTOMER, CUSTOMER_ACCOUNT } from "../../../queries/index.js";
+import Loading from "../../../components/Loading";
 
 async function updateCustomer(formData, sendMutation) {
   try {
@@ -43,10 +22,13 @@ async function updateCustomer(formData, sendMutation) {
 }
 
 export default function CustomerEdit() {
-  const { customerAccount } = useOutletContext();
+  const { customerId } = useLoaderData();
   const navigate = useNavigate();
-  const [sendMutation, { data, loading, error }] = useMutation(
-    UPDATE_CUSTOMER_MUTATION
+  const [sendMutation, { data: mutationData, loading, error }] =
+    useMutation(UPDATE_CUSTOMER);
+  const { loading: queryLoading, data: queryData } = useQuery(
+    CUSTOMER_ACCOUNT,
+    { variables: { id: customerId } }
   );
   const formErrors =
     error?.message === "MONGOOSE_VALIDATION_ERROR"
@@ -56,24 +38,32 @@ export default function CustomerEdit() {
   useEffect(() => {
     // After submitting the form, redirect to the user account dashboard.
     // data is available when there aren't any errors.
-    if (data) {
+    if (mutationData) {
       navigate(
-        routes.getDynamicRoute({ route: "customer", id: customerAccount.id })
+        routes.getDynamicRoute({
+          route: "customer",
+          id: mutationData.updateCustomerAccount.id,
+        })
       );
     }
-  }, [data]);
+  }, [mutationData]);
 
-  return (
-    <>
-      <LoadingOverlay show={loading} />
-      <CustomerForm
-        title={"Edit customer"}
-        customerAccount={customerAccount}
-        errors={formErrors}
-        onSubmit={({ formData }) => {
-          updateCustomer(formData, sendMutation);
-        }}
-      />
-    </>
-  );
+  if (queryLoading) {
+    return <Loading />;
+  } else {
+    const { getCustomerAccount: customerAccount } = queryData;
+    return (
+      <>
+        <LoadingOverlay show={loading} />
+        <CustomerForm
+          title={"Edit customer"}
+          customerAccount={customerAccount}
+          errors={formErrors}
+          onSubmit={({ formData }) => {
+            updateCustomer(formData, sendMutation);
+          }}
+        />
+      </>
+    );
+  }
 }
