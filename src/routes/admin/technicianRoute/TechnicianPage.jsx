@@ -1,18 +1,30 @@
-import { useLoaderData, Outlet, useAsyncValue } from "react-router-dom";
+import { useLoaderData, Outlet } from "react-router-dom";
+import { useQuery } from "@apollo/client";
 
 import TechnicianTopNav from "./technicianComponents/TechnicianTopNav";
-
 import { capitalizeName } from "../../../utils/formatters";
 
+import { TECHNICIAN } from "../../../queries/index.js";
+import Loading from "../../../components/LoadingOverlay";
+import ErrorDisplay from "../../../components/ErrorDisplay";
 export async function loader({ params }) {
   return { technicianId: params.technicianId };
 }
 export default function TechnicianPage() {
   const { technicianId } = useLoaderData();
-  const { data, errors } = useAsyncValue();
-  const technicianAccount = data.technicianList.find(
-    (technician) => technician._id === technicianId
-  );
+  const { loading, error, data } = useQuery(TECHNICIAN, {
+    variables: { id: technicianId },
+  });
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <ErrorDisplay message={error.message} />;
+  }
+
+  const { getTechnician: technicianAccount } = data;
 
   return (
     <div className="w-full flex flex-col flex-wrap justify-start">

@@ -1,24 +1,66 @@
-import { Form, useNavigate, useSubmit } from "react-router-dom";
+import { useMutation } from "@apollo/client";
+import { Form, useNavigate } from "react-router-dom";
+import { UPDATE_TECHNICIAN } from "../../../../queries/UPDATE_TECHNICIAN";
+import { useEffect } from "react";
+import routes from "../../../routeDefinitions";
+import store from "../../../../utils/store";
 export default function TechnicianForm({ inputs, title, technician }) {
   const navigate = useNavigate();
-  const submit = useSubmit();
+  const [
+    updateTechnician,
+    { data: updateData, loading: updateLoading, error: updateError },
+  ] = useMutation(UPDATE_TECHNICIAN);
+  // const [
+  //   createNewTechnician,
+  //   { data: creationData, loading: creationLoading, error: creationError },
+  // ] = useMutation(UPDATE_TECHNICIAN);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     const isValid = !inputs.map((input) => input.validate()).includes(false);
 
     if (isValid) {
       const formData = new FormData(e.currentTarget);
+      const formDataObject = Object.fromEntries(formData);
       if (technician) {
-        // If technician is truthy then we are editing a technician
-        // and not creating a new one.
-        formData.set("technicianId", technician._id);
+        // We are updating a technician
+        formDataObject["id"] = technician.id;
+        const variables = { updateTechnicianInput: { ...formDataObject } };
+        try {
+          await updateTechnician({ variables });
+        } catch (error) {
+          console.log("Error updating technician: ", error.message);
+        }
+      } else {
+        console.log("Creating new technician...");
+        // We are creating a new technician.
+        // const variables = { technician: { ...formDataObject } };
+
+        // try {
+        //   await createNewTechnician({ variables });
+        // } catch (error) {
+        //   console.log("Error creating technician: ", error.message);
+        // }
       }
-      return submit(formData, { method: "post" });
     }
   }
 
+  useEffect(() => {
+    if (updateData) {
+      // Redirect the user to the technician dashboard.
+
+      // The url to redirect to.
+      const redirectUrl = routes.getDynamicRoute({
+        route: "technician",
+        id: updateData.updateTechnician.id,
+      });
+      // The message to be displayed when the technician dashboard loads.
+      store.save(redirectUrl, "Technician updated successfully.");
+      // Redirect the user.
+      navigate(redirectUrl);
+    }
+  }, [updateData]);
   return (
     <Form
       className="flex flex-col w-full px-5"

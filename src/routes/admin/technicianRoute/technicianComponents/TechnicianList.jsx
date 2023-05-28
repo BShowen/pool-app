@@ -1,12 +1,25 @@
-import { useAsyncValue, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@apollo/client";
 
 import { capitalizeName } from "../../../../utils/formatters";
+import { TECHNICIAN_LIST } from "../../../../queries/index.js";
 
 import routes from "../../../routeDefinitions";
+import Loading from "../../../../components/Loading";
+import ErrorDisplay from "../../../../components/ErrorDisplay";
 export default function TechnicianList() {
-  const { data, errors } = useAsyncValue();
+  const { loading, data, error } = useQuery(TECHNICIAN_LIST);
   const navigate = useNavigate();
-  const technicianList = data.technicianList;
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <ErrorDisplay message={error.message} />;
+  }
+
+  const { getTechnicianList: technicianList } = data;
 
   return (
     <>
@@ -35,13 +48,13 @@ export default function TechnicianList() {
             {technicianList.map((technician) => {
               return (
                 <tr
-                  key={technician._id}
+                  key={technician.id}
                   className="hover:cursor-pointer"
                   onClick={() => {
                     navigate(
                       routes.getDynamicRoute({
                         route: "technician",
-                        id: technician._id,
+                        id: technician.id,
                       })
                     );
                   }}

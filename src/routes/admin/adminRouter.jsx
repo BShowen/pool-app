@@ -14,9 +14,7 @@ import CustomerDashboard from "./customerRoute/customerComponents/CustomerDashbo
 import CustomerList from "./customerRoute/customerComponents/CustomerList";
 
 /* -------------------- Technician routes -------------------- */
-import TechniciansPage, {
-  loader as techniciansPageLoader,
-} from "./technicianRoute/TechniciansPage";
+import TechniciansPage from "./technicianRoute/TechniciansPage";
 import TechnicianPage, {
   loader as technicianPageLoader,
 } from "./technicianRoute/TechnicianPage";
@@ -24,9 +22,7 @@ import NewTechnicianPage, {
   action as newTechnicianPageAction,
 } from "./technicianRoute/NewTechnicianPage";
 
-import TechnicianEditPage, {
-  action as technicianEditPageAction,
-} from "./technicianRoute/TechnicianEditPage";
+import TechnicianEditPage from "./technicianRoute/TechnicianEditPage";
 
 import TechnicianRoutes, {
   loader as technicianRoutesLoader,
@@ -94,8 +90,7 @@ export default {
     {
       path: routes.technicians,
       element: <TechniciansPage />,
-      id: "technician-root",
-      loader: techniciansPageLoader,
+      errorElement: <ErrorDisplay />,
       children: [
         {
           index: true,
@@ -109,11 +104,12 @@ export default {
             {
               index: true,
               element: <TechnicianDashboard />,
+              loader: technicianPageLoader,
             },
             {
               path: routes.editTechnician,
               element: <TechnicianEditPage />,
-              action: technicianEditPageAction,
+              loader: technicianPageLoader,
             },
             {
               path: routes.technicianRoutes,

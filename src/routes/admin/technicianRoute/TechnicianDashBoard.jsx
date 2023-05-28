@@ -1,70 +1,126 @@
-import { useSubmit, useNavigate, useOutletContext } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useLoaderData } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation } from "@apollo/client";
+
 import { capitalizeName } from "../../../utils/formatters";
 import routes from "../../routeDefinitions";
+import { TECHNICIAN, TECHNICIAN_LIST } from "../../../queries/index.js";
+import Loading from "../../../components/Loading";
+import ErrorDisplay from "../../../components/ErrorDisplay";
+import { DELETE_TECHNICIAN } from "../../../queries/DELETE_TECHNICIAN";
+import BannerAlert from "../../../components/BannerAlert";
+import store from "../../../utils/store";
 
 export default function TechnicianDashboard() {
-  const submit = useSubmit();
+  // -----------------------------------------------------------------
+  // This is a message that is displayed when a technician has been updated.
+  const [message] = store.get();
+  useEffect(() => {
+    return () => {
+      // Clear the store only when unmounting.
+      store.clear();
+    };
+  });
+  // -----------------------------------------------------------------
+
   const navigate = useNavigate();
   const [replace, setReplace] = useState(false);
-  const technician = useOutletContext();
-  const editTechnicianRoute = routes.getDynamicRoute({
-    route: "editTechnician",
-    id: technician._id,
+  const [
+    deleteTechnician,
+    { data: mutationData, error: mutationError, loading: mutationLoading },
+  ] = useMutation(DELETE_TECHNICIAN, {
+    fetchPolicy: "no-cache",
+    refetchQueries: [{ query: TECHNICIAN_LIST }],
+  });
+  const { technicianId } = useLoaderData();
+  const {
+    loading: queryLoading,
+    error: queryError,
+    data: queryData,
+  } = useQuery(TECHNICIAN, {
+    variables: { id: technicianId },
   });
 
-  return (
-    <div className="card bg-base-100 w-full lg:w-3/5 lg:shadow-lg">
-      <div className="card-body card-compact flex flex-col lg:flex-row lg:justify-around lg:flex-wrap">
-        <div className="card">
-          <div className="card-body card-compact">
-            <h1 className="card-title">Contact information</h1>
+  useEffect(() => {
+    if (mutationData) {
+      if (mutationData?.deleteTechnician === true) {
+        navigate(routes.technicians);
+      }
+    }
+  }, [mutationData]);
 
-            <div className="py-2">
-              <p className="font-semibold">
-                {capitalizeName(technician.firstName, technician.lastName)}
-              </p>
-              <p>{technician.emailAddress}</p>
+  if (queryLoading || mutationLoading) {
+    return <Loading />;
+  }
+
+  if (queryError) {
+    return <ErrorDisplay message={queryError.message} />;
+  }
+
+  const { getTechnician: technician } = queryData;
+
+  return (
+    <>
+      {mutationError && <BannerAlert message={mutationError.message} />}
+      {message && <BannerAlert message={message} />}
+      <div className="card bg-base-100 w-full lg:w-3/5 lg:shadow-lg">
+        <div className="card-body card-compact flex flex-col lg:flex-row lg:justify-around lg:flex-wrap">
+          <div className="card">
+            <div className="card-body card-compact">
+              <h1 className="card-title">Contact information</h1>
+
+              <div className="py-2">
+                <p className="font-semibold">
+                  {capitalizeName(technician.firstName, technician.lastName)}
+                </p>
+                <p>{technician.emailAddress}</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="card-actions justify-end w-full">
-          <button
-            className="btn btn-primary btn-md lg:btn-sm"
-            onClick={() => {
-              if (!replace) {
-                setReplace(true);
-              }
-              navigate(editTechnicianRoute, { replace });
-            }}
-          >
-            Edit
-          </button>
-          <button
-            className="btn btn-error btn-md lg:btn-sm"
-            onClick={() => {
-              let canDelete = confirm(
-                `Delete ${capitalizeName(
-                  technician.firstName,
-                  technician.lastName
-                )}?`
-              );
-              if (canDelete) {
-                const formData = new FormData();
-                formData.set("technicianId", technician._id);
-                formData.set("intent", "DELETE");
-                submit(formData, {
-                  method: "post",
-                  action: editTechnicianRoute,
-                });
-              }
-            }}
-          >
-            Delete
-          </button>
+          <div className="card-actions justify-end w-full">
+            <button
+              className="btn btn-primary btn-md lg:btn-sm"
+              onClick={() => {
+                if (!replace) {
+                  setReplace(true);
+                }
+                navigate(
+                  routes.getDynamicRoute({
+                    route: "editTechnician",
+                    id: technician.id,
+                  }),
+                  { replace }
+                );
+              }}
+            >
+              Edit
+            </button>
+            <button
+              className="btn btn-error btn-md lg:btn-sm"
+              onClick={async () => {
+                const canDelete = confirm(
+                  `Delete ${capitalizeName(
+                    technician.firstName,
+                    technician.lastName
+                  )}?`
+                );
+                if (canDelete) {
+                  try {
+                    await deleteTechnician({
+                      variables: { id: technician.id },
+                    });
+                  } catch (error) {
+                    console.log("Error deleting technician: ", error.message);
+                  }
+                }
+              }}
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

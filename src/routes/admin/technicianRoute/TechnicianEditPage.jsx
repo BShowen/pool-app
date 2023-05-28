@@ -1,38 +1,30 @@
-import { useActionData, redirect, useOutletContext } from "react-router-dom";
+import { useActionData, redirect, useLoaderData } from "react-router-dom";
 import { useEffect } from "react";
+import { useQuery } from "@apollo/client";
 
-import { updateTechnician, deleteTechnician } from "../../../utils/apiFetches";
 import TechnicianForm from "./technicianComponents/TechnicianForm";
 import useInput from "../../../hooks/useInput";
 import routes from "../../routeDefinitions";
-export async function action({ request }) {
-  const formData = await request.formData();
-  const formObject = Object.fromEntries(formData);
+import { TECHNICIAN } from "../../../queries";
+import Loading from "../../../components/Loading";
+import ErrorDisplay from "../../../components/ErrorDisplay";
 
-  if (formObject.intent === "DELETE") {
-    const { response, errors } = await deleteTechnician({
-      technicianId: formObject.technicianId,
-    });
-    if (response.status == "204") {
-      return redirect(routes.technicians);
-    } else {
-      console.log("error deleting customer", errors);
-      return false;
-    }
-  } else {
-    const { status, data, errors } = await updateTechnician(formObject);
-    if (status === 200) {
-      return redirect(
-        routes.getDynamicRoute({ route: "technician", id: data._id })
-      );
-    } else {
-      return errors;
-    }
-  }
-}
 export default function TechnicianEditPage() {
-  const technician = useOutletContext();
-  const errors = useActionData() || {};
+  const { technicianId } = useLoaderData();
+  const { loading, data, error } = useQuery(TECHNICIAN, {
+    variables: { id: technicianId },
+  });
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <ErrorDisplay message={error.message} />;
+  }
+
+  const { getTechnician: technician } = data;
+
   const [firstName] = useInput({
     value: technician.firstName,
     type: "text",
@@ -66,17 +58,17 @@ export default function TechnicianEditPage() {
     },
   });
 
-  useEffect(() => {
-    if (errors.emailAddress) {
-      setEmailError(errors.emailAddress);
-    }
-  }, [errors]);
+  // useEffect(() => {
+  //   if (error.emailAddress) {
+  //     setEmailError(error.emailAddress);
+  //   }
+  // }, [error]);
 
   return (
     <TechnicianForm
       title={"Edit customer"}
       technician={technician}
-      errors={errors}
+      errors={error}
       inputs={[firstName, lastName, email]}
     />
   );

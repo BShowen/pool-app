@@ -29,7 +29,7 @@ function get() {
       return JSON.parse(atob(value));
     }
   }
-  return false;
+  return [];
 }
 
 /**
