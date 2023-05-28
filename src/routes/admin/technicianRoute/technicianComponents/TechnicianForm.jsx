@@ -1,19 +1,26 @@
 import { useMutation } from "@apollo/client";
 import { Form, useNavigate } from "react-router-dom";
-import { UPDATE_TECHNICIAN } from "../../../../queries/UPDATE_TECHNICIAN";
+import {
+  UPDATE_TECHNICIAN,
+  CREATE_TECHNICIAN,
+  TECHNICIAN_LIST,
+} from "../../../../queries/index.js";
 import { useEffect } from "react";
 import routes from "../../../routeDefinitions";
 import store from "../../../../utils/store";
-export default function TechnicianForm({ inputs, title, technician }) {
+import Loading from "../../../../components/Loading.jsx";
+export default function TechnicianForm({ inputs, title, technician, onError }) {
   const navigate = useNavigate();
   const [
     updateTechnician,
     { data: updateData, loading: updateLoading, error: updateError },
   ] = useMutation(UPDATE_TECHNICIAN);
-  // const [
-  //   createNewTechnician,
-  //   { data: creationData, loading: creationLoading, error: creationError },
-  // ] = useMutation(UPDATE_TECHNICIAN);
+  const [
+    createTechnician,
+    { data: creationData, loading: creationLoading, error: creationError },
+  ] = useMutation(CREATE_TECHNICIAN, {
+    refetchQueries: [{ query: TECHNICIAN_LIST }],
+  });
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -33,23 +40,25 @@ export default function TechnicianForm({ inputs, title, technician }) {
           console.log("Error updating technician: ", error.message);
         }
       } else {
-        console.log("Creating new technician...");
         // We are creating a new technician.
-        // const variables = { technician: { ...formDataObject } };
+        const variables = { technician: { ...formDataObject } };
+        const { protocol, host } = window.location;
 
-        // try {
-        //   await createNewTechnician({ variables });
-        // } catch (error) {
-        //   console.log("Error creating technician: ", error.message);
-        // }
+        // This is the url that brings the user from their email to the app.
+        variables.technician.registrationUrl = `${protocol}//${host}${routes.registerTechnician}`;
+
+        try {
+          await createTechnician({ variables });
+        } catch (error) {
+          console.log("Error creating technician: ", error.message);
+        }
       }
     }
   }
 
   useEffect(() => {
+    // Redirect the user to the technician dashboard.
     if (updateData) {
-      // Redirect the user to the technician dashboard.
-
       // The url to redirect to.
       const redirectUrl = routes.getDynamicRoute({
         route: "technician",
@@ -61,6 +70,32 @@ export default function TechnicianForm({ inputs, title, technician }) {
       navigate(redirectUrl);
     }
   }, [updateData]);
+
+  useEffect(() => {
+    // Redirect the user to the technician dashboard.
+    if (creationData) {
+      // The url to redirect to.
+      const redirectUrl = routes.getDynamicRoute({
+        route: "technician",
+        id: creationData.createNewTechnician.id,
+      });
+      // The message to be displayed when the technician dashboard loads.
+      store.save(redirectUrl, "Technician created successfully.");
+      // Redirect the user.
+      navigate(redirectUrl);
+    }
+  }, [creationData]);
+
+  useEffect(() => {
+    if (creationError) {
+      onError(creationError.graphQLErrors[0].extensions.fields.emailAddress);
+    }
+  }, [creationError]);
+
+  if (creationLoading || updateLoading) {
+    return <Loading />;
+  }
+
   return (
     <Form
       className="flex flex-col w-full px-5"

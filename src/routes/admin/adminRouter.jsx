@@ -18,9 +18,7 @@ import TechniciansPage from "./technicianRoute/TechniciansPage";
 import TechnicianPage, {
   loader as technicianPageLoader,
 } from "./technicianRoute/TechnicianPage";
-import NewTechnicianPage, {
-  action as newTechnicianPageAction,
-} from "./technicianRoute/NewTechnicianPage";
+import NewTechnicianPage from "./technicianRoute/NewTechnicianPage";
 
 import TechnicianEditPage from "./technicianRoute/TechnicianEditPage";
 
@@ -123,7 +121,6 @@ export default {
     {
       path: routes.newTechnician,
       element: <NewTechnicianPage />,
-      action: newTechnicianPageAction,
       errorElement: <ErrorDisplay />,
     },
     {
