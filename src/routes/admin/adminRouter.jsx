@@ -31,10 +31,7 @@ import TechnicianList from "./technicianRoute/technicianComponents/TechnicianLis
 import TechnicianDashboard from "./technicianRoute/TechnicianDashBoard";
 
 /* -------------------- Service Days routes -------------------- */
-import {
-  ServiceDayList,
-  loader as serviceDayListLoader,
-} from "./serviceDayRoute/serviceDayList";
+import { ServiceDayList } from "./serviceDayRoute/serviceDayList";
 
 /* -------------------- Error components -------------------- */
 import ErrorDisplay from "../../components/ErrorDisplay";
@@ -126,7 +123,6 @@ export default {
     {
       path: routes.serviceDays,
       element: <ServiceDayList />,
-      loader: serviceDayListLoader,
     },
   ],
 };

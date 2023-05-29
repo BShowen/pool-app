@@ -1,23 +1,29 @@
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Disclosure, Transition } from "@headlessui/react";
 import { BsArrowsExpand, BsArrowsCollapse } from "react-icons/bs";
-import useSorter from "../../../hooks/useSorter";
+import { useQuery } from "@apollo/client";
 
-import { getAllServiceRoutes } from "../../../utils/apiFetches";
+import { GET_ROUTE_LIST } from "../../../queries/index.js";
+import Loading from "../../../components/Loading.jsx";
+import ErrorDisplay from "../../../components/ErrorDisplay.jsx";
+import useSorter from "../../../hooks/useSorter";
 import { capitalize, formatAccountName } from "../../../utils/formatters";
 import routes from "../../routeDefinitions";
 
-export async function loader() {
-  const response = await getAllServiceRoutes();
-  return response;
-}
-
 export function ServiceDayList() {
-  const { data, errors, status } = useLoaderData();
+  const { loading, data, error } = useQuery(GET_ROUTE_LIST, {
+    fetchPolicy: "network-only",
+  });
 
-  if (errors) {
-    // Handle error.
+  if (loading) {
+    return <Loading />;
   }
+
+  if (error) {
+    return <ErrorDisplay message={error.message} />;
+  }
+
+  const { getServiceRouteList: serviceRouteList } = data;
 
   return (
     <div className="h-full lg:h-screen">
@@ -29,9 +35,9 @@ export function ServiceDayList() {
 
       <div className="w-full pt-16  lg:px-5">
         <div className="mx-auto w-3/4 rounded-2xl bg-white p-3 border-2 gap-5 flex flex-col shadow-sm">
-          {data.routes.map((route) => (
+          {serviceRouteList.map((route) => (
             <TechnicianDisclosure
-              key={route.technician._id || 0}
+              key={route.technician.id || 0}
               route={route}
             />
           ))}
@@ -44,11 +50,7 @@ export function ServiceDayList() {
 function TechnicianDisclosure({ route }) {
   const navigate = useNavigate();
   const [customerAccounts, sortBy] = useSorter(route.customers);
-  const technician =
-    Object.entries(route.technician).length > 0
-      ? route.technician
-      : { _id: 0, firstName: "Unassigned" };
-
+  const { technician } = route;
   return (
     <Disclosure as="div" defaultOpen={false}>
       {({ open }) => (
@@ -113,13 +115,13 @@ function TechnicianDisclosure({ route }) {
                     return (
                       <tr
                         draggable
-                        key={customer._id}
+                        key={customer.id}
                         className="hover:cursor-pointer hover"
                         onClick={() => {
                           navigate(
                             routes.getDynamicRoute({
                               route: "customer",
-                              id: customer._id,
+                              id: customer.id,
                             })
                           );
                         }}
