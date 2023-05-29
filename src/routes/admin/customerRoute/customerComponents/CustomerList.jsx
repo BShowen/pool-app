@@ -6,7 +6,7 @@ import { formatAccountName, capitalize } from "../../../../utils/formatters";
 import routes from "../../../routeDefinitions";
 import BannerAlert from "../../../../components/BannerAlert";
 import useSorter from "../../../../hooks/useSorter";
-import { CUSTOMER_TECHNICIAN_LIST } from "../../../../queries";
+import { CUSTOMER_TECHNICIAN_LIST, UPDATE_CUSTOMER } from "../../../../queries";
 import ErrorDisplay from "../../../../components/ErrorDisplay";
 import Loading from "../../../../components/Loading";
 
@@ -103,20 +103,6 @@ export default function CustomerList() {
   }
 }
 
-// export async function action({ request }) {
-//   const formData = await request.formData();
-//   const response = await updateCustomer(Object.fromEntries(formData));
-//   return response;
-// }
-
-const UPDATE_CUSTOMER = gql`
-  mutation Mutation($customerAccountInput: UpdateCustomerAccountInput) {
-    updateCustomerAccount(customerAccountInput: $customerAccountInput) {
-      id
-      technicianId
-    }
-  }
-`;
 function TechnicianSelector({
   customerAccountId,
   technicianId,
