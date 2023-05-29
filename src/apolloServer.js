@@ -25,5 +25,20 @@ const authLink = setContext((_, { headers }) => {
 });
 export default new ApolloClient({
   link: from([removeTypenameLink, authLink.concat(httpLink)]),
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          getCustomerAccount: {
+            read(_, { args, toReference }) {
+              return toReference({
+                __typename: "CustomerAccount",
+                id: args.id,
+              });
+            },
+          },
+        },
+      },
+    },
+  }),
 });
