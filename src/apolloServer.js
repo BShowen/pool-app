@@ -9,7 +9,7 @@ import { setContext } from "@apollo/client/link/context";
 import { removeTypenameLink } from "./utils/removeTypenameLink";
 
 const httpLink = createHttpLink({
-  uri: "http://192.168.1.138:8080/",
+  uri: import.meta.env.VITE_GRAPHQL_SERVER,
 });
 
 const authLink = setContext((_, { headers }) => {
