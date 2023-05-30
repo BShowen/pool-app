@@ -9,9 +9,9 @@ import {
 import routes from "../../../routeDefinitions";
 import Loading from "../../../../components/Loading";
 import {
-  CUSTOMER_LIST,
   DELETE_CUSTOMER_ACCOUNT,
   CUSTOMER_ACCOUNT,
+  CUSTOMER_TECHNICIAN_LIST,
 } from "../../../../queries/index.js";
 import ErrorDisplay from "../../../../components/ErrorDisplay";
 
@@ -21,16 +21,53 @@ export default function CustomerDashboard() {
     deleteAccount,
     { data: mutationData, error: mutationError, loading: mutationLoading },
   ] = useMutation(DELETE_CUSTOMER_ACCOUNT, {
-    // ----------------------------------------------------
-    // No need to cache the results for deleting an account.
-    fetchPolicy: "no-cache",
-    // ----------------------------------------------------
+    update: function (cache, result) {
+      // The deleted customer account.
+      const deletedCustomerAccount = result.data?.deleteCustomerAccount;
 
-    // ----------------------------------------------------
-    // Refetch the list of customers to update the Apollo cache.
-    // This is easier than manually updating the cache.
-    refetchQueries: [{ query: CUSTOMER_LIST }],
-    // ----------------------------------------------------
+      // Query the cache to get the current cache for the
+      // CUSTOMER_TECHNICIAN_LIST query
+      const existingCustomers = cache.readQuery({
+        query: CUSTOMER_TECHNICIAN_LIST,
+      });
+
+      if (!deletedCustomerAccount) {
+        // If deletedCustomerAccount is false then no document was deleted
+        // which means there was most likely an error. Therefor no need to
+        // update the cache.
+        return;
+      }
+      // This section is reached when there was a document deleted from the db.
+      // Therefor we need to update the cache.
+
+      // Create the new value that is to be cached for the
+      // CUSTOMER_TECHNICIAN_LIST query
+      const updatedCustomerAccountList =
+        existingCustomers.getCustomerAccountList.filter((customerAccount) => {
+          return customerAccount.id !== deletedCustomerAccount.id;
+        });
+
+      // Rewrite the cached return value for CUSTOMER_TECHNICIAN_LIST
+      cache.writeQuery({
+        // This is the query in the cache that we're updating.
+        query: CUSTOMER_TECHNICIAN_LIST,
+        // This is the new data to be returned from the query.
+        data: {
+          ...existingCustomers,
+          getCustomerAccountList: [...updatedCustomerAccountList],
+        },
+      });
+
+      // Remove the old document from the cache.
+      cache.evict({ id: cache.identify(deletedCustomerAccount) });
+
+      // This removes orphaned documents (AccountOwners) that remain after
+      // removing the parent doc (CustomerAccount)
+      deletedCustomerAccount.accountOwners.forEach((accountOwnerDoc) => {
+        // Remove customerAccount.accountOwners from cache
+        cache.evict({ id: cache.identify(accountOwnerDoc) });
+      });
+    },
   });
   const {
     loading: queryLoading,
@@ -44,7 +81,7 @@ export default function CustomerDashboard() {
 
   // Redirect to customer list page when an account is deleted.
   useEffect(() => {
-    if (mutationData?.deleteCustomerAccount === true) {
+    if (mutationData?.deleteCustomerAccount) {
       navigate(routes.customers);
     }
   }, [mutationData]);

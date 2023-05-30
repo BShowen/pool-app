@@ -1,7 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 
-import { CREATE_NEW_CUSTOMER, CUSTOMER_LIST } from "../../../queries/index.js";
+import {
+  CREATE_NEW_CUSTOMER,
+  CUSTOMER_LIST,
+  CUSTOMER_TECHNICIAN_LIST,
+} from "../../../queries/index.js";
 import CustomerForm from "./customerComponents/CustomerForm";
 import routes from "../../routeDefinitions";
 import { useEffect } from "react";
@@ -23,7 +27,31 @@ export default function NewCustomerPage() {
   const navigate = useNavigate();
   const [createCustomer, { data, error, loading }] = useMutation(
     CREATE_NEW_CUSTOMER,
-    { refetchQueries: [{ query: CUSTOMER_LIST }] }
+    {
+      update(cache, { data }) {
+        // The document that was just created.
+        const newCustomerFromResponse = data?.createNewCustomerAccount;
+
+        // The current cache that is stored for the CUSTOMER_TECHNICIAN_LIST query
+        const existingCustomers = cache.readQuery({
+          query: CUSTOMER_TECHNICIAN_LIST,
+        });
+
+        // Update the cached value for CUSTOMER_TECHNICIAN_LIST query
+        if (existingCustomers && newCustomerFromResponse) {
+          cache.writeQuery({
+            query: CUSTOMER_TECHNICIAN_LIST,
+            data: {
+              ...existingCustomers,
+              getCustomerAccountList: [
+                ...existingCustomers.getCustomerAccountList,
+                newCustomerFromResponse,
+              ],
+            },
+          });
+        }
+      },
+    }
   );
   const formErrors = error?.graphQLErrors[0]?.extensions?.fields;
 
