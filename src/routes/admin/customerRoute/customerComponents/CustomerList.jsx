@@ -6,7 +6,10 @@ import { formatAccountName, capitalize } from "../../../../utils/formatters";
 import routes from "../../../routeDefinitions";
 import BannerAlert from "../../../../components/BannerAlert";
 import useSorter from "../../../../hooks/useSorter";
-import { CUSTOMER_TECHNICIAN_LIST, UPDATE_CUSTOMER } from "../../../../queries";
+import {
+  CUSTOMER_TECHNICIAN_LIST,
+  UPDATE_CUSTOMER_TECHNICIAN,
+} from "../../../../queries";
 import ErrorDisplay from "../../../../components/ErrorDisplay";
 import Loading from "../../../../components/Loading";
 
@@ -109,7 +112,7 @@ function TechnicianSelector({
   technicianList,
 }) {
   const [showErrorAlert, setErrorAlert] = useState(false);
-  const [updateCustomer] = useMutation(UPDATE_CUSTOMER);
+  const [updateCustomer] = useMutation(UPDATE_CUSTOMER_TECHNICIAN);
 
   async function handleChange(e) {
     e.preventDefault();
