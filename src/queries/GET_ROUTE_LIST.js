@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const GET_ROUTE_LIST = gql`
-  query Customers {
+  query getServiceRouteList {
     getServiceRouteList {
       technician {
         firstName
