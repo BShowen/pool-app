@@ -37,6 +37,14 @@ export default new ApolloClient({
               });
             },
           },
+          getTechnician: {
+            read(_, { args, toReference }) {
+              return toReference({
+                __typename: "Technician",
+                id: args.id,
+              });
+            },
+          },
         },
       },
     },
