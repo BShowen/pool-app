@@ -1,32 +1,27 @@
-import { useActionData, redirect, useLoaderData } from "react-router-dom";
-import { useEffect } from "react";
-import { useQuery } from "@apollo/client";
+import { useNavigate, useLoaderData } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useMutation, useQuery } from "@apollo/client";
 
-import TechnicianForm from "./technicianComponents/TechnicianForm";
 import useInput from "../../../hooks/useInput";
 import routes from "../../routeDefinitions";
-import { TECHNICIAN } from "../../../queries";
+import { TECHNICIAN, UPDATE_TECHNICIAN } from "../../../queries";
 import Loading from "../../../components/Loading";
 import ErrorDisplay from "../../../components/ErrorDisplay";
+import { Form } from "../../../components/Form";
 
 export default function TechnicianEditPage() {
+  const navigate = useNavigate();
   const { technicianId } = useLoaderData();
   const { loading, data, error } = useQuery(TECHNICIAN, {
     variables: { id: technicianId },
   });
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (error) {
-    return <ErrorDisplay message={error.message} />;
-  }
-
-  const { getTechnician: technician } = data;
+  const [updateTechnician, { data: submitData, loading: submitLoading }] =
+    useMutation(UPDATE_TECHNICIAN);
+  const [technician, setTechnician] = useState({});
 
   const [firstName] = useInput({
-    value: technician.firstName,
+    value: "",
     type: "text",
     name: "firstName",
     placeholder: "First name",
@@ -36,7 +31,7 @@ export default function TechnicianEditPage() {
   });
 
   const [lastName] = useInput({
-    value: technician.lastName,
+    value: "",
     type: "text",
     name: "lastName",
     placeholder: "Last name",
@@ -44,8 +39,8 @@ export default function TechnicianEditPage() {
     error: "Last name is required",
   });
 
-  const [email, setEmailError] = useInput({
-    value: technician.emailAddress,
+  const [emailAddress] = useInput({
+    value: "",
     type: "email",
     name: "emailAddress",
     placeholder: "Email address",
@@ -58,18 +53,75 @@ export default function TechnicianEditPage() {
     },
   });
 
-  // useEffect(() => {
-  //   if (error.emailAddress) {
-  //     setEmailError(error.emailAddress);
-  //   }
-  // }, [error]);
+  const formFields = { firstName, lastName, emailAddress };
+
+  useEffect(() => {
+    // Once the technician is loaded, update the form values.
+    // The form values are empty on initial load while the technician gets
+    // fetched.
+    if (data) {
+      const technician = { ...data.getTechnician };
+      setTechnician(technician);
+      // For each field in the data.getTechnician object...
+      // Assign it's value to the formField for that field.
+      for (const [key, value] of Object.entries(technician)) {
+        // key is the formField. i.e firstName, emailAddress, etc.
+        // value is the value  for that field.
+        formFields[key] &&
+          formFields[key].dispatch({ action: "SET_VALUE", value });
+      }
+    }
+  }, [data]);
+
+  useEffect(() => {
+    // Redirect the user to the technician page after successful submission
+    if (submitData) {
+      const technicianId = submitData.updateTechnician.id;
+      navigate(
+        routes.getDynamicRoute({ route: "technician", id: technicianId })
+      );
+    }
+  }, [submitData]);
+
+  async function handleSubmit() {
+    const isValid = !Object.values(formFields)
+      .map((input) => input.validate())
+      .includes(false);
+
+    if (!isValid) return;
+
+    const updateTechnicianInput = {
+      ...technician,
+      firstName: firstName.input.value,
+      lastName: lastName.input.value,
+      emailAddress: emailAddress.input.value,
+    };
+
+    try {
+      await updateTechnician({ variables: { updateTechnicianInput } });
+    } catch (error) {
+      const errorObj = error?.graphQLErrors[0]?.extensions?.fields;
+      for (const [key, value] of Object.entries(errorObj)) {
+        // key is the formField. i.e firstName, emailAddress, etc.
+        // value is the error message for that field.
+        formFields[key].dispatch({ action: "SET_ERROR", value });
+      }
+    }
+  }
+
+  if (loading || submitLoading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <ErrorDisplay message={error.message} />;
+  }
 
   return (
-    <TechnicianForm
-      title={"Edit customer"}
-      technician={technician}
-      errors={error}
-      inputs={[firstName, lastName, email]}
+    <Form
+      inputList={Object.values(formFields)}
+      formTitle={"Edit technician"}
+      onSubmit={handleSubmit}
     />
   );
 }

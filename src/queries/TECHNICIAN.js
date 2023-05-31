@@ -7,7 +7,6 @@ export const TECHNICIAN = gql`
       lastName
       emailAddress
       id
-      companyId
     }
   }
 `;
