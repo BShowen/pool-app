@@ -120,6 +120,17 @@ export default function useInput(options = {}) {
         setValidated(true);
         return isValid();
       },
+      dispatch: ({ action, value }) => {
+        switch (action) {
+          case "SET_VALUE":
+            setValue(value);
+            setValidated(true);
+            break;
+          case "SET_ERROR":
+            setBackendErrorMessage(value);
+            break;
+        }
+      },
     },
     /**
      * The second item returned from this hook is a setter. This setter should
