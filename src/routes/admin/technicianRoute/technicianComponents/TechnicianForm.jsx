@@ -44,8 +44,13 @@ export default function TechnicianForm({ inputs, title, technician, onError }) {
         const variables = { technician: { ...formDataObject } };
         const { protocol, host } = window.location;
 
+        // ---------------------------------------------------------------
         // This is the url that brings the user from their email to the app.
+        // This string is not persisted in the DB. It is used in the backend
+        // and data is appended to this string before an email is sent to the
+        // technician with this url as a link within the email.
         variables.technician.registrationUrl = `${protocol}//${host}${routes.registerTechnician}`;
+        // ---------------------------------------------------------------
 
         try {
           await createTechnician({ variables });
