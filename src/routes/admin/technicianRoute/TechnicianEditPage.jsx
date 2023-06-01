@@ -7,7 +7,7 @@ import routes from "../../routeDefinitions";
 import { TECHNICIAN, UPDATE_TECHNICIAN } from "../../../queries";
 import Loading from "../../../components/Loading";
 import ErrorDisplay from "../../../components/ErrorDisplay";
-import { Form } from "../../../components/Form";
+import { TechnicianForm } from "./technicianComponents/TechnicianForm.jsx";
 
 export default function TechnicianEditPage() {
   const navigate = useNavigate();
@@ -118,7 +118,7 @@ export default function TechnicianEditPage() {
   }
 
   return (
-    <Form
+    <TechnicianForm
       inputList={Object.values(formFields)}
       formTitle={"Edit technician"}
       onSubmit={handleSubmit}
