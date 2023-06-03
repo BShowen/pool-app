@@ -11,7 +11,6 @@ import Login, { loader as loginLoader } from "./routes/login";
 
 import RegisterPage, {
   loader as registerPageLoader,
-  action as registerPageAction,
 } from "./routes/admin/technicianRoute/RegisterPage";
 
 import adminRoutes from "./routes/admin/adminRouter";
@@ -40,7 +39,6 @@ const router = createBrowserRouter([
     path: routes.registerTechnician,
     element: <RegisterPage />,
     loader: registerPageLoader,
-    action: registerPageAction,
   },
 ]);
 

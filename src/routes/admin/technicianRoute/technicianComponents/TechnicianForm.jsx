@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-export function TechnicianForm({ inputList, formTitle, onSubmit }) {
+export function TechnicianForm({ inputList, formTitle, onSubmit, canCancel }) {
+  const canCancelForm = canCancel === undefined ? true : canCancel;
   const navigate = useNavigate();
   return (
     <form
@@ -32,18 +33,25 @@ export function TechnicianForm({ inputList, formTitle, onSubmit }) {
           <div className="w-full flex flex-col justify-start gap-3">
             <div className="divider !p-0 !m-0"></div>
             <div className="flex gap-2 justify-evenly">
-              <button className="btn btn-primary w-2/4" type="submit">
+              <button
+                className={`btn btn-primary ${
+                  canCancelForm ? "w-2/4" : "w-full"
+                }`}
+                type="submit"
+              >
                 Submit
               </button>
-              <button
-                className="btn btn-error w-2/4"
-                type="button"
-                onClick={() => {
-                  navigate(-1);
-                }}
-              >
-                Cancel
-              </button>
+              {canCancelForm && (
+                <button
+                  className="btn btn-error w-2/4"
+                  type="button"
+                  onClick={() => {
+                    navigate(-1);
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -1,51 +1,48 @@
-import { useLoaderData, redirect } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
+import { useMutation, useQuery } from "@apollo/client";
+import { useState } from "react";
 
+import { TechnicianForm } from "./technicianComponents/TechnicianForm";
 import {
-  getRegistrationTechnician,
-  registerTechnician,
-} from "../../../utils/apiFetches";
-import TechnicianForm from "./technicianComponents/TechnicianForm";
+  GET_REGISTRATION_TECHNICIAN,
+  REGISTER_TECHNICIAN,
+} from "../../../queries/index.js";
 import ErrorDisplay from "../../../components/ErrorDisplay";
+import Loading from "../../../components/Loading";
 import useInput from "../../../hooks/useInput";
 import routes from "../../routeDefinitions";
 import store from "../../../utils/store";
+import { useEffect } from "react";
 
 export async function loader({ request }) {
   const url = new URL(request.url);
   const [technicianId, registrationSecret] = url.searchParams
     .get("q")
     .split("-");
-  const response = await getRegistrationTechnician({
-    technicianId,
-    registrationSecret,
-  });
-  return response;
+  return { technicianId, registrationSecret };
 }
 
-export async function action({ request }) {
-  const formData = await request.formData();
-  const formObject = Object.fromEntries(formData);
-  const url = new URL(request.url);
-  const [_, registrationSecret] = url.searchParams.get("q").split("-");
-  const response = await registerTechnician({
-    ...formObject,
-    registrationSecret,
-  });
-  const { status, errors } = response;
-  if (Number.parseInt(status) === 204) {
-    store.save(routes.login, "Registration successful.");
-    return redirect(routes.login);
-  } else {
-    return errors;
-  }
-}
 export default function RegisterPage() {
-  const response = useLoaderData();
-  const technician = response.data?.technician || {};
-  const loaderError = response.loaderError;
+  const navigate = useNavigate();
+  const { technicianId, registrationSecret } = useLoaderData();
+  const [technician, setTechnician] = useState({});
+
+  const [registerTechnician, { loading: mutationLoading }] =
+    useMutation(REGISTER_TECHNICIAN);
+
+  const {
+    loading: queryLoading,
+    error: queryError,
+    data: queryData,
+  } = useQuery(GET_REGISTRATION_TECHNICIAN, {
+    variables: {
+      id: technicianId,
+      secret: registrationSecret,
+    },
+  });
 
   const [firstName] = useInput({
-    value: technician.firstName,
+    value: "",
     type: "text",
     name: "firstName",
     placeholder: "First name",
@@ -55,7 +52,7 @@ export default function RegisterPage() {
   });
 
   const [lastName] = useInput({
-    value: technician.lastName,
+    value: "",
     type: "text",
     name: "lastName",
     placeholder: "Last name",
@@ -63,8 +60,8 @@ export default function RegisterPage() {
     error: "Last name is required",
   });
 
-  const [email] = useInput({
-    value: technician.emailAddress,
+  const [emailAddress] = useInput({
+    value: "",
     type: "email",
     name: "emailAddress",
     placeholder: "Email address",
@@ -87,16 +84,54 @@ export default function RegisterPage() {
     error: "Password is required",
   });
 
-  if (loaderError) {
-    return <ErrorDisplay message={loaderError.message} />;
-  } else {
-    return (
-      <TechnicianForm
-        title="Registration"
-        technician={technician}
-        errors={{}}
-        inputs={[firstName, lastName, email, password]}
-      />
-    );
+  useEffect(() => {
+    // Update form values when the technician is loaded from the query.
+    if (queryData) {
+      const { getRegistrationTechnician: technician } = queryData;
+      setTechnician(technician);
+      // For each field in the technician object...
+      // Assign it's value to the formField for that field.
+      for (const [key, value] of Object.entries(technician)) {
+        // key is the formField. i.e firstName, emailAddress, etc.
+        // value is the value  for that field.
+        formFields[key] &&
+          formFields[key].dispatch({ action: "SET_VALUE", value });
+      }
+    }
+  }, [queryData]);
+
+  const formFields = { firstName, lastName, emailAddress, password };
+
+  if (queryLoading || mutationLoading) {
+    return <Loading />;
   }
+
+  if (queryError) {
+    return <ErrorDisplay message={queryError.message} />;
+  }
+
+  return (
+    <TechnicianForm
+      canCancel={false}
+      inputList={Object.values(formFields)}
+      formTitle="Registration"
+      onSubmit={async ({ formData }) => {
+        const variables = { technician: { ...technician, ...formData } };
+        try {
+          await registerTechnician({ variables });
+          // Technician was registered successfully. Save a success message and
+          // redirect to login page.
+          store.save(routes.login, "Registration successful.");
+          return navigate(routes.login);
+        } catch (error) {
+          const errorObj = error?.graphQLErrors[0]?.extensions?.fields || {};
+          for (const [key, value] of Object.entries(errorObj)) {
+            // key is the formField. i.e firstName, emailAddress, etc.
+            // value is the error message for that field.
+            formFields[key].dispatch({ action: "SET_ERROR", value });
+          }
+        }
+      }}
+    />
+  );
 }
