@@ -5,8 +5,22 @@ export const UPDATE_CUSTOMER_TECHNICIAN = gql`
     $customerAccountInput: UpdateCustomerAccountInput
   ) {
     updateCustomerAccount(customerAccountInput: $customerAccountInput) {
+      accountName
+      serviceType
+      serviceDay
+      serviceFrequency
+      address
+      price
+      companyId
       id
       technicianId
+      accountOwners {
+        firstName
+        lastName
+        emailAddress
+        phoneNumber
+        id
+      }
     }
   }
 `;

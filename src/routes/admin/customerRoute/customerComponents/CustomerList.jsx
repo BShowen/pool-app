@@ -9,6 +9,7 @@ import useSorter from "../../../../hooks/useSorter";
 import {
   CUSTOMER_TECHNICIAN_LIST,
   UPDATE_CUSTOMER_TECHNICIAN,
+  GET_SERVICE_ROUTE_GROUPED,
 } from "../../../../queries";
 import ErrorDisplay from "../../../../components/ErrorDisplay";
 import Loading from "../../../../components/Loading";
@@ -90,7 +91,7 @@ export default function CustomerList() {
                     <td>{formatAccountName(customer.accountName)}</td>
                     <td className="p-0 m-0 h-full">
                       <TechnicianSelector
-                        customerAccountId={customer.id}
+                        customerAccount={customer}
                         technicianId={customer.technicianId}
                         technicianList={technicianList || []}
                       />
@@ -106,13 +107,66 @@ export default function CustomerList() {
   }
 }
 
-function TechnicianSelector({
-  customerAccountId,
-  technicianId,
-  technicianList,
-}) {
+function TechnicianSelector({ customerAccount, technicianId, technicianList }) {
   const [showErrorAlert, setErrorAlert] = useState(false);
-  const [updateCustomer] = useMutation(UPDATE_CUSTOMER_TECHNICIAN);
+  const [updateCustomer] = useMutation(UPDATE_CUSTOMER_TECHNICIAN, {
+    update(cache, { data }) {
+      // Update the cached response for GET_SERVICE_ROUTE_GROUPED
+
+      // The document that was just updated.
+      const updatedCustomer = data?.updateCustomerAccount;
+
+      // The current cache that is stored for the GET_SERVICE_ROUTE_GROUPED query
+      const groupedServiceRoutes = cache.readQuery({
+        query: GET_SERVICE_ROUTE_GROUPED,
+        variables: { id: updatedCustomer.technicianId },
+      });
+
+      // If there is a cache, updated it.
+      // If there isn't a cache then theres nothing to do.
+      if (groupedServiceRoutes) {
+        // The new cache that will be inserted in place of the old cache.
+        const newCache = {
+          ...groupedServiceRoutes, //Old cache results
+        };
+        // Find the service route within the cache that needs to be updated
+        const serviceRoute = newCache.getGroupedServiceRoute.find((route) => {
+          route.serviceDay === updatedCustomer.serviceDay;
+        });
+
+        if (serviceRoute) {
+          // If serviceRoute is true, then we are updated the cache.
+          serviceRoute.customerAccounts.push(updatedCustomer);
+        } else {
+          // If serviceRoute is false, then we are creating a new serviceRoute
+          // in the cache.
+
+          // New serviceRoute to be inserted into the cache.
+          const serviceRoute = {
+            __typename: "ServiceRouteGrouped",
+            count: 1,
+            total: updatedCustomer.price,
+            customerAccounts: [updatedCustomer],
+            serviceDay: updatedCustomer.serviceDay,
+          };
+
+          // Insert the new serviceRoute into the cache.
+          newCache.getGroupedServiceRoute = [
+            ...newCache.getGroupedServiceRoute,
+            serviceRoute,
+          ];
+        }
+
+        // Update the cached value for CUSTOMER_TECHNICIAN_LIST query with the
+        // new cache
+        cache.writeQuery({
+          query: GET_SERVICE_ROUTE_GROUPED,
+          variables: { id: updatedCustomer.technicianId },
+          data: newCache,
+        });
+      }
+    },
+  });
 
   async function handleChange(e) {
     e.preventDefault();
@@ -126,6 +180,7 @@ function TechnicianSelector({
         variables,
         optimisticResponse: {
           updateCustomerAccount: {
+            ...customerAccount,
             ...variables.customerAccountInput,
             __typename: "CustomerAccount",
           },
@@ -153,7 +208,7 @@ function TechnicianSelector({
         }}
       >
         <form method="post">
-          <input hidden readOnly name="id" value={customerAccountId} />
+          <input hidden readOnly name="id" value={customerAccount.id} />
           <select
             className="focus:outline-none focus:bg-transparent bg-transparent w-min hover:cursor-pointer"
             readOnly
