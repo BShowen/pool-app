@@ -5,7 +5,11 @@ import CustomerForm from "./customerComponents/CustomerForm";
 import routes from "../../routeDefinitions";
 import { useMutation, useQuery } from "@apollo/client";
 
-import { UPDATE_CUSTOMER, CUSTOMER_ACCOUNT } from "../../../queries/index.js";
+import {
+  UPDATE_CUSTOMER,
+  CUSTOMER_ACCOUNT,
+  GET_SERVICE_ROUTE_GROUPED,
+} from "../../../queries/index.js";
 import LoadingOverlay from "../../../components/LoadingOverlay.jsx";
 import ErrorDisplay from "../../../components/ErrorDisplay";
 
@@ -24,15 +28,22 @@ async function updateCustomer(formData, sendMutation) {
 export default function CustomerEdit() {
   const { customerId } = useLoaderData();
   const navigate = useNavigate();
-  const [
-    sendMutation,
-    { data: mutationData, loading: mutationLoading, error: mutationError },
-  ] = useMutation(UPDATE_CUSTOMER);
   const {
     loading: queryLoading,
     data: queryData,
     error: queryError,
   } = useQuery(CUSTOMER_ACCOUNT, { variables: { id: customerId } });
+  const [
+    sendMutation,
+    { data: mutationData, loading: mutationLoading, error: mutationError },
+  ] = useMutation(UPDATE_CUSTOMER, {
+    refetchQueries: () => [
+      {
+        query: GET_SERVICE_ROUTE_GROUPED,
+        variables: { id: queryData.getCustomerAccount.technicianId },
+      },
+    ],
+  });
 
   const formErrors = mutationError?.graphQLErrors[0]?.extensions?.fields;
 
