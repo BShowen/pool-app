@@ -49,7 +49,7 @@ export function ServiceDayList() {
 
 function TechnicianDisclosure({ route }) {
   const navigate = useNavigate();
-  const [customerAccounts, sortBy] = useSorter(route.customers);
+  const [customerAccounts, sortBy] = useSorter(route.customerAccounts);
   const { technician } = route;
   return (
     <Disclosure as="div" defaultOpen={false}>

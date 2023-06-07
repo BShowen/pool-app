@@ -8,7 +8,7 @@ export const GET_ROUTE_LIST = gql`
         id
         lastName
       }
-      customers {
+      customerAccounts {
         accountName
         serviceDay
         id
