@@ -20,6 +20,11 @@ export default function Sidebar({ isSidebarOpen, toggleSidebar }) {
         <label className="drawer-overlay" onClick={toggleSidebar}></label>
         <ul className="menu p-4 w-80 bg-base-100 text-base-content bg-inherit pb-32 lg:pb-4">
           <li>
+            <Link to={routes.adminRoot} onClick={toggleSidebar}>
+              Dashboard
+            </Link>
+          </li>
+          <li>
             <Link to={routes.customers} onClick={toggleSidebar}>
               Customers
             </Link>

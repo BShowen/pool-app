@@ -33,6 +33,9 @@ import TechnicianDashboard from "./technicianRoute/TechnicianDashBoard";
 /* -------------------- Service Days routes -------------------- */
 import { ServiceDayList } from "./serviceDayRoute/serviceDayList";
 
+/* -------------------- Service Days routes -------------------- */
+import { AdminDashboard } from "./adminComponents/AdminDashboard";
+
 /* -------------------- Error components -------------------- */
 import ErrorDisplay from "../../components/ErrorDisplay";
 
@@ -42,6 +45,10 @@ export default {
   loader: rootLoader,
   errorElement: <ErrorDisplay />,
   children: [
+    {
+      element: <AdminDashboard />,
+      index: true,
+    },
     {
       path: routes.customers,
       element: <CustomersPage />,
