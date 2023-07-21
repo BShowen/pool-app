@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client";
 
 import {
   CREATE_NEW_CUSTOMER,
-  CUSTOMER_LIST,
+  // CUSTOMER_LIST,
   CUSTOMER_TECHNICIAN_LIST,
 } from "../../../queries/index.js";
 import CustomerForm from "./customerComponents/CustomerForm";
