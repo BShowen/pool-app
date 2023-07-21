@@ -32,7 +32,7 @@ export default function CustomerEdit() {
     loading: queryLoading,
     data: queryData,
     error: queryError,
-  } = useQuery(CUSTOMER_ACCOUNT, { variables: { id: customerId } });
+  } = useQuery(CUSTOMER_ACCOUNT, { variables: { accountId: customerId } });
   const [
     sendMutation,
     { data: mutationData, loading: mutationLoading, error: mutationError },
@@ -63,7 +63,7 @@ export default function CustomerEdit() {
   if (queryError) {
     return <ErrorDisplay message={queryError.message} />;
   } else {
-    const { getCustomerAccount: customerAccount } = queryData;
+    const { customerAccount } = queryData;
     return (
       <>
         <LoadingOverlay show={mutationLoading} />
