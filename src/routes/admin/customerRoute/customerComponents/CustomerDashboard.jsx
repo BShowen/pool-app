@@ -74,7 +74,7 @@ export default function CustomerDashboard() {
     data: queryData,
     error: queryError,
   } = useQuery(CUSTOMER_ACCOUNT, {
-    variables: { id: customerId },
+    variables: { accountId: customerId },
   });
   const navigate = useNavigate();
   const [replace, setReplace] = useState(false);
@@ -92,7 +92,7 @@ export default function CustomerDashboard() {
     const errorMessage = queryError?.message || mutationError?.message;
     return <ErrorDisplay message={errorMessage} />;
   } else {
-    const { getCustomerAccount: customerAccount } = queryData;
+    const { customerAccount } = queryData;
     return (
       <div className="card bg-base-100 w-full lg:w-3/5 lg:shadow-lg">
         <div className="card-body card-compact flex flex-col lg:flex-row lg:justify-around lg:flex-wrap">

@@ -14,7 +14,7 @@ export default function CustomerPage() {
   const { customerId } = useLoaderData();
   const { loading, error, data } = useQuery(CUSTOMER_ACCOUNT, {
     variables: {
-      id: customerId,
+      accountId: customerId,
     },
   });
 
@@ -23,7 +23,7 @@ export default function CustomerPage() {
   } else if (error) {
     return <ErrorDisplay message={error.message} />;
   } else {
-    const { getCustomerAccount: customerAccount } = data;
+    const { customerAccount } = data;
     return (
       <div className="w-full flex flex-col flex-wrap justify-start">
         {/* Page container */}

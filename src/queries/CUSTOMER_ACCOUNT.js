@@ -1,22 +1,29 @@
 import { gql } from "@apollo/client";
 
 export const CUSTOMER_ACCOUNT = gql`
-  query GetCustomerAccount($id: ID) {
-    getCustomerAccount(id: $id) {
+  query CustomerAccount($accountId: ID!) {
+    customerAccount(accountId: $accountId) {
       accountName
       serviceType
       serviceDay
       serviceFrequency
       address
       price
-      companyId
+      company
       id
-      technicianId
+      technician {
+        id
+        firstName
+        lastName
+        emailAddress
+        roles
+      }
       accountOwners {
         firstName
         lastName
         emailAddress
         phoneNumber
+        account
         id
       }
     }
