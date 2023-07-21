@@ -17,8 +17,8 @@ export function loader() {
 }
 
 const LOGIN = gql`
-  mutation Login($email: String, $password: String) {
-    login(email: $email, password: $password)
+  mutation Login($input: LoginInput) {
+    login(input: $input)
   }
 `;
 
@@ -49,7 +49,7 @@ export default function Login() {
 
   async function submitForm(formData) {
     try {
-      await mutateFunction({ variables: formData });
+      await mutateFunction({ variables: { input: formData } });
     } catch (error) {
       const errorMessages = {};
       error.graphQLErrors.forEach((er) => {
