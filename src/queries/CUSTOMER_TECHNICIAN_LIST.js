@@ -1,32 +1,38 @@
 import { gql } from "@apollo/client";
 
 export const CUSTOMER_TECHNICIAN_LIST = gql`
-  query customerTechnicianList {
-    getCustomerAccountList {
+  query CustomerTechnicianList {
+    customerAccountList {
       accountName
-      accountOwners {
-        emailAddress
-        firstName
-        lastName
-        phoneNumber
-        id
-      }
-      address
-      companyId
-      id
-      price
+      serviceType
       serviceDay
       serviceFrequency
-      serviceType
-      technicianId
+      address
+      price
+      company
+      id
+      technician {
+        id
+        firstName
+        lastName
+        emailAddress
+        roles
+      }
+      accountOwners {
+        firstName
+        lastName
+        emailAddress
+        phoneNumber
+        account
+        id
+      }
     }
-    getTechnicianList {
-      companyId
-      emailAddress
-      lastName
+    technicianList {
       id
       firstName
-      password
+      lastName
+      emailAddress
+      roles
     }
   }
 `;

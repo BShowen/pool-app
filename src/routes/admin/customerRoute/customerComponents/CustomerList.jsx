@@ -17,10 +17,7 @@ import Loading from "../../../../components/Loading";
 export default function CustomerList() {
   const navigate = useNavigate();
   const { loading, error, data } = useQuery(CUSTOMER_TECHNICIAN_LIST);
-  const {
-    getCustomerAccountList: customerAccountList,
-    getTechnicianList: technicianList,
-  } = data;
+  const { customerAccountList, technicianList } = data;
   const [sortedCustomerAccountList, sortBy] = useSorter(customerAccountList);
 
   if (loading) {
