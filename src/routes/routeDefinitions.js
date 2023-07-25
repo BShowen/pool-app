@@ -2,7 +2,8 @@ const customerRoutes = {
   customers: "/admin/customers",
   newCustomer: "/admin/customers/new",
   customer: "/admin/customers/:customerId",
-  editCustomer: "/admin/customers/:customerId/edit",
+  editAccount: "/admin/customers/:customerId/editAccount",
+  editAccountOwner: "/admin/customers/:customerId/editAccountOwner",
   customerPoolReports: "/admin/customers/:customerId/pool-reports",
   customerInvoices: "/admin/customers/:customerId/invoices",
 };

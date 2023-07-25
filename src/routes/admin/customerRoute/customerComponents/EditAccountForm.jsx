@@ -4,21 +4,13 @@ import { Form, useNavigate } from "react-router-dom";
 import AccountOwnerForm from "./AccountOwnerForm";
 import { accountOwnerType } from "../../../../utils/types";
 
-export default function CustomerForm({
-  title,
-  customerAccount,
-  errors,
-  onSubmit,
-}) {
+export default function EditAccountForm({ customerAccount, errors, onSubmit }) {
   // If a submit handler is passed in then use that to submit the form.
   // Otherwise use useSubmit() to submit the form.
   const submit = onSubmit;
-  const [state, setState] = useState(
-    customerAccount || { accountOwners: [{}] }
-  );
+  const [state, setState] = useState(customerAccount);
   const navigate = useNavigate();
   const [focus, setFocus] = useState(false);
-  const accountOwnersCount = state.accountOwners.length - 1;
 
   // If errors is undefined then assign a blank object {} to it.
   // This is because the form expects errors to always be ab object.
@@ -26,42 +18,27 @@ export default function CustomerForm({
 
   function updateState(e) {
     const isSubForm = Object.keys(e.target.dataset).length;
-    if (isSubForm) {
-      const index = e.target.dataset.index;
-      setState((prevState) => {
-        const updatedAccountOwners = [...prevState.accountOwners];
-        updatedAccountOwners[index] = {
-          ...prevState.accountOwners[index],
-          [e.target.name]: e.target.value,
-        };
-        return {
-          ...prevState,
-          accountOwners: updatedAccountOwners,
-        };
-      });
-    } else {
-      setState((prevState) => {
-        let value =
-          e.target.type === "number"
-            ? Number.parseFloat(e.target.value)
-            : e.target.value;
-        return { ...prevState, [e.target.name]: value };
-      });
-    }
-  }
-
-  function removeAccountOwner(itemIndex) {
     setState((prevState) => {
-      const accountOwners = [
-        ...prevState.accountOwners.filter((item, index) => {
-          if (index === itemIndex) return;
-          return item;
-        }),
-      ];
-      const newState = { ...prevState, accountOwners };
-      return newState;
+      let value =
+        e.target.type === "number"
+          ? Number.parseFloat(e.target.value)
+          : e.target.value;
+      return { ...prevState, [e.target.name]: value };
     });
   }
+
+  // function removeAccountOwner(itemIndex) {
+  //   setState((prevState) => {
+  //     const accountOwners = [
+  //       ...prevState.accountOwners.filter((item, index) => {
+  //         if (index === itemIndex) return;
+  //         return item;
+  //       }),
+  //     ];
+  //     const newState = { ...prevState, accountOwners };
+  //     return newState;
+  //   });
+  // }
 
   return (
     <Form
@@ -73,7 +50,7 @@ export default function CustomerForm({
     >
       <div>
         <div className="p-1 lg:p-5 h-24 w-full flex flex-row justify-center items-baseline">
-          <h1 className="text-3xl font-bold">{title}</h1>
+          <h1 className="text-3xl font-bold">Update account</h1>
         </div>
 
         <div className="w-full flex flex-col gap-10 lg:w-1/4 lg:mx-auto lg:pb-40">
@@ -200,7 +177,7 @@ export default function CustomerForm({
             />
           </div>
 
-          {state.accountOwners.map((_, index) => {
+          {/* {state.accountOwners.map((_, index) => {
             return (
               <AccountOwnerForm
                 key={index}
@@ -214,10 +191,10 @@ export default function CustomerForm({
                 shouldFocus={focus && index == accountOwnersCount}
               />
             );
-          })}
+          })} */}
 
           <div className="w-full flex flex-col justify-start gap-3">
-            <button
+            {/* <button
               type="button"
               className="btn btn-accent btn-sm"
               onClick={() => {
@@ -234,7 +211,7 @@ export default function CustomerForm({
               }}
             >
               Add contact
-            </button>
+            </button> */}
             <div className="divider !p-0 !m-0"></div>
             <div className="flex gap-2 justify-evenly">
               <button className="btn btn-primary w-2/4" type="submit">

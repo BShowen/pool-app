@@ -6,7 +6,7 @@ import {
   // CUSTOMER_LIST,
   CUSTOMER_TECHNICIAN_LIST,
 } from "../../../queries/index.js";
-import CustomerForm from "./customerComponents/CustomerForm";
+import EditAccountForm from "./customerComponents/EditAccountForm";
 import routes from "../../routeDefinitions";
 import { useEffect } from "react";
 import LoadingOverlay from "../../../components/LoadingOverlay";
@@ -69,8 +69,7 @@ export default function NewCustomerPage() {
   return (
     <>
       <LoadingOverlay show={loading} />
-      <CustomerForm
-        title={"New customer"}
+      <EditAccountForm
         errors={formErrors}
         onSubmit={({ formData }) => {
           createNewCustomer(formData, createCustomer);

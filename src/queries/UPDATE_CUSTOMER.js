@@ -1,24 +1,23 @@
 import { gql } from "@apollo/client";
 
 export const UPDATE_CUSTOMER = gql`
-  mutation UpdateCustomerAccount(
-    $customerAccountInput: UpdateCustomerAccountInput
-  ) {
-    updateCustomerAccount(customerAccountInput: $customerAccountInput) {
+  mutation UpdateCustomerAccount($input: UpdateCustomerAccountInput) {
+    updateCustomerAccount(input: $input) {
       accountName
-      address
-      companyId
-      id
-      price
+      serviceType
       serviceDay
       serviceFrequency
-      serviceType
+      address
+      price
+      company
+      id
       accountOwners {
-        emailAddress
         firstName
-        id
         lastName
+        emailAddress
         phoneNumber
+        account
+        id
       }
     }
   }

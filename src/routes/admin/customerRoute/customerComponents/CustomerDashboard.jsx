@@ -94,91 +94,103 @@ export default function CustomerDashboard() {
   } else {
     const { customerAccount } = queryData;
     return (
-      <div className="card bg-base-100 w-full lg:w-3/5 lg:shadow-lg">
-        <div className="card-body card-compact flex flex-col lg:flex-row lg:justify-around lg:flex-wrap">
-          <div className="card">
-            <div className="card-body card-compact">
-              <h1 className="card-title">Contacts</h1>
-              {customerAccount.accountOwners.map((contact) => {
-                return (
-                  <div key={contact.id} className="py-2">
-                    <p className="font-semibold">
-                      {capitalizeName(contact.firstName, contact.lastName)}
-                    </p>
-                    <p>{contact.emailAddress}</p>
-                    <p>{contact.phoneNumber}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+      // Page container
+      <div className="w-full flex flex-col items-center gap-16">
+        <div className="card bg-base-100 w-full lg:w-3/5 lg:shadow-lg">
+          <div className="card-body card-compact flex flex-col lg:flex-row lg:justify-around lg:flex-wrap">
+            <p className="card-title justify-center w-full">
+              Account information
+            </p>
 
-          <div className="card">
-            <div className="card-body card-compact">
-              <h1 className="card-title">Address</h1>
-              <p>{customerAccount.address}</p>
+            <div className="card">
+              <div className="card-body card-compact">
+                <h1 className="card-title">Address</h1>
+                <p>{customerAccount.address}</p>
+              </div>
             </div>
-          </div>
 
-          <div className="card">
-            <div className="card-body card-compact">
-              <h1 className="card-title">Service</h1>
-              <p>
-                <span className="font-semibold">Type:</span>{" "}
-                {customerAccount.serviceType}
-              </p>
-              <p>
-                <span className="font-semibold">Frequency:</span>{" "}
-                {customerAccount.serviceFrequency}
-              </p>
-              <p>
-                <span className="font-semibold">Day:</span>{" "}
-                {customerAccount.serviceDay}
-              </p>
-              <p>
-                <span className="font-semibold">Price:</span>{" "}
-                {customerAccount.price}
-              </p>
+            <div className="card">
+              <div className="card-body card-compact">
+                <h1 className="card-title">Service</h1>
+                <p>
+                  <span className="font-semibold">Type:</span>{" "}
+                  {customerAccount.serviceType}
+                </p>
+                <p>
+                  <span className="font-semibold">Frequency:</span>{" "}
+                  {customerAccount.serviceFrequency}
+                </p>
+                <p>
+                  <span className="font-semibold">Day:</span>{" "}
+                  {customerAccount.serviceDay}
+                </p>
+                <p>
+                  <span className="font-semibold">Price:</span>{" "}
+                  {customerAccount.price}
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="card-actions justify-end w-full">
-            <button
-              className="btn btn-primary btn-md lg:btn-sm"
-              onClick={() => {
-                if (!replace) {
-                  setReplace(true);
-                }
-                navigate(
-                  routes.getDynamicRoute({
-                    route: "editCustomer",
-                    id: customerAccount.id,
-                  }),
-                  { replace }
-                );
-              }}
-            >
-              Edit
-            </button>
-            <button
-              className="btn btn-error btn-md lg:btn-sm"
-              onClick={async () => {
-                const canDelete = confirm(
-                  `Delete ${formatAccountName(customerAccount.accountName)}?`
-                );
-                if (canDelete) {
-                  try {
-                    await deleteAccount({
-                      variables: { id: customerAccount.id },
-                    });
-                  } catch (error) {
-                    console.log("Error deleting customer: ", error.message);
+            <div className="card-actions justify-end w-full">
+              <button
+                className="btn btn-primary btn-md lg:btn-sm"
+                onClick={() => {
+                  if (!replace) {
+                    setReplace(true);
                   }
-                }
-              }}
-            >
-              Delete
-            </button>
+                  navigate(
+                    routes.getDynamicRoute({
+                      route: "editAccount",
+                      id: customerAccount.id,
+                    }),
+                    { replace }
+                  );
+                }}
+              >
+                Update
+              </button>
+              <button
+                className="btn btn-error btn-md lg:btn-sm"
+                onClick={async () => {
+                  const canDelete = confirm(
+                    `Delete ${formatAccountName(customerAccount.accountName)}?`
+                  );
+                  if (canDelete) {
+                    try {
+                      await deleteAccount({
+                        variables: { id: customerAccount.id },
+                      });
+                    } catch (error) {
+                      console.log("Error deleting customer: ", error.message);
+                    }
+                  }
+                }}
+              >
+                Delete Account
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="card bg-base-100 w-full lg:w-3/5 lg:shadow-lg">
+          <div className="card-body card-compact flex flex-col lg:flex-row lg:justify-around lg:flex-wrap">
+            <p className="card-title justify-center w-full">Contacts</p>
+
+            <div className="card">
+              <div className="card-body card-compact">
+                {customerAccount.accountOwners.map((contact) => {
+                  return (
+                    <div key={contact.id} className="py-2">
+                      <p className="font-semibold">
+                        {capitalizeName(contact.firstName, contact.lastName)}
+                      </p>
+                      <p>{contact.emailAddress}</p>
+                      <p>{contact.phoneNumber}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </div>

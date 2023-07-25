@@ -1,7 +1,7 @@
 import { useNavigate, useLoaderData } from "react-router-dom";
 import { useEffect } from "react";
 
-import CustomerForm from "./customerComponents/CustomerForm";
+import EditAccountForm from "./customerComponents/EditAccountForm";
 import routes from "../../routeDefinitions";
 import { useMutation, useQuery } from "@apollo/client";
 
@@ -25,7 +25,7 @@ async function updateCustomer(formData, sendMutation) {
   }
 }
 
-export default function CustomerEdit() {
+export default function EditAccount() {
   const { customerId } = useLoaderData();
   const navigate = useNavigate();
   const {
@@ -67,8 +67,7 @@ export default function CustomerEdit() {
     return (
       <>
         <LoadingOverlay show={mutationLoading} />
-        <CustomerForm
-          title={"Edit customer"}
+        <EditAccountForm
           customerAccount={customerAccount}
           errors={formErrors}
           onSubmit={({ formData }) => {
