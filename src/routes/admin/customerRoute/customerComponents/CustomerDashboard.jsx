@@ -174,7 +174,7 @@ export default function CustomerDashboard() {
 
         <div className="card bg-base-100 w-full lg:w-3/5 lg:shadow-lg">
           <div className="card-body card-compact flex flex-col lg:flex-row lg:justify-around lg:flex-wrap">
-            <p className="card-title justify-center w-full">Contacts</p>
+            <p className="card-title justify-center w-full">Account Owners</p>
 
             <div className="card">
               <div className="card-body card-compact">
@@ -190,6 +190,26 @@ export default function CustomerDashboard() {
                   );
                 })}
               </div>
+            </div>
+
+            <div className="card-actions justify-end w-full">
+              <button
+                className="btn btn-primary btn-md lg:btn-sm"
+                onClick={() => {
+                  if (!replace) {
+                    setReplace(true);
+                  }
+                  navigate(
+                    routes.getDynamicRoute({
+                      route: "editAccountOwner",
+                      id: customerAccount.id,
+                    }),
+                    { replace }
+                  );
+                }}
+              >
+                Update
+              </button>
             </div>
           </div>
         </div>

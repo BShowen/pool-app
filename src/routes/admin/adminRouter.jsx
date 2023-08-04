@@ -8,6 +8,7 @@ import CustomerPage, {
   loader as customerPageLoader,
 } from "./customerRoute/CustomerPage";
 import EditAccountPage from "./customerRoute/EditAccountPage";
+import EditAccountOwnerPage from "./customerRoute/EditAccountOwnerPage";
 
 /* -------------------- Customer components -------------------- */
 import CustomerDashboard from "./customerRoute/customerComponents/CustomerDashboard";
@@ -79,7 +80,7 @@ export default {
             },
             {
               path: routes.editAccountOwner,
-              element: <EditAccountPage />,
+              element: <EditAccountOwnerPage />,
               loader: customerPageLoader,
             },
             {

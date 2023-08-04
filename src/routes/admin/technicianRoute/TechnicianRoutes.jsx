@@ -7,7 +7,7 @@ import { formatAccountName, capitalize } from "../../../utils/formatters";
 import Loading from "../../../components/Loading";
 import ErrorDisplay from "../../../components/ErrorDisplay";
 import routes from "../../routeDefinitions";
-import { GET_SERVICE_ROUTE_GROUPED } from "../../../queries/index.js";
+import { GET_SERVICE_ROUTES } from "../../../queries/index.js";
 
 export function loader({ params }) {
   return { technicianId: params.technicianId };
@@ -15,7 +15,7 @@ export function loader({ params }) {
 
 export default function TechnicianRoutes() {
   const { technicianId } = useLoaderData();
-  const { loading, error, data } = useQuery(GET_SERVICE_ROUTE_GROUPED, {
+  const { loading, error, data } = useQuery(GET_SERVICE_ROUTES, {
     variables: {
       id: technicianId,
     },

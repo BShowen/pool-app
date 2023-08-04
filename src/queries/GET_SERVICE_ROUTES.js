@@ -1,10 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const GET_SERVICE_ROUTE_GROUPED = gql`
-  query GetGroupedServiceRoute($id: ID) {
-    getGroupedServiceRoute(id: $id) {
-      count
-      total
+export const GET_SERVICE_ROUTES = gql`
+  query Query {
+    serviceRouteAll {
       customerAccounts {
         accountName
         serviceType
@@ -12,18 +10,24 @@ export const GET_SERVICE_ROUTE_GROUPED = gql`
         serviceFrequency
         address
         price
-        companyId
         id
-        technicianId
         accountOwners {
           firstName
           lastName
           emailAddress
           phoneNumber
+          account
           id
         }
       }
-      serviceDay
+      technician {
+        id
+        firstName
+        lastName
+        emailAddress
+        roles
+      }
+      count
     }
   }
 `;

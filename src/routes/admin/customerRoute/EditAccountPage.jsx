@@ -8,16 +8,19 @@ import { useMutation, useQuery } from "@apollo/client";
 import {
   UPDATE_CUSTOMER,
   CUSTOMER_ACCOUNT,
-  GET_SERVICE_ROUTE_GROUPED,
+  GET_SERVICE_ROUTES,
 } from "../../../queries/index.js";
-import LoadingOverlay from "../../../components/LoadingOverlay.jsx";
 import ErrorDisplay from "../../../components/ErrorDisplay";
 
 async function updateCustomer(formData, sendMutation) {
   try {
-    const variables = { customerAccountInput: formData };
-    await sendMutation({ variables });
+    // Create an input object to send to the backend.
+    const input = Object.fromEntries(formData.entries());
+    input.price = Number.parseFloat(input.price);
+    // Send the mutation with the variables.
+    await sendMutation({ variables: { input } });
   } catch (error) {
+    console.log({ error });
     // Errors are handled by CustomerEdit component (below).
     // This catch statement is here to silence the browser from logging
     // that there is an uncaught error.
@@ -28,21 +31,16 @@ async function updateCustomer(formData, sendMutation) {
 export default function EditAccount() {
   const { customerId } = useLoaderData();
   const navigate = useNavigate();
-  const {
-    loading: queryLoading,
-    data: queryData,
-    error: queryError,
-  } = useQuery(CUSTOMER_ACCOUNT, { variables: { accountId: customerId } });
+  // Retrieve the customer account in order to prefill the form.
+  const { data: queryData, error: queryError } = useQuery(CUSTOMER_ACCOUNT, {
+    variables: { accountId: customerId },
+  });
+  // The mutation to update the customer account.
   const [
     sendMutation,
     { data: mutationData, loading: mutationLoading, error: mutationError },
   ] = useMutation(UPDATE_CUSTOMER, {
-    refetchQueries: () => [
-      {
-        query: GET_SERVICE_ROUTE_GROUPED,
-        variables: { id: queryData.getCustomerAccount.technicianId },
-      },
-    ],
+    refetchQueries: [{ query: GET_SERVICE_ROUTES }],
   });
 
   const formErrors = mutationError?.graphQLErrors[0]?.extensions?.fields;
@@ -65,16 +63,13 @@ export default function EditAccount() {
   } else {
     const { customerAccount } = queryData;
     return (
-      <>
-        <LoadingOverlay show={mutationLoading} />
-        <EditAccountForm
-          customerAccount={customerAccount}
-          errors={formErrors}
-          onSubmit={({ formData }) => {
-            updateCustomer(formData, sendMutation);
-          }}
-        />
-      </>
+      <EditAccountForm
+        customerAccount={customerAccount}
+        errors={formErrors}
+        onSubmit={({ formData }) => {
+          updateCustomer(formData, sendMutation);
+        }}
+      />
     );
   }
 }

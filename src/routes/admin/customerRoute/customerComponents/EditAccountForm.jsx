@@ -45,7 +45,9 @@ export default function EditAccountForm({ customerAccount, errors, onSubmit }) {
       className="flex flex-col w-full px-5"
       onSubmit={(e) => {
         e.preventDefault();
-        submit({ formData: state });
+        const formData = new FormData(e.target);
+        formData.append("id", state.id);
+        submit({ formData });
       }}
     >
       <div>
