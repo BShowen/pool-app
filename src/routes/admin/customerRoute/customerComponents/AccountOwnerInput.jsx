@@ -1,13 +1,13 @@
-export default function AccountOwnerForm({
-  changeHandler,
+export function AccountOwnerInput({
   values,
+  onInput,
   index,
   errors,
   removeHandler,
   shouldFocus,
 }) {
   return (
-    <div className="w-full rounded-lg px-2 py-3 bg-slate-100">
+    <div className="w-full rounded-lg px-2 py-3 bg-slate-100 my-2">
       <h1 className="text-center font-semibold text-lg">Contact information</h1>
 
       <label className="label">
@@ -18,13 +18,13 @@ export default function AccountOwnerForm({
       <input
         type="text"
         placeholder="First name"
-        data-index={index}
+        // data-index={index}
         name="firstName"
         className={`input input-bordered w-full focus:outline-none ${
           errors.firstName && "input-secondary"
         }`}
         value={values.firstName || ""}
-        onInput={changeHandler}
+        onInput={onInput}
         autoFocus={shouldFocus}
       />
 
@@ -36,13 +36,12 @@ export default function AccountOwnerForm({
       <input
         type="text"
         placeholder="Last name"
-        data-index={index}
         name="lastName"
         className={`input input-bordered w-full focus:outline-none ${
           errors.lastName && "input-secondary"
         }`}
         value={values.lastName || ""}
-        onInput={changeHandler}
+        onInput={onInput}
       />
 
       <label className="label">
@@ -55,13 +54,12 @@ export default function AccountOwnerForm({
       <input
         type="email"
         placeholder="Email address"
-        data-index={index}
         name="emailAddress"
         className={`input input-bordered w-full focus:outline-none ${
           errors.emailAddress && "input-secondary"
         }`}
         value={values.emailAddress || ""}
-        onInput={changeHandler}
+        onInput={onInput}
       />
 
       <label className="label">
@@ -74,13 +72,12 @@ export default function AccountOwnerForm({
       <input
         type="text"
         placeholder="Phone number"
-        data-index={index}
         name="phoneNumber"
         className={`input input-bordered w-full focus:outline-none ${
           errors.phoneNumber && "input-secondary"
         }`}
         value={values.phoneNumber || ""}
-        onInput={changeHandler}
+        onInput={onInput}
       />
 
       <div

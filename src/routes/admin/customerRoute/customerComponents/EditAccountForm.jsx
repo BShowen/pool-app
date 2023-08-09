@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { Form, useNavigate } from "react-router-dom";
 
-import AccountOwnerForm from "./AccountOwnerForm";
-import { accountOwnerType } from "../../../../utils/types";
-
 export default function EditAccountForm({ customerAccount, errors, onSubmit }) {
   // If a submit handler is passed in then use that to submit the form.
   // Otherwise use useSubmit() to submit the form.
