@@ -73,8 +73,7 @@ export default function CustomerDashboard() {
                     routes.getDynamicRoute({
                       route: "editAccount",
                       id: customerAccount.id,
-                    }),
-                    { replace: false }
+                    })
                   );
                 }}
               >
@@ -114,15 +113,11 @@ export default function CustomerDashboard() {
                       <button
                         className="btn btn-primary btn-sm"
                         onClick={() => {
-                          if (!replace) {
-                            setReplace(true);
-                          }
                           navigate(
                             routes.getDynamicRoute({
                               route: "editAccountOwner",
                               id: [customerAccount.id, contact.id],
-                            }),
-                            { replace }
+                            })
                           );
                         }}
                       >
@@ -142,6 +137,7 @@ export default function CustomerDashboard() {
 }
 
 function DeleteCustomerAccountButton({ customerAccount }) {
+  const navigate = useNavigate();
   const [deleteAccount, { data, error, loading }] = useMutation(
     DELETE_CUSTOMER_ACCOUNT,
     {
