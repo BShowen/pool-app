@@ -8,7 +8,7 @@ import Loading from "../../../components/Loading.jsx";
 import ErrorDisplay from "../../../components/ErrorDisplay.jsx";
 export async function loader({ params }) {
   // Retrieve and return the id from the url.
-  return { customerId: params.customerId };
+  return params;
 }
 export default function CustomerPage() {
   const { customerId } = useLoaderData();

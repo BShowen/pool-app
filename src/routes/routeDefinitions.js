@@ -3,7 +3,7 @@ const customerRoutes = {
   newCustomer: "/admin/customers/new",
   customer: "/admin/customers/:customerId",
   editAccount: "/admin/customers/:customerId/editAccount",
-  editAccountOwner: "/admin/customers/:customerId/editAccountOwner",
+  editAccountOwner: "/admin/customers/:customerId/editAccountOwner/:ownerId",
   customerPoolReports: "/admin/customers/:customerId/pool-reports",
   customerInvoices: "/admin/customers/:customerId/invoices",
 };
@@ -31,7 +31,7 @@ const adminRoutes = {
   adminRoot: "/admin",
 };
 
-const dynamicSegment = /:([a-zA-Z]+)(?=\/|$)/;
+const dynamicSegment = /:([a-zA-Z]+)(?=\/|$)/g;
 
 const routes = {
   ...customerRoutes,
@@ -40,8 +40,23 @@ const routes = {
   ...rootRoutes,
   ...adminRoutes,
   getDynamicRoute({ route, id }) {
-    return this[route].replace(dynamicSegment, id);
+    let shifter;
+    if (!Array.isArray(id)) {
+      id = [id];
+    }
+    shifter = createShifterArray(id);
+    return this[route].replaceAll(dynamicSegment, shifter);
   },
 };
+
+function createShifterArray(arr) {
+  let shiftedArray = [...arr]; // Create a copy of the original array
+  return function () {
+    if (shiftedArray.length === 0) {
+      return undefined; // Return undefined when the array is empty
+    }
+    return shiftedArray.shift(); // Remove and return the first element of the array
+  };
+}
 
 export default routes;

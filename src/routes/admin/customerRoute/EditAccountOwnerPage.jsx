@@ -8,7 +8,7 @@ import { CUSTOMER_ACCOUNT, UPDATE_CUSTOMERS } from "../../../queries/index.js";
 
 export default function EditAccountOwnerPage() {
   // Get the id from the url.
-  const { customerId } = useLoaderData();
+  const { customerId, ownerId } = useLoaderData();
   // navigate is used to navigate back when user clicks "Cancel" button.
   const navigate = useNavigate();
   // Retrieve the customer account in order to prefill the form.
@@ -23,20 +23,21 @@ export default function EditAccountOwnerPage() {
   ] = useMutation(UPDATE_CUSTOMERS);
 
   // Store the form data for form submission.
-  const [state, setState] = useState([]);
+  const [accountOwner, setAccountOwner] = useState({});
 
   // On page load, customer account data is retrieved from backend.
   // The backend provides some fields that need to be removed in order for
   // the mutation query to work properly.
   // Remove "__typename", "account" fields.
   useEffect(() => {
-    const newState = data.customerAccount.accountOwners.map((accountOwner) => {
-      const account = { ...accountOwner };
-      delete account.__typename;
-      delete account.account;
-      return account;
-    });
-    setState(newState);
+    const account = {
+      ...data.customerAccount.accountOwners.find(
+        (accountOwner) => accountOwner.id == ownerId
+      ),
+    };
+    delete account.__typename;
+    delete account.account;
+    setAccountOwner(account);
   }, [data]);
 
   // When the mutation is successful, redirect to dashboard.
@@ -53,45 +54,27 @@ export default function EditAccountOwnerPage() {
     ? mutationError.graphQLErrors[0].extensions.fields
     : {};
 
-  const accountOwnerInputs = state.map((owner, index) => {
-    return (
-      <AccountOwnerInput
-        key={owner.id}
-        index={index}
-        values={owner}
-        onInput={(e) => {
-          setState((prevState) => {
-            return prevState.map((entry) => {
-              if (entry.id == owner.id) {
-                return { ...entry, [e.target.name]: e.target.value };
-              } else {
-                return entry;
-              }
-            });
-          });
-        }}
-        errors={formErrors[index] || {}}
-        removeHandler={() => {
-          console.log("Remove handler");
-        }}
-        shouldFocus={index == 0}
-      />
-    );
-  });
-
   return (
     <div className="w-full flex flex-col gap-10 lg:w-1/4 lg:mx-auto lg:pb-40">
       <Form
         onSubmit={async (e) => {
           e.preventDefault();
           try {
-            await updateCustomers({ variables: { input: state } });
+            await updateCustomers({ variables: { input: accountOwner } });
           } catch (error) {
             console.log({ error });
           }
         }}
       >
-        {accountOwnerInputs}
+        <AccountOwnerInput
+          values={accountOwner}
+          onInput={(e) => {
+            setAccountOwner((prevState) => {
+              return { ...prevState, [e.target.name]: e.target.value };
+            });
+          }}
+          errors={formErrors[0] || {}}
+        />
         <div className="divider !p-0 !m-0"></div>
         <div className="flex gap-2 justify-evenly">
           <button className="btn btn-primary w-2/4" type="submit">

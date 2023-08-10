@@ -12,6 +12,7 @@ import {
   DELETE_CUSTOMER_ACCOUNT,
   CUSTOMER_ACCOUNT,
   CUSTOMER_TECHNICIAN_LIST,
+  DELETE_ACCOUNT_OWNER,
 } from "../../../../queries/index.js";
 import ErrorDisplay from "../../../../components/ErrorDisplay";
 
@@ -175,44 +176,78 @@ export default function CustomerDashboard() {
           <div className="card-body card-compact flex flex-col lg:flex-row lg:justify-around lg:flex-wrap">
             <p className="card-title justify-center w-full">Account Owners</p>
 
-            <div className="card">
-              <div className="card-body card-compact">
-                {customerAccount.accountOwners.map((contact) => {
-                  return (
-                    <div key={contact.id} className="py-2">
-                      <p className="font-semibold">
+            <div className="w-full flex flex-col gap-2">
+              {customerAccount.accountOwners.map((contact) => {
+                return (
+                  <div
+                    key={contact.id}
+                    className="p-2 border-2 rounded-lg border-gray-100 w-full flex flex-row justify-between"
+                  >
+                    <div>
+                      <p>
+                        <span className="font-semibold">Name: </span>
                         {capitalizeName(contact.firstName, contact.lastName)}
                       </p>
-                      <p>{contact.emailAddress}</p>
-                      <p>{contact.phoneNumber}</p>
+                      <p>
+                        <span className="font-semibold">Email: </span>
+                        {contact.emailAddress}
+                      </p>
+                      <p>
+                        <span className="font-semibold">Phone: </span>
+                        {contact.phoneNumber}
+                      </p>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="card-actions justify-end w-full">
-              <button
-                className="btn btn-primary btn-md lg:btn-sm"
-                onClick={() => {
-                  if (!replace) {
-                    setReplace(true);
-                  }
-                  navigate(
-                    routes.getDynamicRoute({
-                      route: "editAccountOwner",
-                      id: customerAccount.id,
-                    }),
-                    { replace }
-                  );
-                }}
-              >
-                Update
-              </button>
+                    <div className="flex gap-1 flex-row justify-between items-center">
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() => {
+                          if (!replace) {
+                            setReplace(true);
+                          }
+                          navigate(
+                            routes.getDynamicRoute({
+                              route: "editAccountOwner",
+                              id: [customerAccount.id, contact.id],
+                            }),
+                            { replace }
+                          );
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <DeleteCustomerButton customerId={contact.id} />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
     );
   }
+}
+
+function DeleteCustomerButton({ customerId }) {
+  const [deleteAccountOwner, { data, loading, error }] = useMutation(
+    DELETE_ACCOUNT_OWNER,
+    { refetchQueries: [{ query: CUSTOMER_TECHNICIAN_LIST }] }
+  );
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error...</p>;
+  return (
+    <button
+      className="btn btn-error btn-sm"
+      onClick={async () => {
+        try {
+          await deleteAccountOwner({ variables: { customerId } });
+        } catch (error) {
+          console.log(error);
+        }
+      }}
+    >
+      Delete
+    </button>
+  );
 }

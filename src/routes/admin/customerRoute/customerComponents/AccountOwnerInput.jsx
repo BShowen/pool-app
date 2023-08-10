@@ -1,11 +1,4 @@
-export function AccountOwnerInput({
-  values,
-  onInput,
-  index,
-  errors,
-  removeHandler,
-  shouldFocus,
-}) {
+export function AccountOwnerInput({ values, onInput, errors }) {
   return (
     <div className="w-full rounded-lg px-2 py-3 bg-slate-100 my-2">
       <h1 className="text-center font-semibold text-lg">Contact information</h1>
@@ -18,14 +11,13 @@ export function AccountOwnerInput({
       <input
         type="text"
         placeholder="First name"
-        // data-index={index}
         name="firstName"
         className={`input input-bordered w-full focus:outline-none ${
           errors.firstName && "input-secondary"
         }`}
         value={values.firstName || ""}
         onInput={onInput}
-        autoFocus={shouldFocus}
+        autoFocus
       />
 
       <label className="label">
@@ -79,20 +71,6 @@ export function AccountOwnerInput({
         value={values.phoneNumber || ""}
         onInput={onInput}
       />
-
-      <div
-        className={`pt-3 flex justify-end relative ${
-          index > 0 ? "" : "hidden"
-        }`}
-      >
-        <button
-          type="button"
-          className=" w-full btn btn-error btn-sm"
-          onClick={index > 0 ? () => removeHandler(index) : null}
-        >
-          Remove
-        </button>
-      </div>
     </div>
   );
 }
