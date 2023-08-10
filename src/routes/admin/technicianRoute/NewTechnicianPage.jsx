@@ -6,7 +6,6 @@ import { TechnicianForm } from "./technicianComponents/TechnicianForm";
 import { CREATE_TECHNICIAN, TECHNICIAN_LIST } from "../../../queries/index.js";
 import useInput from "../../../hooks/useInput";
 import routes from "../../routeDefinitions";
-import Loading from "../../../components/Loading";
 
 export default function NewTechnicianPage() {
   const navigate = useNavigate();
@@ -86,7 +85,7 @@ export default function NewTechnicianPage() {
   }, [data]);
 
   if (loading) {
-    return <Loading />;
+    return <p>Loading...</p>;
   }
 
   return (

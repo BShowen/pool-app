@@ -5,8 +5,6 @@ import { useMutation, useQuery } from "@apollo/client";
 import useInput from "../../../hooks/useInput";
 import routes from "../../routeDefinitions";
 import { TECHNICIAN, UPDATE_TECHNICIAN } from "../../../queries";
-import Loading from "../../../components/Loading";
-import ErrorDisplay from "../../../components/ErrorDisplay";
 import { TechnicianForm } from "./technicianComponents/TechnicianForm.jsx";
 
 export default function TechnicianEditPage() {
@@ -110,11 +108,11 @@ export default function TechnicianEditPage() {
   }
 
   if (loading || submitLoading) {
-    return <Loading />;
+    return <p>Loading...</p>;
   }
 
   if (error) {
-    return <ErrorDisplay message={error.message} />;
+    return <p>Error...</p>;
   }
 
   return (

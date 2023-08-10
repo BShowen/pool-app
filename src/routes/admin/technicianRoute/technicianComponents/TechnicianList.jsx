@@ -5,18 +5,16 @@ import { capitalizeName } from "../../../../utils/formatters";
 import { TECHNICIAN_LIST } from "../../../../queries/index.js";
 
 import routes from "../../../routeDefinitions";
-import Loading from "../../../../components/Loading";
-import ErrorDisplay from "../../../../components/ErrorDisplay";
 export default function TechnicianList() {
   const { loading, data, error } = useQuery(TECHNICIAN_LIST);
   const navigate = useNavigate();
 
   if (loading) {
-    return <Loading />;
+    return <p>Loading...</p>;
   }
 
   if (error) {
-    return <ErrorDisplay message={error.message} />;
+    return <p>Error...</p>;
   }
 
   const { getTechnicianList: technicianList } = data;

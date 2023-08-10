@@ -5,8 +5,6 @@ import TechnicianTopNav from "./technicianComponents/TechnicianTopNav";
 import { capitalizeName } from "../../../utils/formatters";
 
 import { TECHNICIAN } from "../../../queries/index.js";
-import Loading from "../../../components/LoadingOverlay";
-import ErrorDisplay from "../../../components/ErrorDisplay";
 export async function loader({ params }) {
   return { technicianId: params.technicianId };
 }
@@ -17,11 +15,11 @@ export default function TechnicianPage() {
   });
 
   if (loading) {
-    return <Loading />;
+    return <p>Loading...</p>;
   }
 
   if (error) {
-    return <ErrorDisplay message={error.message} />;
+    return <p>Error...</p>;
   }
 
   const { getTechnician: technicianAccount } = data;

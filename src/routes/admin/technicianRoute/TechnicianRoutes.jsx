@@ -4,8 +4,6 @@ import { useLoaderData, useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
 import { formatAccountName, capitalize } from "../../../utils/formatters";
-import Loading from "../../../components/Loading";
-import ErrorDisplay from "../../../components/ErrorDisplay";
 import routes from "../../routeDefinitions";
 import { GET_SERVICE_ROUTES } from "../../../queries/index.js";
 
@@ -24,11 +22,11 @@ export default function TechnicianRoutes() {
   const defaultOpen = false;
 
   if (loading) {
-    return <Loading />;
+    return <p>Loading...</p>;
   }
 
   if (error) {
-    return <ErrorDisplay message={error.message} />;
+    return <p>Error...</p>;
   }
 
   const customerList = sortByWeekday(data.getGroupedServiceRoute);

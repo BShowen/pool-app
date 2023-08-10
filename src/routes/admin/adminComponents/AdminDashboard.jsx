@@ -1,18 +1,16 @@
 import { useQuery } from "@apollo/client";
 
-import Loading from "../../../components/Loading";
-import ErrorDisplay from "../../../components/ErrorDisplay";
 import { GET_SERVICE_ROUTE } from "../../../queries/index.js";
 
 export function AdminDashboard() {
   const { loading, error, data } = useQuery(GET_SERVICE_ROUTE);
 
   if (loading) {
-    return <Loading />;
+    return <p>Loading...</p>;
   }
 
   if (error) {
-    return <ErrorDisplay message={error.message} />;
+    return <p>Error...</p>;
   }
 
   console.log({ data });

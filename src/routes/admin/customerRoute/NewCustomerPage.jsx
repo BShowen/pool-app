@@ -3,13 +3,11 @@ import { useMutation } from "@apollo/client";
 
 import {
   CREATE_NEW_CUSTOMER,
-  // CUSTOMER_LIST,
   CUSTOMER_TECHNICIAN_LIST,
 } from "../../../queries/index.js";
 import EditAccountForm from "./customerComponents/EditAccountForm";
 import routes from "../../routeDefinitions";
 import { useEffect } from "react";
-import LoadingOverlay from "../../../components/LoadingOverlay";
 
 async function createNewCustomer(formData, sendMutation) {
   try {
@@ -66,15 +64,13 @@ export default function NewCustomerPage() {
     }
   }, [data]);
 
+  if (loading) return <p>Loading...</p>;
   return (
-    <>
-      <LoadingOverlay show={loading} />
-      <EditAccountForm
-        errors={formErrors}
-        onSubmit={({ formData }) => {
-          createNewCustomer(formData, createCustomer);
-        }}
-      />
-    </>
+    <EditAccountForm
+      errors={formErrors}
+      onSubmit={({ formData }) => {
+        createNewCustomer(formData, createCustomer);
+      }}
+    />
   );
 }

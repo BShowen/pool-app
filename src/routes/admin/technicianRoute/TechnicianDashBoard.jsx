@@ -5,8 +5,6 @@ import { useQuery, useMutation } from "@apollo/client";
 import { capitalizeName } from "../../../utils/formatters";
 import routes from "../../routeDefinitions";
 import { TECHNICIAN, TECHNICIAN_LIST } from "../../../queries/index.js";
-import Loading from "../../../components/Loading";
-import ErrorDisplay from "../../../components/ErrorDisplay";
 import { DELETE_TECHNICIAN } from "../../../queries/DELETE_TECHNICIAN";
 import BannerAlert from "../../../components/BannerAlert";
 import store from "../../../utils/store";
@@ -50,11 +48,11 @@ export default function TechnicianDashboard() {
   }, [mutationData]);
 
   if (queryLoading || mutationLoading) {
-    return <Loading />;
+    return <p>Loading...</p>;
   }
 
   if (queryError) {
-    return <ErrorDisplay message={queryError.message} />;
+    return <p>Error...</p>;
   }
 
   const { getTechnician: technician } = queryData;

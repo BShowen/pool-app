@@ -10,8 +10,6 @@ import {
   CUSTOMER_TECHNICIAN_LIST,
   UPDATE_CUSTOMER_TECHNICIAN,
 } from "../../../../queries";
-import ErrorDisplay from "../../../../components/ErrorDisplay";
-import Loading from "../../../../components/Loading";
 
 export default function CustomerList() {
   const navigate = useNavigate();
@@ -20,9 +18,9 @@ export default function CustomerList() {
   const [sortedCustomerAccountList, sortBy] = useSorter(customerAccountList);
 
   if (loading) {
-    return <Loading />;
+    return <p>Loading...</p>;
   } else if (error) {
-    return <ErrorDisplay message={error.message} />;
+    return <p>Error...</p>;
   } else {
     return (
       <div className="h-full lg:h-screen">

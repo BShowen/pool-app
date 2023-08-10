@@ -4,8 +4,6 @@ import { BsArrowsExpand, BsArrowsCollapse } from "react-icons/bs";
 import { useQuery } from "@apollo/client";
 
 import { GET_ROUTE_LIST } from "../../../queries/index.js";
-import Loading from "../../../components/Loading.jsx";
-import ErrorDisplay from "../../../components/ErrorDisplay.jsx";
 import useSorter from "../../../hooks/useSorter";
 import { capitalize, formatAccountName } from "../../../utils/formatters";
 import routes from "../../routeDefinitions";
@@ -16,11 +14,11 @@ export function ServiceDayList() {
   });
 
   if (loading) {
-    return <Loading />;
+    return <p>Loading</p>;
   }
 
   if (error) {
-    return <ErrorDisplay message={error.message} />;
+    return <p>Error...</p>;
   }
 
   const { getServiceRouteList: serviceRouteList } = data;
