@@ -6,8 +6,8 @@ import {
   CREATE_CUSTOMER_ACCOUNT,
   CUSTOMER_TECHNICIAN_LIST,
 } from "../../../queries/index.js";
-import { NewAccountForm } from "./customerComponents/NewAccountForm";
-import routes from "../../routeDefinitions";
+import { NewAccountForm } from "./customerComponents/NewAccountForm.jsx";
+import routes from "../../routeDefinitions.js";
 import { useEffect } from "react";
 
 const accountOwnerType = {
@@ -17,7 +17,7 @@ const accountOwnerType = {
   phoneNumber: "",
 };
 
-export default function NewCustomerPage() {
+export function NewAccountPage() {
   const navigate = useNavigate();
   const [createCustomer, { data, error, loading }] = useMutation(
     CREATE_CUSTOMER_ACCOUNT,

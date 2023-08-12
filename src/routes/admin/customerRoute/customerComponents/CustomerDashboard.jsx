@@ -87,7 +87,6 @@ export default function CustomerDashboard() {
         <div className="card bg-base-100 w-full lg:w-3/5 lg:shadow-lg">
           <div className="card-body card-compact flex flex-col lg:flex-row lg:justify-around lg:flex-wrap">
             <p className="card-title justify-center w-full">Account Owners</p>
-
             <div className="w-full flex flex-col gap-2">
               {customerAccount.accountOwners.map((contact) => {
                 return (
@@ -128,6 +127,21 @@ export default function CustomerDashboard() {
                   </div>
                 );
               })}
+            </div>
+            <div className="w-full flex justify-end">
+              <button
+                className="btn btn-primary btn-md lg:btn-sm"
+                onClick={() => {
+                  navigate(
+                    routes.getDynamicRoute({
+                      route: "newAccountOwner",
+                      id: customerAccount.id,
+                    })
+                  );
+                }}
+              >
+                Add account owner
+              </button>
             </div>
           </div>
         </div>

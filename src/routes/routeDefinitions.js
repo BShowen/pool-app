@@ -4,6 +4,7 @@ const customerRoutes = {
   customer: "/admin/customers/:customerId",
   editAccount: "/admin/customers/:customerId/editAccount",
   editAccountOwner: "/admin/customers/:customerId/editAccountOwner/:ownerId",
+  newAccountOwner: "/admin/customers/:customerId/newAccountOwner",
   customerPoolReports: "/admin/customers/:customerId/pool-reports",
   customerInvoices: "/admin/customers/:customerId/invoices",
 };

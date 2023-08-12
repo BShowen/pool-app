@@ -3,7 +3,7 @@ import Root, { loader as rootLoader } from "./root";
 
 /* -------------------- Customer routes -------------------- */
 import CustomersPage from "./customerRoute/CustomersPage";
-import NewCustomerPage from "./customerRoute/NewCustomerPage";
+import { NewAccountPage } from "./customerRoute/NewAccountPage";
 import CustomerPage, {
   loader as customerPageLoader,
 } from "./customerRoute/CustomerPage";
@@ -13,6 +13,7 @@ import EditAccountOwnerPage from "./customerRoute/EditAccountOwnerPage";
 /* -------------------- Customer components -------------------- */
 import CustomerDashboard from "./customerRoute/customerComponents/CustomerDashboard";
 import CustomerList from "./customerRoute/customerComponents/CustomerList";
+import { NewAccountOwnerPage } from "./customerRoute/NewAccountOwnerPage";
 
 /* -------------------- Technician routes -------------------- */
 import TechniciansPage from "./technicianRoute/TechniciansPage";
@@ -61,7 +62,7 @@ export default {
         },
         {
           path: routes.newCustomer,
-          element: <NewCustomerPage />,
+          element: <NewAccountPage />,
         },
         {
           path: routes.customer,
@@ -81,6 +82,11 @@ export default {
             {
               path: routes.editAccountOwner,
               element: <EditAccountOwnerPage />,
+              loader: customerPageLoader,
+            },
+            {
+              path: routes.newAccountOwner,
+              element: <NewAccountOwnerPage />,
               loader: customerPageLoader,
             },
             {
