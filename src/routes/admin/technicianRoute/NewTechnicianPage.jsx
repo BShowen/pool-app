@@ -3,14 +3,17 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { TechnicianForm } from "./technicianComponents/TechnicianForm";
-import { CREATE_TECHNICIAN, TECHNICIAN_LIST } from "../../../queries/index.js";
+import {
+  CREATE_TECHNICIAN,
+  GET_TECHNICIAN_LIST,
+} from "../../../queries/index.js";
 import useInput from "../../../hooks/useInput";
 import routes from "../../routeDefinitions";
 
 export default function NewTechnicianPage() {
   const navigate = useNavigate();
   const [createTechnician, { loading, data }] = useMutation(CREATE_TECHNICIAN, {
-    refetchQueries: [{ query: TECHNICIAN_LIST }],
+    refetchQueries: [{ query: GET_TECHNICIAN_LIST }],
   });
 
   const [firstName] = useInput({

@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "@apollo/client";
 
 import { capitalizeName } from "../../../utils/formatters";
 import routes from "../../routeDefinitions";
-import { TECHNICIAN, TECHNICIAN_LIST } from "../../../queries/index.js";
+import { TECHNICIAN, GET_TECHNICIAN_LIST } from "../../../queries/index.js";
 import { DELETE_TECHNICIAN } from "../../../queries/DELETE_TECHNICIAN";
 import BannerAlert from "../../../components/BannerAlert";
 import store from "../../../utils/store";
@@ -28,7 +28,7 @@ export default function TechnicianDashboard() {
     { data: mutationData, error: mutationError, loading: mutationLoading },
   ] = useMutation(DELETE_TECHNICIAN, {
     fetchPolicy: "no-cache",
-    refetchQueries: [{ query: TECHNICIAN_LIST }],
+    refetchQueries: [{ query: GET_TECHNICIAN_LIST }],
   });
   const { technicianId } = useLoaderData();
   const {

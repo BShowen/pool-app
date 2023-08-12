@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
 
-export const TECHNICIAN_LIST = gql`
+export const GET_TECHNICIAN_LIST = gql`
   query GetTechnicianList {
-    getTechnicianList {
+    technicianList {
+      id
       firstName
       lastName
       emailAddress
-      id
-      companyId
+      roles
     }
   }
 `;

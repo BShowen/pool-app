@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
-import { TECHNICIAN_LIST } from "../../../queries/index.js";
+import { GET_TECHNICIAN_LIST } from "../../../queries/index.js";
 
 export default function TechniciansPage() {
-  const { loading, error } = useQuery(TECHNICIAN_LIST);
+  const { loading, error } = useQuery(GET_TECHNICIAN_LIST);
 
   if (loading) {
     return <p>Loading...</p>;

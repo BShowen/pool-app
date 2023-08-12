@@ -2,23 +2,17 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
 import { capitalizeName } from "../../../../utils/formatters";
-import { TECHNICIAN_LIST } from "../../../../queries/index.js";
+import { GET_TECHNICIAN_LIST } from "../../../../queries/index.js";
 
 import routes from "../../../routeDefinitions";
 export default function TechnicianList() {
-  const { loading, data, error } = useQuery(TECHNICIAN_LIST);
+  const { loading, data, error } = useQuery(GET_TECHNICIAN_LIST);
   const navigate = useNavigate();
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error...</p>;
 
-  if (error) {
-    return <p>Error...</p>;
-  }
-
-  const { getTechnicianList: technicianList } = data;
-
+  const { technicianList } = data;
   return (
     <>
       <div className="sticky p-1 lg:p-5 top-0 z-50 bg-white shadow-sm">
