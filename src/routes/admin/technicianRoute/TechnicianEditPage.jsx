@@ -88,7 +88,7 @@ export default function TechnicianEditPage() {
 
     if (!isValid) return;
 
-    const updateTechnicianInput = {
+    const formData = {
       ...technician,
       firstName: firstName.input.value,
       lastName: lastName.input.value,
@@ -96,7 +96,7 @@ export default function TechnicianEditPage() {
     };
 
     try {
-      await updateTechnician({ variables: { updateTechnicianInput } });
+      await updateTechnician({ variables: { input: formData } });
     } catch (error) {
       const errorObj = error?.graphQLErrors[0]?.extensions?.fields;
       for (const [key, value] of Object.entries(errorObj)) {
