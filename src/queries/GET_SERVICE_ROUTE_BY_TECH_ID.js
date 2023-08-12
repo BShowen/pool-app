@@ -1,14 +1,11 @@
 import { gql } from "@apollo/client";
 
-export const GET_SERVICE_ROUTE = gql`
-  query GetServiceRoute($technicianId: ID) {
-    getServiceRoute {
-      technician {
-        firstName
-        lastName
-        id
-      }
+export const GET_SERVICE_ROUTE_BY_TECH_ID = gql`
+  query ServiceRouteByTechId($technicianId: ID!) {
+    serviceRouteByTechId(technicianId: $technicianId) {
+      serviceDay
       count
+      total
       customerAccounts {
         accountName
         serviceType
@@ -16,14 +13,14 @@ export const GET_SERVICE_ROUTE = gql`
         serviceFrequency
         address
         price
-        companyId
         id
-        technicianId
         accountOwners {
           firstName
           lastName
           emailAddress
           phoneNumber
+          password
+          account
           id
         }
       }

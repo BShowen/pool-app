@@ -5,7 +5,7 @@ import { useQuery } from "@apollo/client";
 
 import { formatAccountName, capitalize } from "../../../utils/formatters";
 import routes from "../../routeDefinitions";
-import { GET_SERVICE_ROUTES } from "../../../queries/index.js";
+import { GET_SERVICE_ROUTE_BY_TECH_ID } from "../../../queries/index.js";
 
 export function loader({ params }) {
   return { technicianId: params.technicianId };
@@ -13,23 +13,17 @@ export function loader({ params }) {
 
 export default function TechnicianRoutes() {
   const { technicianId } = useLoaderData();
-  const { loading, error, data } = useQuery(GET_SERVICE_ROUTES, {
-    variables: {
-      id: technicianId,
-    },
+  const { loading, error, data } = useQuery(GET_SERVICE_ROUTE_BY_TECH_ID, {
+    variables: { technicianId },
   });
   const navigate = useNavigate();
   const defaultOpen = false;
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+  if (loading) return <p>Loading...</p>;
 
-  if (error) {
-    return <p>Error...</p>;
-  }
+  if (error) return <p>Error...</p>;
 
-  const customerList = sortByWeekday(data.getGroupedServiceRoute);
+  const customerList = sortByWeekday(data.serviceRouteByTechId);
 
   return (
     <div className="w-full pt-16  lg:px-5">

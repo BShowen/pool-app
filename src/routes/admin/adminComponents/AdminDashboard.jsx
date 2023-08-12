@@ -1,9 +1,9 @@
 import { useQuery } from "@apollo/client";
 
-import { GET_SERVICE_ROUTE } from "../../../queries/index.js";
+import { GET_SERVICE_ROUTES } from "../../../queries/index.js";
 
 export function AdminDashboard() {
-  const { loading, error, data } = useQuery(GET_SERVICE_ROUTE);
+  const { loading, error, data } = useQuery(GET_SERVICE_ROUTES);
 
   if (loading) {
     return <p>Loading...</p>;
