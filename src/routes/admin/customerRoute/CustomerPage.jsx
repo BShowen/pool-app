@@ -1,7 +1,7 @@
 import { useLoaderData, Outlet } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
-import { CUSTOMER_ACCOUNT } from "../../../queries/index.js";
+import { GET_CUSTOMER_ACCOUNT } from "../../../queries/index.js";
 import CustomerTopNav from "./customerComponents/CustomerTopNav";
 import { formatAccountName } from "../../../utils/formatters";
 export async function loader({ params }) {
@@ -10,7 +10,7 @@ export async function loader({ params }) {
 }
 export default function CustomerPage() {
   const { customerId } = useLoaderData();
-  const { loading, error, data } = useQuery(CUSTOMER_ACCOUNT, {
+  const { loading, error, data } = useQuery(GET_CUSTOMER_ACCOUNT, {
     variables: {
       accountId: customerId,
     },

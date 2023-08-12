@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
-import { CUSTOMER_TECHNICIAN_LIST } from "../../../queries/index.js";
+import { GET_CUSTOMER_TECHNICIAN_LIST } from "../../../queries/index.js";
 export default function CustomersPage() {
   /**
    * Get a list of customer accounts and a list of technician accounts.
@@ -14,7 +14,7 @@ export default function CustomersPage() {
    * data into child components using props, like I was doing initially. Passing
    * data down as props lead to stale data/UI.
    */
-  const { loading, error } = useQuery(CUSTOMER_TECHNICIAN_LIST);
+  const { loading, error } = useQuery(GET_CUSTOMER_TECHNICIAN_LIST);
 
   if (error) {
     return <p>Error...</p>;

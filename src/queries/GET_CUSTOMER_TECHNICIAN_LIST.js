@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
-export const CUSTOMER_TECHNICIAN_LIST = gql`
-  query CustomerTechnicianList {
+export const GET_CUSTOMER_TECHNICIAN_LIST = gql`
+  query GetCustomerTechnicianList {
     customerAccountList {
       accountName
       serviceType

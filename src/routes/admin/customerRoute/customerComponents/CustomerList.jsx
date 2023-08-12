@@ -7,13 +7,13 @@ import routes from "../../../routeDefinitions";
 import BannerAlert from "../../../../components/BannerAlert";
 import useSorter from "../../../../hooks/useSorter";
 import {
-  CUSTOMER_TECHNICIAN_LIST,
+  GET_CUSTOMER_TECHNICIAN_LIST,
   UPDATE_ACCOUNT_TECHNICIAN,
 } from "../../../../queries/index";
 
 export default function CustomerList() {
   const navigate = useNavigate();
-  const { loading, error, data } = useQuery(CUSTOMER_TECHNICIAN_LIST);
+  const { loading, error, data } = useQuery(GET_CUSTOMER_TECHNICIAN_LIST);
   const { customerAccountList, technicianList } = data;
   const [sortedCustomerAccountList, sortBy] = useSorter(customerAccountList);
 
@@ -105,7 +105,7 @@ function TechnicianSelector({ customerAccount, technicianId, technicianList }) {
   const [showErrorAlert, setErrorAlert] = useState(false);
   const [updateAccountTechnician, { loading, data, error }] = useMutation(
     UPDATE_ACCOUNT_TECHNICIAN,
-    { refetchQueries: [{ query: CUSTOMER_TECHNICIAN_LIST }] }
+    { refetchQueries: [{ query: GET_CUSTOMER_TECHNICIAN_LIST }] }
     // {
     //   update(cache, { data }) {
     //     // Update the cached response for GET_SERVICE_ROUTE_GROUPED

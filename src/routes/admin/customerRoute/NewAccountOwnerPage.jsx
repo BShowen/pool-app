@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { accountOwnerType } from "../../../utils/types";
 import {
   CREATE_ACCOUNT_OWNERS,
-  CUSTOMER_TECHNICIAN_LIST,
+  GET_CUSTOMER_TECHNICIAN_LIST,
 } from "../../../queries/index";
 import { useMutation } from "@apollo/client";
 export function NewAccountOwnerPage() {
@@ -12,7 +12,7 @@ export function NewAccountOwnerPage() {
   const navigate = useNavigate();
   const [createAccountOwners, { loading, error, data }] = useMutation(
     CREATE_ACCOUNT_OWNERS,
-    { refetchQueries: [{ query: CUSTOMER_TECHNICIAN_LIST }] }
+    { refetchQueries: [{ query: GET_CUSTOMER_TECHNICIAN_LIST }] }
   );
   const [shouldSubFormFocus, setShouldSubFormFocus] = useState(false);
   const [formData, setFormData] = useState({

@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import {
   CREATE_CUSTOMER_ACCOUNT,
-  CUSTOMER_TECHNICIAN_LIST,
+  GET_CUSTOMER_TECHNICIAN_LIST,
 } from "../../../queries/index.js";
 import { NewAccountForm } from "./customerComponents/NewAccountForm.jsx";
 import routes from "../../routeDefinitions.js";
@@ -21,7 +21,7 @@ export function NewAccountPage() {
   const navigate = useNavigate();
   const [createCustomer, { data, error, loading }] = useMutation(
     CREATE_CUSTOMER_ACCOUNT,
-    { refetchQueries: [{ query: CUSTOMER_TECHNICIAN_LIST }] }
+    { refetchQueries: [{ query: GET_CUSTOMER_TECHNICIAN_LIST }] }
     // {
     //   update(cache, { data }) {
     //     // The document that was just created.

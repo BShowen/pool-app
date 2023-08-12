@@ -7,7 +7,7 @@ import { useMutation, useQuery } from "@apollo/client";
 
 import {
   UPDATE_CUSTOMER,
-  CUSTOMER_ACCOUNT,
+  GET_CUSTOMER_ACCOUNT,
   GET_SERVICE_ROUTES,
 } from "../../../queries/index.js";
 import ErrorDisplay from "../../../components/ErrorDisplay";
@@ -32,9 +32,12 @@ export default function EditAccount() {
   const { customerId } = useLoaderData();
   const navigate = useNavigate();
   // Retrieve the customer account in order to prefill the form.
-  const { data: queryData, error: queryError } = useQuery(CUSTOMER_ACCOUNT, {
-    variables: { accountId: customerId },
-  });
+  const { data: queryData, error: queryError } = useQuery(
+    GET_CUSTOMER_ACCOUNT,
+    {
+      variables: { accountId: customerId },
+    }
+  );
   // The mutation to update the customer account.
   const [
     sendMutation,

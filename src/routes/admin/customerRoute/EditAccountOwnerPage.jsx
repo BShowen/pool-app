@@ -4,7 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import { AccountOwnerInput } from "./customerComponents/AccountOwnerInput.jsx";
-import { CUSTOMER_ACCOUNT, UPDATE_CUSTOMERS } from "../../../queries/index.js";
+import {
+  GET_CUSTOMER_ACCOUNT,
+  UPDATE_CUSTOMERS,
+} from "../../../queries/index.js";
 
 export default function EditAccountOwnerPage() {
   // Get the id from the url.
@@ -12,7 +15,7 @@ export default function EditAccountOwnerPage() {
   // navigate is used to navigate back when user clicks "Cancel" button.
   const navigate = useNavigate();
   // Retrieve the customer account in order to prefill the form.
-  const { data, error, loading } = useQuery(CUSTOMER_ACCOUNT, {
+  const { data, error, loading } = useQuery(GET_CUSTOMER_ACCOUNT, {
     variables: { accountId: customerId },
   });
 

@@ -9,15 +9,15 @@ import {
 import routes from "../../../routeDefinitions";
 import {
   DELETE_CUSTOMER_ACCOUNT,
-  CUSTOMER_ACCOUNT,
-  CUSTOMER_TECHNICIAN_LIST,
+  GET_CUSTOMER_ACCOUNT,
+  GET_CUSTOMER_TECHNICIAN_LIST,
   DELETE_ACCOUNT_OWNER,
 } from "../../../../queries/index.js";
 
 export default function CustomerDashboard() {
   const navigate = useNavigate();
   const { customerId } = useLoaderData();
-  const { loading, data, error } = useQuery(CUSTOMER_ACCOUNT, {
+  const { loading, data, error } = useQuery(GET_CUSTOMER_ACCOUNT, {
     variables: { accountId: customerId },
   });
 
@@ -155,7 +155,7 @@ function DeleteCustomerAccountButton({ customerAccount }) {
   const [deleteAccount, { data, error, loading }] = useMutation(
     DELETE_CUSTOMER_ACCOUNT,
     {
-      refetchQueries: [{ query: CUSTOMER_TECHNICIAN_LIST }],
+      refetchQueries: [{ query: GET_CUSTOMER_TECHNICIAN_LIST }],
       // update: function (cache, result) {
       //   // The deleted customer account.
       //   const deletedCustomerAccount = result.data?.deleteCustomerAccount;
@@ -236,7 +236,7 @@ function DeleteCustomerAccountButton({ customerAccount }) {
 function DeleteCustomerButton({ customerId }) {
   const [deleteAccountOwner, { data, loading, error }] = useMutation(
     DELETE_ACCOUNT_OWNER,
-    { refetchQueries: [{ query: CUSTOMER_TECHNICIAN_LIST }] }
+    { refetchQueries: [{ query: GET_CUSTOMER_TECHNICIAN_LIST }] }
   );
 
   if (loading) return <p>Loading...</p>;
