@@ -57,13 +57,13 @@ export default function NewTechnicianPage() {
       .includes(false);
     if (!isValid) return;
     const { protocol, host } = window.location;
-    const variables = { technician: { ...formData } };
+    const variables = { input: { ...formData } };
     // ---------------------------------------------------------------
     // This is the url that brings the user from their email to the app.
     // This string is not persisted in the DB. It is used in the backend
     // and data is appended to this string before an email is sent to the
     // technician with this url as a link within the email.
-    variables.technician.registrationUrl = `${protocol}//${host}${routes.registerTechnician}`;
+    variables.input.registrationUrl = `${protocol}//${host}${routes.registerTechnician}`;
     // ---------------------------------------------------------------
     try {
       await createTechnician({ variables });
@@ -80,7 +80,7 @@ export default function NewTechnicianPage() {
   useEffect(() => {
     // Redirect to the technician page after a successful submission.
     if (data) {
-      const technicianId = data.createNewTechnician.id;
+      const technicianId = data.newTechnician.id;
       navigate(
         routes.getDynamicRoute({ route: "technician", id: technicianId })
       );
