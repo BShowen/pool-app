@@ -106,7 +106,7 @@ export default function TechnicianDashboard() {
                 if (canDelete) {
                   try {
                     await deleteTechnician({
-                      variables: { id: technician.id },
+                      variables: { technicianId: technician.id },
                     });
                   } catch (error) {
                     console.log("Error deleting technician: ", error.message);
