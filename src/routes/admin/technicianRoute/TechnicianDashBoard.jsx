@@ -4,13 +4,13 @@ import { useQuery, useMutation } from "@apollo/client";
 
 import { capitalizeName } from "../../../utils/formatters";
 import routes from "../../routeDefinitions";
-import { TECHNICIAN, GET_TECHNICIAN_LIST } from "../../../queries/index.js";
+import { GET_TECHNICIAN, GET_TECHNICIAN_LIST } from "../../../queries/index.js";
 import { DELETE_TECHNICIAN } from "../../../queries/DELETE_TECHNICIAN";
 import BannerAlert from "../../../components/BannerAlert";
 
 export default function TechnicianDashboard() {
   const { technicianId } = useLoaderData();
-  const { loading, error, data } = useQuery(TECHNICIAN, {
+  const { loading, error, data } = useQuery(GET_TECHNICIAN, {
     variables: { id: technicianId },
   });
 

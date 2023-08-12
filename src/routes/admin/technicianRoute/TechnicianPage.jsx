@@ -4,13 +4,13 @@ import { useQuery } from "@apollo/client";
 import TechnicianTopNav from "./technicianComponents/TechnicianTopNav";
 import { capitalizeName } from "../../../utils/formatters";
 
-import { TECHNICIAN } from "../../../queries/index.js";
+import { GET_TECHNICIAN } from "../../../queries/index.js";
 export async function loader({ params }) {
   return { technicianId: params.technicianId };
 }
 export default function TechnicianPage() {
   const { technicianId } = useLoaderData();
-  const { loading, error, data } = useQuery(TECHNICIAN, {
+  const { loading, error, data } = useQuery(GET_TECHNICIAN, {
     variables: { id: technicianId },
   });
 

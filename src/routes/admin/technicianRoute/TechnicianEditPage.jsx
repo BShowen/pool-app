@@ -4,13 +4,13 @@ import { useMutation, useQuery } from "@apollo/client";
 
 import useInput from "../../../hooks/useInput";
 import routes from "../../routeDefinitions";
-import { TECHNICIAN, UPDATE_TECHNICIAN } from "../../../queries";
+import { GET_TECHNICIAN, UPDATE_TECHNICIAN } from "../../../queries";
 import { TechnicianForm } from "./technicianComponents/TechnicianForm.jsx";
 
 export default function TechnicianEditPage() {
   const navigate = useNavigate();
   const { technicianId } = useLoaderData();
-  const { loading, data, error } = useQuery(TECHNICIAN, {
+  const { loading, data, error } = useQuery(GET_TECHNICIAN, {
     variables: { id: technicianId },
   });
 

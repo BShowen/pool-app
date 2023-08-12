@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-export const TECHNICIAN = gql`
+export const GET_TECHNICIAN = gql`
   query GetTechnicianList($id: ID) {
     getTechnician(id: $id) {
       firstName
