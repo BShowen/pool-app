@@ -3,25 +3,25 @@ import { Disclosure, Transition } from "@headlessui/react";
 import { BsArrowsExpand, BsArrowsCollapse } from "react-icons/bs";
 import { useQuery } from "@apollo/client";
 
-import { GET_ROUTE_LIST } from "../../../queries/index.js";
+import { GET_ALL_SERVICE_ROUTES } from "../../../queries/index.js";
 import useSorter from "../../../hooks/useSorter";
 import { capitalize, formatAccountName } from "../../../utils/formatters";
 import routes from "../../routeDefinitions";
 
 export function ServiceDayList() {
-  const { loading, data, error } = useQuery(GET_ROUTE_LIST, {
+  const { loading, data, error } = useQuery(GET_ALL_SERVICE_ROUTES, {
     fetchPolicy: "network-only",
   });
 
   if (loading) {
-    return <p>Loading</p>;
+    return <p>Loading...</p>;
   }
 
   if (error) {
     return <p>Error...</p>;
   }
 
-  const { getServiceRouteList: serviceRouteList } = data;
+  const { serviceRouteAll: serviceRouteList } = data;
 
   return (
     <div className="h-full lg:h-screen">
