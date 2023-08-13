@@ -3,9 +3,8 @@ import { useEffect, useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 
 import routes from "./routeDefinitions";
-import store from "../utils/store";
-import BannerAlert from "../components/BannerAlert";
 import LoadingOverlay from "../components/LoadingOverlay";
+import { LOGIN } from "../queries/index";
 
 export function loader() {
   // Redirect the user if they are already logged in.
@@ -16,26 +15,12 @@ export function loader() {
   return null;
 }
 
-const LOGIN = gql`
-  mutation Login($input: LoginInput) {
-    login(input: $input)
-  }
-`;
-
 export default function Login() {
   const navigate = useNavigate();
-  const [mutateFunction, { data, loading }] = useMutation(LOGIN);
-  const [messageList] = useState(store.get()); //Get any messages associated with this route
+  const [login, { data, loading }] = useMutation(LOGIN);
   const [formErrors, setFormErrors] = useState({
     email: undefined,
     password: undefined,
-  });
-
-  useEffect(() => {
-    return () => {
-      // Clear the store only when unmounting.
-      store.clear();
-    };
   });
 
   useEffect(() => {
@@ -49,7 +34,7 @@ export default function Login() {
 
   async function submitForm(formData) {
     try {
-      await mutateFunction({ variables: { input: formData } });
+      await login({ variables: { input: formData } });
     } catch (error) {
       const errorMessages = {};
       error.graphQLErrors.forEach((er) => {
@@ -62,7 +47,6 @@ export default function Login() {
 
   return (
     <>
-      <BannerAlert message={messageList[0]} />
       <LoadingOverlay show={loading} />
       <div className="pt-6">
         <Form
