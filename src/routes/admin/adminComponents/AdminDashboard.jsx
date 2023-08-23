@@ -244,7 +244,7 @@ function ChemicalInput({ text, formValues, inputHandler }) {
           onInput={(e) => {
             const value = e.target.value.trim();
             const name = e.target.name;
-            if (validInput({ value }))
+            if (validateInput({ value }))
               inputHandler({ name, value, action: "test" });
           }}
           onFocus={(e) => {
@@ -269,7 +269,7 @@ function ChemicalInput({ text, formValues, inputHandler }) {
           onInput={(e) => {
             const value = e.target.value.trim();
             const name = e.target.name;
-            if (validInput({ value }))
+            if (validateInput({ value }))
               inputHandler({ name, value, action: "addQuantity" });
           }}
           onFocus={(e) => {
@@ -303,7 +303,7 @@ function ChemicalInput({ text, formValues, inputHandler }) {
   );
 }
 
-function validInput({ value }) {
+function validateInput({ value }) {
   // Return true if value is a Number, Decimal, or an empty string.
   // Return false for any other character input.
 
