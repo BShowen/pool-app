@@ -95,40 +95,45 @@ function PoolReportForm({ cancelHandler }) {
   });
 
   function updateState({ name, value, action }) {
-    if (action === "addQuantity") {
-      setFormValues((prevState) => {
-        return {
-          ...prevState,
-          [name]: {
-            ...prevState[name],
-            add: { ...prevState[name].add, quantity: value },
-          },
-        };
-      });
-    } else if (action === "addUnit") {
-      setFormValues((prevState) => {
-        return {
-          ...prevState,
-          [name]: {
-            ...prevState[name],
-            add: { ...prevState[name].add, unit: value },
-          },
-        };
-      });
-    } else if (action === "test") {
-      setFormValues((prevState) => {
-        return {
-          ...prevState,
-          [name]: { ...prevState[name], test: value },
-        };
-      });
-    } else if (action === "notes") {
-      setFormValues((prevState) => {
-        return {
-          ...prevState,
-          [name]: value,
-        };
-      });
+    switch (action) {
+      case "addQuantity":
+        setFormValues((prevState) => {
+          return {
+            ...prevState,
+            [name]: {
+              ...prevState[name],
+              add: { ...prevState[name].add, quantity: value },
+            },
+          };
+        });
+        break;
+      case "addUnit":
+        setFormValues((prevState) => {
+          return {
+            ...prevState,
+            [name]: {
+              ...prevState[name],
+              add: { ...prevState[name].add, unit: value },
+            },
+          };
+        });
+        break;
+      case "test":
+        setFormValues((prevState) => {
+          return {
+            ...prevState,
+            [name]: { ...prevState[name], test: value },
+          };
+        });
+        break;
+      case "notes":
+        setFormValues((prevState) => {
+          return {
+            ...prevState,
+            [name]: value,
+          };
+        });
+        break;
     }
   }
 
