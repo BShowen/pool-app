@@ -18,7 +18,7 @@ export async function loader() {
     const payload = JSON.parse(atob(token.split(".")[1]));
     if (payload.roles.includes("ADMIN")) {
       return redirect("/admin");
-    } else if (payload.roles.includes("TECHNICIAN")) {
+    } else if (payload.roles.includes("TECH")) {
       return redirect("/technician");
     } else {
       return redirect("/customer");
