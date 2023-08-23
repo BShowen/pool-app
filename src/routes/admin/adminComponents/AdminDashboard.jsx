@@ -82,17 +82,19 @@ function CustomerRow({ account, index }) {
   );
 }
 
-function PoolReportForm({ cancelHandler }) {
-  const [formValues, setFormValues] = useState({
-    chlorine: { test: 2.0, add: { unit: "lb", quantity: 5.0 } },
-    ph: { test: 7.2, add: { unit: "cups", quantity: 3 } },
-    alkalinity: { test: 70, add: { unit: "lb", quantity: 4.0 } },
-    stabilizer: { test: 25, add: { unit: "lb", quantity: 2.5 } },
-    calcium: { test: 150, add: { unit: "lb", quantity: 6 } },
-    tablets: { test: 1, add: { unit: "lb", quantity: 2.0 } },
-    salt: { test: 2900, add: { unit: "lb", quantity: 80 } },
-    notes: "",
-  });
+function PoolReportForm({ cancelHandler, defaultValues }) {
+  const [formValues, setFormValues] = useState(
+    defaultValues || {
+      chlorine: { test: "13.5", add: { unit: "lb", quantity: "" } },
+      ph: { test: "", add: { unit: "cups", quantity: "" } },
+      alkalinity: { test: "", add: { unit: "lb", quantity: "" } },
+      stabilizer: { test: "", add: { unit: "lb", quantity: "" } },
+      calcium: { test: "", add: { unit: "lb", quantity: "" } },
+      tablets: { test: "", add: { unit: "lb", quantity: "" } },
+      salt: { test: "", add: { unit: "lb", quantity: "" } },
+      notes: "",
+    }
+  );
 
   function updateState({ name, value, action }) {
     switch (action) {
