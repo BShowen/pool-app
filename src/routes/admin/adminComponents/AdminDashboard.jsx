@@ -85,12 +85,12 @@ function CustomerRow({ account, index }) {
 function PoolReportForm({ cancelHandler, defaultValues }) {
   const [formValues, setFormValues] = useState(
     defaultValues || {
-      chlorine: { test: "13.5", add: { unit: "lb", quantity: "" } },
+      chlorine: { test: "", add: { unit: "lb", quantity: "" } },
       ph: { test: "", add: { unit: "cups", quantity: "" } },
       alkalinity: { test: "", add: { unit: "lb", quantity: "" } },
       stabilizer: { test: "", add: { unit: "lb", quantity: "" } },
       calcium: { test: "", add: { unit: "lb", quantity: "" } },
-      tablets: { test: "", add: { unit: "lb", quantity: "" } },
+      tablets: { test: "", add: { quantity: "" } },
       salt: { test: "", add: { unit: "lb", quantity: "" } },
       notes: "",
     }
@@ -139,13 +139,75 @@ function PoolReportForm({ cancelHandler, defaultValues }) {
     }
   }
 
+  function serializeState(obj) {
+    const newObj = {}; // Create a new object to hold the transformed data
+
+    for (const key in obj) {
+      if (typeof obj[key] === "object") {
+        // If it's an object, recursively call the function on it
+        if (key === "add" && obj[key].quantity === "") {
+          // If the object is the "add" object and no chemicals were added, then
+          // don't process the object.
+          continue;
+        } else {
+          newObj[key] = serializeState(obj[key]);
+        }
+      } else if (key === "test" || key === "quantity") {
+        // If it's "test" or "quantity," convert to a number if it's not empty,
+        // otherwise, convert to null
+        const newValue = obj[key] === "" ? null : Number(obj[key]);
+        // If the newValue is null, don't keep the newValue or the key.
+        if (newValue !== null) {
+          newObj[key] = newValue;
+        }
+      } else {
+        // If it's neither "test" nor "quantity," convert to a number if it's
+        // not empty, otherwise convert to null.
+        const newValue = obj[key] === "" ? null : Number(obj[key]);
+        // If the newValue is null, don't keep the newValue or the key.
+        if (newValue !== null) {
+          newObj[key] = obj[key];
+        }
+      }
+    }
+
+    return newObj; // Return the new object with transformed data
+  }
+
+  function deserializeState(obj) {
+    const newObj = {}; // Create a new object to hold the transformed data
+    for (const [key, value] of Object.entries(obj)) {
+      if (key === "notes") {
+        // No processing needed. Keep the value as it is.
+        newObj.notes = value || "";
+      } else if (Object.entries(value).length === 0) {
+        // No data for this entry, create default data.
+        newObj[key] = { test: "", add: { unit: "lb", quantity: "" } };
+      } else {
+        // Keep old data, but insert efault data for keys that are missing.
+        newObj[key] = {
+          ...value,
+          test: value?.test || "",
+          add: value?.add || { unit: "lb", quantity: "" },
+        };
+      }
+    }
+
+    if (newObj.notes === undefined) {
+      // If notes were not provided, create default notes
+      newObj.notes = "";
+    }
+
+    return newObj; // Return the new object with transformed data
+  }
+
   return (
     <div className="w-full px-0 mt-2 expanded-content flex flex-row justify-center">
       <Form
         className="w-full lg:w-2/4 flex flex-col bg-slate-200 rounded-md pb-4"
         onSubmit={(e) => {
           e.preventDefault();
-          console.log(formValues);
+          console.log(serializeState(formValues));
         }}
       >
         <div className="flex flex-row justify-center items-center py-1">
