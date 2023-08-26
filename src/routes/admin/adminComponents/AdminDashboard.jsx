@@ -1,8 +1,11 @@
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { Form } from "react-router-dom";
 
-import { GET_SERVICE_ROUTE_TODAY } from "../../../queries/index.js";
+import {
+  CREATE_CHEMICAL_LOG,
+  GET_SERVICE_ROUTE_TODAY,
+} from "../../../queries/index.js";
 import { formatAccountName } from "../../../utils/formatters.js";
 
 export function AdminDashboard() {
@@ -74,6 +77,7 @@ function CustomerRow({ account, index }) {
           {showPoolReportForm && (
             <PoolReportForm
               cancelHandler={() => setShowPoolReportForm(false)}
+              customerAccountId={account.id}
             />
           )}
         </td>
@@ -82,19 +86,20 @@ function CustomerRow({ account, index }) {
   );
 }
 
-function PoolReportForm({ cancelHandler, defaultValues }) {
-  const [formValues, setFormValues] = useState(
-    defaultValues || {
-      chlorine: { test: "", add: { unit: "lb", quantity: "" } },
-      ph: { test: "", add: { unit: "cups", quantity: "" } },
-      alkalinity: { test: "", add: { unit: "lb", quantity: "" } },
-      stabilizer: { test: "", add: { unit: "lb", quantity: "" } },
-      calcium: { test: "", add: { unit: "lb", quantity: "" } },
-      tablets: { test: "", add: { quantity: "" } },
-      salt: { test: "", add: { unit: "lb", quantity: "" } },
-      notes: "",
-    }
-  );
+function PoolReportForm({ cancelHandler, customerAccountId }) {
+  const [createChemicalLog, { loading, error, data }] =
+    useMutation(CREATE_CHEMICAL_LOG);
+
+  const [formValues, setFormValues] = useState({
+    chlorine: { test: "", add: { unit: "lb", quantity: "" } },
+    pH: { test: "", add: { unit: "cups", quantity: "" } },
+    alkalinity: { test: "", add: { unit: "lb", quantity: "" } },
+    stabilizer: { test: "", add: { unit: "lb", quantity: "" } },
+    calcium: { test: "", add: { unit: "lb", quantity: "" } },
+    tablets: { test: "", add: { quantity: "" } },
+    salt: { test: "", add: { unit: "lb", quantity: "" } },
+    notes: "",
+  });
 
   function updateState({ name, value, action }) {
     switch (action) {
@@ -201,13 +206,33 @@ function PoolReportForm({ cancelHandler, defaultValues }) {
     return newObj; // Return the new object with transformed data
   }
 
+  if (loading) {
+    return "Loading...";
+  }
+
+  if (error) {
+    return "Error...";
+  }
+
   return (
     <div className="w-full px-0 mt-2 expanded-content flex flex-row justify-center">
       <Form
         className="w-full lg:w-2/4 flex flex-col bg-slate-200 rounded-md pb-4"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
-          console.log(serializeState(formValues));
+          try {
+            await createChemicalLog({
+              variables: {
+                input: {
+                  customerAccountId,
+                  ...serializeState(formValues),
+                },
+              },
+            });
+            console.log("Success!");
+          } catch (error) {
+            console.log("Error! ", { error });
+          }
         }}
       >
         <div className="flex flex-row justify-center items-center py-1">
