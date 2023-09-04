@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 
 import routes from "./routeDefinitions";
-import LoadingOverlay from "../components/LoadingOverlay";
+import { SpinnerOverlay } from "../components/SpinnerOverlay.jsx";
 import { LOGIN } from "../queries/index";
 
 export function loader() {
@@ -46,77 +46,75 @@ export default function Login() {
   }
 
   return (
-    <>
-      <LoadingOverlay show={loading} />
-      <div className="pt-6">
-        <Form
-          method="post"
-          className="flex flex-col gap-4 w-full p-5 md:w-96 md:mx-auto"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const formData = Object.fromEntries(new FormData(e.target));
-            submitForm(formData);
-          }}
-        >
-          <div>
-            <div className="mb-2 block">
-              <label
-                htmlFor="email"
-                className={formErrors.email ? "text-secondary" : ""}
-              >
-                Email
-              </label>
-            </div>
-            <input
-              required
-              id="email"
-              type="email"
-              placeholder="Email"
-              name="email"
-              className={`input input-bordered w-full ${
-                formErrors.email ? "input-secondary" : ""
-              }`}
-            />
-            <p
-              className={`mt-2 text-sm h-4 text-secondary ${
-                (!formErrors.email && "invisible") || ""
-              }`}
+    <div className="pt-6">
+      <Form
+        method="post"
+        className="flex flex-col gap-4 w-full p-5 md:w-96 md:mx-auto relative"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const formData = Object.fromEntries(new FormData(e.target));
+          submitForm(formData);
+        }}
+      >
+        {loading && <SpinnerOverlay />}
+        <div>
+          <div className="mb-2 block">
+            <label
+              htmlFor="email"
+              className={formErrors.email ? "text-secondary" : ""}
             >
-              {formErrors.email}
-            </p>
+              Email
+            </label>
           </div>
-          <div>
-            <div className="mb-2 block">
-              <label
-                htmlFor="password"
-                className={formErrors.password ? "text-secondary" : ""}
-              >
-                Password
-              </label>
-            </div>
-            <input
-              required
-              id="password"
-              type="password"
-              placeholder="Password"
-              name="password"
-              className={`input input-bordered w-full ${
-                formErrors.password ? "input-secondary" : ""
-              }`}
-            />
-            <p
-              className={`mt-2 text-sm h-4 text-secondary ${
-                !formErrors.password && "invisible"
-              }`}
+          <input
+            required
+            id="email"
+            type="email"
+            placeholder="Email"
+            name="email"
+            className={`input input-bordered w-full ${
+              formErrors.email ? "input-secondary" : ""
+            }`}
+          />
+          <p
+            className={`mt-2 text-sm h-4 text-secondary ${
+              (!formErrors.email && "invisible") || ""
+            }`}
+          >
+            {formErrors.email}
+          </p>
+        </div>
+        <div>
+          <div className="mb-2 block">
+            <label
+              htmlFor="password"
+              className={formErrors.password ? "text-secondary" : ""}
             >
-              {formErrors.password}
-            </p>
+              Password
+            </label>
           </div>
-          <button className="btn btn-primary" type="submit">
-            Login
-          </button>
-        </Form>
-      </div>
-    </>
+          <input
+            required
+            id="password"
+            type="password"
+            placeholder="Password"
+            name="password"
+            className={`input input-bordered w-full ${
+              formErrors.password ? "input-secondary" : ""
+            }`}
+          />
+          <p
+            className={`mt-2 text-sm h-4 text-secondary ${
+              !formErrors.password && "invisible"
+            }`}
+          >
+            {formErrors.password}
+          </p>
+        </div>
+        <button className="btn btn-primary" type="submit">
+          Login
+        </button>
+      </Form>
+    </div>
   );
 }
