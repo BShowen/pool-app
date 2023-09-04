@@ -1,17 +1,35 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { Form } from "react-router-dom";
+import { Transition } from "@headlessui/react";
 
 import {
   CREATE_CHEMICAL_LOG,
   GET_SERVICE_ROUTE_TODAY,
 } from "../../../queries/index.js";
 import { formatAccountName } from "../../../utils/formatters.js";
+import { SpinnerOverlay } from "../../../components/SpinnerOverlay.jsx";
 
 export function AdminDashboard() {
   const { loading, error, data } = useQuery(GET_SERVICE_ROUTE_TODAY, {
     fetchPolicy: "network-only",
   });
+
+  const [serviceRoute, setServiceRoute] = useState(
+    data?.serviceRouteToday || {
+      customerAccounts: [],
+      count: 0,
+      technician: null,
+    }
+  );
+
+  useEffect(() => {
+    // if not loading and not error and there is data, then set the serviceRoute
+    // state to the data returned by the query.
+    if (!loading && !error && data) {
+      setServiceRoute(data.serviceRouteToday);
+    }
+  }, [data, error, loading]);
 
   if (loading) {
     return <p>Loading...</p>;
@@ -20,8 +38,6 @@ export function AdminDashboard() {
   if (error) {
     return <p>Error...</p>;
   }
-
-  const { serviceRouteToday: serviceRoute } = data;
 
   return (
     <div className="w-full flex flex-col flex-wrap justify-start items-center pt-9">
@@ -34,7 +50,24 @@ export function AdminDashboard() {
         <tbody>
           {serviceRoute.customerAccounts.map((account, index) => {
             return (
-              <CustomerRow key={account.id} account={account} index={index} />
+              <CustomerRow
+                key={account.id}
+                account={account}
+                index={index}
+                hideAccount={() => {
+                  // When the pool report form is submitted, remove that
+                  // customer from the state so they are removed from the UI.
+                  setServiceRoute((prevState) => {
+                    return {
+                      ...prevState,
+                      customerAccounts: prevState.customerAccounts.filter(
+                        (acc) => acc.id !== account.id
+                      ),
+                      count: prevState.count - 1,
+                    };
+                  });
+                }}
+              />
             );
           })}
         </tbody>
@@ -43,7 +76,7 @@ export function AdminDashboard() {
   );
 }
 
-function CustomerRow({ account, index }) {
+function CustomerRow({ account, index, hideAccount }) {
   const [showPoolReportForm, setShowPoolReportForm] = useState(false);
   return (
     <>
@@ -78,6 +111,7 @@ function CustomerRow({ account, index }) {
             <PoolReportForm
               cancelHandler={() => setShowPoolReportForm(false)}
               customerAccountId={account.id}
+              hideAccount={hideAccount}
             />
           )}
         </td>
@@ -86,9 +120,11 @@ function CustomerRow({ account, index }) {
   );
 }
 
-function PoolReportForm({ cancelHandler, customerAccountId }) {
-  const [createChemicalLog, { loading, error, data }] =
-    useMutation(CREATE_CHEMICAL_LOG);
+function PoolReportForm({ cancelHandler, customerAccountId, hideAccount }) {
+  const [createChemicalLog, { loading, error, data }] = useMutation(
+    CREATE_CHEMICAL_LOG,
+    { refetchQueries: [{ query: GET_SERVICE_ROUTE_TODAY }] }
+  );
 
   const [formValues, setFormValues] = useState({
     chlorine: { test: "", add: { unit: "lb", quantity: "" } },
@@ -100,6 +136,15 @@ function PoolReportForm({ cancelHandler, customerAccountId }) {
     salt: { test: "", add: { unit: "lb", quantity: "" } },
     notes: "",
   });
+
+  useEffect(() => {
+    // if not loading and not error and there is data, then the pool report form
+    //  has been successfully submitted and we need to remove this customer from
+    // the list of customers displayed on the page.
+    if (!loading && !error && data) {
+      hideAccount();
+    }
+  }, [data]);
 
   function updateState({ name, value, action }) {
     switch (action) {
@@ -206,10 +251,6 @@ function PoolReportForm({ cancelHandler, customerAccountId }) {
     return newObj; // Return the new object with transformed data
   }
 
-  if (loading) {
-    return "Loading...";
-  }
-
   if (error) {
     return "Error...";
   }
@@ -217,7 +258,7 @@ function PoolReportForm({ cancelHandler, customerAccountId }) {
   return (
     <div className="w-full px-0 mt-2 expanded-content flex flex-row justify-center">
       <Form
-        className="w-full lg:w-2/4 flex flex-col bg-slate-200 rounded-md pb-4"
+        className="w-full lg:w-2/4 flex flex-col bg-slate-100 rounded-md pb-4 relative"
         onSubmit={async (e) => {
           e.preventDefault();
           try {
@@ -229,12 +270,12 @@ function PoolReportForm({ cancelHandler, customerAccountId }) {
                 },
               },
             });
-            console.log("Success!");
           } catch (error) {
-            console.log("Error! ", { error });
+            console.log("Error ", { error });
           }
         }}
       >
+        {loading && <SpinnerOverlay />}
         <div className="flex flex-row justify-center items-center py-1">
           <div className="flex flex-row justify-end w-3/12 lg:w-1/3 pe-4"></div>
           <div className="flex flex-row gap-2 w-9/12 lg:w-2/3 justify-start">
@@ -247,7 +288,7 @@ function PoolReportForm({ cancelHandler, customerAccountId }) {
           </div>
         </div>
         <ChemicalInput
-          text={"Chlorine"}
+          text={"chlorine"}
           formValues={formValues}
           inputHandler={updateState}
         />
@@ -257,27 +298,27 @@ function PoolReportForm({ cancelHandler, customerAccountId }) {
           inputHandler={updateState}
         />
         <ChemicalInput
-          text={"Alkalinity"}
+          text={"alkalinity"}
           formValues={formValues}
           inputHandler={updateState}
         />
         <ChemicalInput
-          text={"Stabilizer"}
+          text={"stabilizer"}
           formValues={formValues}
           inputHandler={updateState}
         />
         <ChemicalInput
-          text={"Salt"}
+          text={"salt"}
           formValues={formValues}
           inputHandler={updateState}
         />
         <ChemicalInput
-          text={"Calcium"}
+          text={"calcium"}
           formValues={formValues}
           inputHandler={updateState}
         />
         <ChemicalInput
-          text={"Tablets"}
+          text={"tablets"}
           formValues={formValues}
           inputHandler={updateState}
         />
@@ -311,7 +352,7 @@ function PoolReportForm({ cancelHandler, customerAccountId }) {
 }
 
 function ChemicalInput({ text, formValues, inputHandler }) {
-  const elementText = text.toLowerCase();
+  // const text = text.toLowerCase();
 
   return (
     <div className="flex flex-row justify-center items-center py-1">
@@ -320,7 +361,7 @@ function ChemicalInput({ text, formValues, inputHandler }) {
       </div>
       <div className="flex flex-row gap-2 w-9/12 lg:w-2/3 justify-start">
         <input
-          name={elementText}
+          name={text}
           className="input input-sm w-4/12 lg:w-3/12 text-center"
           // Input needs to be "text" and not "number" because Safari allows
           // users to type any value into the "number" field even if it's not
@@ -329,7 +370,7 @@ function ChemicalInput({ text, formValues, inputHandler }) {
           // keystroke from the user and validate the input myself.
           type="text"
           inputMode="decimal"
-          value={formValues[elementText]?.test}
+          value={formValues[text]?.test}
           onInput={(e) => {
             const value = e.target.value.trim();
             const name = e.target.name;
@@ -340,11 +381,11 @@ function ChemicalInput({ text, formValues, inputHandler }) {
             e.target.value = "";
           }}
           onBlur={(e) => {
-            e.target.value = formValues[elementText]?.test;
+            e.target.value = formValues[text]?.test;
           }}
         />
         <input
-          name={elementText}
+          name={text}
           className="input input-sm w-4/12 lg:w-3/12 text-center"
           // Input needs to be "text" and not "number" because Safari allows
           // users to type any value into the "number" field even if it's not
@@ -354,7 +395,7 @@ function ChemicalInput({ text, formValues, inputHandler }) {
           type="text"
           inputMode="decimal"
           step="0.01"
-          value={formValues[elementText]?.add?.quantity}
+          value={formValues[text]?.add?.quantity}
           onInput={(e) => {
             const value = e.target.value.trim();
             const name = e.target.name;
@@ -365,14 +406,14 @@ function ChemicalInput({ text, formValues, inputHandler }) {
             e.target.value = "";
           }}
           onBlur={(e) => {
-            e.target.value = formValues[elementText]?.add?.quantity;
+            e.target.value = formValues[text]?.add?.quantity;
           }}
         />
-        {elementText !== "tablets" && (
+        {text !== "tablets" && (
           <select
             className="input input-sm w-3/12 lg:w-3/12"
-            name={elementText}
-            value={formValues[elementText]?.add?.unit}
+            name={text}
+            value={formValues[text]?.add?.unit}
             onInput={(e) => {
               const name = e.target.name;
               const value = e.target.value;
