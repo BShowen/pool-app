@@ -30,7 +30,6 @@ export default function TechnicianRoutes() {
       <div className="mx-auto w-3/4 rounded-2xl bg-white p-3 border-2 gap-5 flex flex-col shadow-sm">
         {customerList.map((serviceDay) => {
           const customerAccounts = serviceDay.customerAccounts;
-
           return (
             <Disclosure
               as="div"
@@ -70,7 +69,7 @@ export default function TechnicianRoutes() {
                     leaveTo="transform scale-95 opacity-0"
                   >
                     <Disclosure.Panel className="px-2 text-sm text-gray-500">
-                      <table className="table w-full border-separate border-2 border-t-0 rounded-b-2xl">
+                      <table className="table border-separate border-2 border-t-0 rounded-t-none rounded-b-2xl overflow-hidden">
                         <tbody>
                           {customerAccounts.map((customer) => {
                             return (

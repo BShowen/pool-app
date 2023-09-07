@@ -75,7 +75,7 @@ function TechnicianDisclosure({ route }) {
             leaveTo="transform scale-95 opacity-0"
           >
             <Disclosure.Panel className="px-2 text-sm text-gray-500">
-              <table className="table w-full border-separate border-spacing-0 border-2 border-t-0 rounded-b-2xl overflow-hidden">
+              <table className="table border-separate border-spacing-0 border-2 border-t-0 rounded-b-2xl overflow-hidden rounded-t-none">
                 <thead>
                   <tr>
                     <th className="rounded-none">

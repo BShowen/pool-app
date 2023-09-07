@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function MobileBottomNav({ isSidebarOpen, toggleSidebar }) {
   return (
-    <div className="btm-nav btm-nav-lg lg:hidden bg-slate-100">
+    <div className="btm-nav btm-nav-lg lg:hidden bg-slate-100 z-50">
       {/* <div className="btm-nav btm-nav-lg lg:hidden h-28"> */}
       <Link as="button" to="/">
         <svg
@@ -38,11 +38,7 @@ export default function MobileBottomNav({ isSidebarOpen, toggleSidebar }) {
         </svg>
       </button>
       <div>
-        <label
-          className="swap swap-rotate"
-          // htmlFor="my-drawer"
-          onChange={toggleSidebar}
-        >
+        <label className="swap swap-rotate" onChange={toggleSidebar}>
           {/* <!-- this hidden checkbox controls the state --> */}
           <input
             type="checkbox"

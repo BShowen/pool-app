@@ -15,7 +15,7 @@ export default function TechnicianList() {
   const { technicianList } = data;
   return (
     <>
-      <div className="sticky p-1 lg:p-5 top-0 z-50 bg-white shadow-sm">
+      <div className="sticky p-1 lg:p-5 top-0 z-40 bg-white shadow-sm">
         <div className="w-full flex flex-row justify-center">
           <h1 className="text-3xl font-bold">Technicians</h1>
         </div>
