@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { Form } from "react-router-dom";
-import { Transition } from "@headlessui/react";
 
 import {
   CREATE_CHEMICAL_LOG,
@@ -42,6 +41,7 @@ export function AdminDashboard() {
   return (
     <div className="w-full flex flex-col flex-wrap justify-start items-center pt-9">
       <div className="p-2 w-full lg:w-11/12">
+        {/* Header */}
         <span className="badge badge-primary p-3">
           {serviceRoute.count} customers
         </span>
@@ -78,6 +78,54 @@ export function AdminDashboard() {
 
 function CustomerRow({ account, index, hideAccount }) {
   const [showPoolReportForm, setShowPoolReportForm] = useState(false);
+
+  function isDateToday(dateInMilliseconds) {
+    // Return true if dateInMilliSeconds is todays date, regardless of time.
+    // All im looking for is ensuring the dateInMilliseconds is todays DAY,
+    // MONTH and YEAR
+    if (dateInMilliseconds === undefined) {
+      return false;
+    }
+    function formatDateToDDMMYYYY(dateInMilliseconds) {
+      const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+      const dateFormatter = new Intl.DateTimeFormat("en-US", options);
+      return dateFormatter.format(dateInMilliseconds);
+    }
+
+    return (
+      formatDateToDDMMYYYY(dateInMilliseconds) ===
+      formatDateToDDMMYYYY(new Date().getTime())
+    );
+  }
+
+  function sanitizeResponse(obj) {
+    // obj is the raw object received from the backend.
+    // Create and return a new copy of the obj with "__typename" removed,
+    // "customerAccountId" removed, "id" removed, "date" removed, and null
+    // values replaced by empty strings
+
+    // Create a new object to hold the filtered data
+    const filteredObject = {};
+
+    // Loop through the keys in the original object
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== null && typeof value === "object") {
+        filteredObject[key] = sanitizeResponse(value);
+      } else if (
+        key !== "__typename" &&
+        key !== "id" &&
+        key !== "customerAccountId" &&
+        key !== "date"
+      ) {
+        // Copy the key and its value to the filtered object
+        filteredObject[key] = obj[key] || "";
+      }
+    }
+
+    // Return the filtered object
+    return filteredObject;
+  }
+
   return (
     <>
       <tr key={account.id} className="hover:cursor-pointer flex flex-col">
@@ -88,23 +136,46 @@ function CustomerRow({ account, index, hideAccount }) {
             // expanded content, then do not collapse the <tr>.
             // In other words, only expand/collapse when the <tr> element itself
             // is clicked.
-            if (e.target.closest(".expanded-content")) {
-              return;
-            } else {
+            if (!e.target.closest(".expanded-content"))
               setShowPoolReportForm((prevState) => !prevState);
-            }
           }}
         >
-          <div className="w-full flex flex-row justify-between items-center">
-            <div className="flex flew-row items-center gap-2">
-              <div className="border-2 bg-slate-200 w-8 text-center rounded-md">
-                <p className="text-xl">{index + 1}</p>
+          <div className="w-full flex flex-row justify-end items-center flex-wrap gap-2">
+            <div className="flex flew-row items-center me-auto">
+              <div className="border-2 bg-slate-200 w-6 h-6 text-center rounded-md ">
+                <p className="text-sm font-semibold">{index + 1}</p>
               </div>
-              <div>{formatAccountName(account.accountName)}</div>
+              <div>
+                <p className="text-sm font-semibold px-1">
+                  {formatAccountName(account.accountName)}
+                </p>
+              </div>
             </div>
+            {/* 
+              showPoolReportForm --> So the "Send pool report" button 
+              disappears when the pool report form is opened for editing 
+            */}
+            {isDateToday(account.latestChemicalLog?.date) &&
+              !showPoolReportForm && (
+                <div className="w-full md:w-auto order-last md:order-none">
+                  <button
+                    className="btn btn-accent btn-xs w-full"
+                    onClick={(e) => {
+                      e.stopPropagation(); //Prevent the row from expanding.
+                      e.preventDefault(); //Prevent any default behavior.
+                    }}
+                  >
+                    Send pool report
+                  </button>
+                </div>
+              )}
             <div className="flex flex-row justify-end gap-2">
-              <div className="badge badge-accent">Filter</div>
-              <div className="badge badge-accent">Salt Cell</div>
+              <div className="badge badge-secondary text-xs font-semibold">
+                Filter
+              </div>
+              <div className="badge badge-secondary text-xs font-semibold">
+                Salt Cell
+              </div>
             </div>
           </div>
           {showPoolReportForm && (
@@ -112,6 +183,11 @@ function CustomerRow({ account, index, hideAccount }) {
               cancelHandler={() => setShowPoolReportForm(false)}
               customerAccountId={account.id}
               hideAccount={hideAccount}
+              values={
+                account.latestChemicalLog
+                  ? sanitizeResponse(account.latestChemicalLog)
+                  : null
+              }
             />
           )}
         </td>
@@ -120,29 +196,35 @@ function CustomerRow({ account, index, hideAccount }) {
   );
 }
 
-function PoolReportForm({ cancelHandler, customerAccountId, hideAccount }) {
+function PoolReportForm({
+  cancelHandler,
+  customerAccountId,
+  hideAccount,
+  values,
+}) {
   const [createChemicalLog, { loading, error, data }] = useMutation(
     CREATE_CHEMICAL_LOG,
     { refetchQueries: [{ query: GET_SERVICE_ROUTE_TODAY }] }
   );
 
-  const [formValues, setFormValues] = useState({
-    chlorine: { test: "", add: { unit: "lb", quantity: "" } },
-    pH: { test: "", add: { unit: "cups", quantity: "" } },
-    alkalinity: { test: "", add: { unit: "lb", quantity: "" } },
-    stabilizer: { test: "", add: { unit: "lb", quantity: "" } },
-    calcium: { test: "", add: { unit: "lb", quantity: "" } },
-    tablets: { test: "", add: { quantity: "" } },
-    salt: { test: "", add: { unit: "lb", quantity: "" } },
-    notes: "",
-  });
+  const [formValues, setFormValues] = useState(
+    values || {
+      chlorine: { test: "", add: { unit: "lb", quantity: "" } },
+      pH: { test: "", add: { unit: "cups", quantity: "" } },
+      alkalinity: { test: "", add: { unit: "lb", quantity: "" } },
+      stabilizer: { test: "", add: { unit: "lb", quantity: "" } },
+      calcium: { test: "", add: { unit: "lb", quantity: "" } },
+      tablets: { test: "", add: { quantity: "" } },
+      salt: { test: "", add: { unit: "lb", quantity: "" } },
+      notes: "",
+    }
+  );
 
   useEffect(() => {
     // if not loading and not error and there is data, then the pool report form
-    //  has been successfully submitted and we need to remove this customer from
-    // the list of customers displayed on the page.
+    // has been successfully submitted and we need to collapse the form.
     if (!loading && !error && data) {
-      hideAccount();
+      cancelHandler(); // Collapse the form on successful submission.
     }
   }, [data]);
 
@@ -189,7 +271,10 @@ function PoolReportForm({ cancelHandler, customerAccountId, hideAccount }) {
     }
   }
 
-  function serializeState(obj) {
+  function convertStringToNull(obj) {
+    // Create and return a copy of the obj and replace all null values with
+    // an empty string.
+
     const newObj = {}; // Create a new object to hold the transformed data
 
     for (const key in obj) {
@@ -200,7 +285,7 @@ function PoolReportForm({ cancelHandler, customerAccountId, hideAccount }) {
           // don't process the object.
           continue;
         } else {
-          newObj[key] = serializeState(obj[key]);
+          newObj[key] = convertStringToNull(obj[key]);
         }
       } else if (key === "test" || key === "quantity") {
         // If it's "test" or "quantity," convert to a number if it's not empty,
@@ -224,33 +309,6 @@ function PoolReportForm({ cancelHandler, customerAccountId, hideAccount }) {
     return newObj; // Return the new object with transformed data
   }
 
-  function deserializeState(obj) {
-    const newObj = {}; // Create a new object to hold the transformed data
-    for (const [key, value] of Object.entries(obj)) {
-      if (key === "notes") {
-        // No processing needed. Keep the value as it is.
-        newObj.notes = value || "";
-      } else if (Object.entries(value).length === 0) {
-        // No data for this entry, create default data.
-        newObj[key] = { test: "", add: { unit: "lb", quantity: "" } };
-      } else {
-        // Keep old data, but insert efault data for keys that are missing.
-        newObj[key] = {
-          ...value,
-          test: value?.test || "",
-          add: value?.add || { unit: "lb", quantity: "" },
-        };
-      }
-    }
-
-    if (newObj.notes === undefined) {
-      // If notes were not provided, create default notes
-      newObj.notes = "";
-    }
-
-    return newObj; // Return the new object with transformed data
-  }
-
   if (error) {
     return "Error...";
   }
@@ -266,7 +324,7 @@ function PoolReportForm({ cancelHandler, customerAccountId, hideAccount }) {
               variables: {
                 input: {
                   customerAccountId,
-                  ...serializeState(formValues),
+                  ...convertStringToNull(formValues),
                 },
               },
             });
@@ -323,16 +381,7 @@ function PoolReportForm({ cancelHandler, customerAccountId, hideAccount }) {
           inputHandler={updateState}
         />
         <div className="flex flex-row w-full justify-center mt-2 px-1">
-          <textarea
-            name="notes"
-            className="textarea textarea-bordered w-full"
-            placeholder="Customer notes"
-            onInput={(e) => {
-              const name = e.target.name;
-              const value = e.target.value;
-              updateState({ name, value, action: "notes" });
-            }}
-          />
+          <TextArea value={formValues.notes} inputHandler={updateState} />
         </div>
         <div className="w-full flex flex-row gap-3 justify-center pt-4">
           <button
@@ -365,12 +414,12 @@ function ChemicalInput({ text, formValues, inputHandler }) {
           className="input input-sm w-4/12 lg:w-3/12 text-center"
           // Input needs to be "text" and not "number" because Safari allows
           // users to type any value into the "number" field even if it's not
-          // valid. Then, Safari wont pass this invalid value to me so I can
-          // implement validation. So, I use "text" in order to receive every
+          // valid. Then Safari wont pass this invalid value to me so I can
+          // implement validation. So I use "text" in order to receive every
           // keystroke from the user and validate the input myself.
           type="text"
           inputMode="decimal"
-          value={formValues[text]?.test}
+          placeholder={formValues[text]?.test}
           onInput={(e) => {
             const value = e.target.value.trim();
             const name = e.target.name;
@@ -378,10 +427,9 @@ function ChemicalInput({ text, formValues, inputHandler }) {
               inputHandler({ name, value, action: "test" });
           }}
           onFocus={(e) => {
-            e.target.value = "";
-          }}
-          onBlur={(e) => {
-            e.target.value = formValues[text]?.test;
+            const value = "";
+            const name = e.target.name;
+            inputHandler({ name, value, action: "test" });
           }}
         />
         <input
@@ -395,7 +443,7 @@ function ChemicalInput({ text, formValues, inputHandler }) {
           type="text"
           inputMode="decimal"
           step="0.01"
-          value={formValues[text]?.add?.quantity}
+          placeholder={formValues[text]?.add?.quantity}
           onInput={(e) => {
             const value = e.target.value.trim();
             const name = e.target.name;
@@ -403,10 +451,11 @@ function ChemicalInput({ text, formValues, inputHandler }) {
               inputHandler({ name, value, action: "addQuantity" });
           }}
           onFocus={(e) => {
-            e.target.value = "";
-          }}
-          onBlur={(e) => {
-            e.target.value = formValues[text]?.add?.quantity;
+            inputHandler({
+              name: e.target.name,
+              value: "",
+              action: "addQuantity",
+            });
           }}
         />
         {text !== "tablets" && (
@@ -430,6 +479,35 @@ function ChemicalInput({ text, formValues, inputHandler }) {
         )}
       </div>
     </div>
+  );
+}
+
+function TextArea({ value, inputHandler }) {
+  // A textarea component that clears the value on the first onFocus event only.
+  const [firstFocus, setFirstFocus] = useState(true);
+  return (
+    <textarea
+      name="notes"
+      className="textarea textarea-bordered w-full"
+      placeholder={value || "Customer notes"}
+      onInput={(e) =>
+        inputHandler({
+          name: e.target.name.toLowerCase(),
+          value: e.target.value,
+          action: "notes",
+        })
+      }
+      onFocus={(e) => {
+        if (firstFocus) {
+          inputHandler({
+            name: e.target.name,
+            value: "",
+            action: "notes",
+          });
+          setFirstFocus(false);
+        }
+      }}
+    />
   );
 }
 
