@@ -11,14 +11,14 @@ export default function Sidebar({ isSidebarOpen, toggleSidebar }) {
         checked={isSidebarOpen}
         readOnly
       />
-      <div className="drawer-content flex flex-col justify-start items-center pb-32 lg:pb-0">
+      <div className="drawer-content flex flex-col justify-start items-center lg:pb-0">
         <div className="w-full max-w-screen-2xl">
           <Outlet />
         </div>
       </div>
       <div className="drawer-side z-40">
         <label className="drawer-overlay" onClick={toggleSidebar}></label>
-        <ul className="min-h-full menu menu-lg p-4 w-80 bg-base-200 pb-32 lg:pb-4">
+        <ul className="min-h-full menu menu-lg p-4 w-80 bg-base-200 pb-14 lg:pb-4">
           <li>
             <Link to={routes.adminRoot} onClick={toggleSidebar}>
               Dashboard
