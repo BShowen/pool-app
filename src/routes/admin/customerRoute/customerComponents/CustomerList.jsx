@@ -23,7 +23,7 @@ export default function CustomerList() {
     return <p>Error...</p>;
   } else {
     return (
-      <div className="h-full lg:h-screen">
+      <div className="h-full lg:h-screen min-w-full">
         <div className="sticky p-1 lg:p-5 top-0 z-40 bg-white shadow-sm">
           <div className="w-full flex flex-row justify-center">
             <h1 className="text-3xl font-bold">Customers</h1>
@@ -290,7 +290,7 @@ function TechnicianSelector({ customerAccount, technicianId, technicianList }) {
         <form method="post">
           <input hidden readOnly name="id" value={customerAccount.id} />
           <select
-            className="focus:outline-none focus:bg-transparent bg-transparent w-min hover:cursor-pointer"
+            className="select focus:outline-none focus:bg-transparent bg-transparent w-min hover:cursor-pointer px-4"
             readOnly
             value={technicianId || 0}
             onChange={handleChange}

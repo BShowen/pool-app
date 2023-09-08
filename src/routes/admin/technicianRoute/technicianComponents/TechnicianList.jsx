@@ -15,7 +15,7 @@ export default function TechnicianList() {
   const { technicianList } = data;
   return (
     <>
-      <div className="sticky p-1 lg:p-5 top-0 z-40 bg-white shadow-sm">
+      <div className="sticky p-1 lg:p-5 top-0 z-40 bg-white shadow-sm min-w-full">
         <div className="w-full flex flex-row justify-center">
           <h1 className="text-3xl font-bold">Technicians</h1>
         </div>
@@ -29,7 +29,7 @@ export default function TechnicianList() {
           </Link>
         </div>
       </div>
-      <div className="overflow-x-auto w-full pt-5">
+      <div className="overflow-x-auto min-w-full pt-5">
         <div className="p-2">
           <span className="badge badge-primary p-3">
             {technicianList.length} technicians

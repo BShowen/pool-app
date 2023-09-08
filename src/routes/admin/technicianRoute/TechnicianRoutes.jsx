@@ -26,8 +26,8 @@ export default function TechnicianRoutes() {
   const customerList = sortByWeekday(data.serviceRouteByTechId);
 
   return (
-    <div className="w-full pt-16  lg:px-5">
-      <div className="mx-auto w-3/4 rounded-2xl bg-white p-3 border-2 gap-5 flex flex-col shadow-sm">
+    <div className="min-w-full px-1 lg:px-5">
+      <div className="rounded-2xl p-3 border-2 gap-5 flex flex-col shadow-sm">
         {customerList.map((serviceDay) => {
           const customerAccounts = serviceDay.customerAccounts;
           return (

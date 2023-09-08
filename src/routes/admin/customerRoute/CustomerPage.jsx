@@ -27,7 +27,7 @@ export default function CustomerPage() {
         {/* Page container */}
 
         {/* Page header */}
-        <div className="w-full flex flex-col gap-5 justify-center items-center sticky top-0 bg-white z-50 p-5">
+        <div className="w-full flex flex-col gap-5 justify-center items-center sticky top-0 bg-white z-40 p-5">
           <div>
             <h1 className="text-3xl mx-auto">
               {formatAccountName(customerAccount.accountName)}

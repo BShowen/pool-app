@@ -39,7 +39,7 @@ export function AdminDashboard() {
   }
 
   return (
-    <div className="w-full flex flex-col flex-wrap justify-start items-center pt-9">
+    <div className="w-full flex flex-col justify-start items-center pt-9">
       <div className="p-2 w-full lg:w-11/12">
         {/* Header */}
         <span className="badge badge-primary p-3">
@@ -169,14 +169,17 @@ function CustomerRow({ account, index, hideAccount }) {
                   </button>
                 </div>
               )}
-            <div className="flex flex-row justify-end gap-2">
-              <div className="badge badge-secondary text-xs font-semibold">
-                Filter
-              </div>
-              <div className="badge badge-secondary text-xs font-semibold">
-                Salt Cell
-              </div>
-            </div>
+            {!isDateToday(account.latestChemicalLog?.date) &&
+              !showPoolReportForm && (
+                <div className="flex flex-row justify-end gap-2">
+                  <div className="badge badge-secondary text-xs font-semibold">
+                    Filter
+                  </div>
+                  <div className="badge badge-secondary text-xs font-semibold">
+                    Salt Cell
+                  </div>
+                </div>
+              )}
           </div>
           {showPoolReportForm && (
             <PoolReportForm

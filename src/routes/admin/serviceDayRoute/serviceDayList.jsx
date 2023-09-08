@@ -24,15 +24,15 @@ export function ServiceDayList() {
   const { serviceRouteAll: serviceRouteList } = data;
 
   return (
-    <div className="h-full lg:h-screen">
+    <div className="min-w-full">
       <div className="sticky p-1 lg:p-5 top-0 z-40 bg-white shadow-sm">
         <div className="w-full flex flex-row justify-center">
           <h1 className="text-3xl font-bold">Service days</h1>
         </div>
       </div>
 
-      <div className="w-full pt-16  lg:px-5">
-        <div className="mx-auto w-3/4 rounded-2xl bg-white p-3 border-2 gap-5 flex flex-col shadow-sm">
+      <div className="w-full pt-16 px-1 lg:px-5">
+        <div className="rounded-2xl bg-white p-3 border-2 gap-5 flex flex-col shadow-sm">
           {serviceRouteList.map((route) => (
             <TechnicianDisclosure
               key={route.technician.id || 0}

@@ -11,10 +11,8 @@ export default function Sidebar({ isSidebarOpen, toggleSidebar }) {
         checked={isSidebarOpen}
         readOnly
       />
-      <div className="drawer-content flex flex-col justify-start items-center lg:pb-0">
-        <div className="w-full max-w-screen-2xl">
-          <Outlet />
-        </div>
+      <div className="drawer-content flex flex-col justify-start items-center mb-20 lg:mb-0 max-w-full min-w-full w-full">
+        <Outlet />
       </div>
       <div className="drawer-side z-40">
         <label className="drawer-overlay" onClick={toggleSidebar}></label>
