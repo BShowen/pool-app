@@ -41,6 +41,9 @@ import { AdminDashboard } from "./adminComponents/AdminDashboard";
 /* -------------------- Error components -------------------- */
 import ErrorDisplay from "../../components/ErrorDisplay";
 
+/* -------------------- Cleaning services routes -------------------- */
+import { CleaningServicePage } from "./cleaningServiceRoute/cleaningServicePage";
+
 export default {
   path: routes.adminRoot,
   element: <Root />,
@@ -133,6 +136,11 @@ export default {
           ],
         },
       ],
+    },
+    {
+      path: routes.cleaningServices,
+      element: <CleaningServicePage />,
+      errorElement: <ErrorDisplay />,
     },
     {
       path: routes.newTechnician,

@@ -16,7 +16,7 @@ export default function Sidebar({ isSidebarOpen, toggleSidebar }) {
       </div>
       <div className="drawer-side z-40">
         <label className="drawer-overlay" onClick={toggleSidebar}></label>
-        <ul className="min-h-full menu menu-lg p-4 w-80 bg-base-200 pb-14 lg:pb-4">
+        <ul className="min-h-full menu menu-lg p-4 w-80 bg-base-200 pb-14 lg:pb-4 flex flex-col gap-1">
           <li>
             <Link to={routes.adminRoot} onClick={toggleSidebar}>
               Dashboard
@@ -36,6 +36,27 @@ export default function Sidebar({ isSidebarOpen, toggleSidebar }) {
             <Link to={routes.serviceDays} onClick={toggleSidebar}>
               Service Days
             </Link>
+          </li>
+          <li>
+            <details>
+              <summary>Products & Services</summary>
+              <ul className="flex flex-col gap-1 my-1">
+                <li>
+                  <Link
+                    to={routes.cleaningServices}
+                    onClick={toggleSidebar}
+                    className="text-sm"
+                  >
+                    Cleaning services
+                  </Link>
+                </li>
+                <li className="">
+                  <Link to={"#"} onClick={toggleSidebar} className="text-sm">
+                    Repair services
+                  </Link>
+                </li>
+              </ul>
+            </details>
           </li>
           <li className="mt-auto">
             <Link to="/logout">Logout</Link>

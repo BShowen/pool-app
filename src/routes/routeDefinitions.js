@@ -1,3 +1,7 @@
+const cleaningServices = {
+  cleaningServices: "/admin/cleaningServices",
+};
+
 const customerRoutes = {
   customers: "/admin/customers",
   newCustomer: "/admin/customers/new",
@@ -35,6 +39,7 @@ const adminRoutes = {
 const dynamicSegment = /:([a-zA-Z]+)(?=\/|$)/g;
 
 const routes = {
+  ...cleaningServices,
   ...customerRoutes,
   ...technicianRoutes,
   ...serviceDays,
