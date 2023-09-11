@@ -5,6 +5,7 @@ export const GET_SERVICE_LIST = gql`
     getAllServices {
       description
       name
+      id
     }
   }
 `;

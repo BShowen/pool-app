@@ -1,10 +1,10 @@
-import { FiEdit3, FiDelete } from "react-icons/fi";
 import { capitalize } from "../../../utils/formatters";
 import { useEffect, useState } from "react";
 import { Form } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 import { GET_SERVICE_LIST, CREATE_SERVICE } from "../../../queries/index.js";
-import { SpinnerOverlay } from "./../../../components/SpinnerOverlay";
+import { SpinnerOverlay } from "../../../components/SpinnerOverlay";
+import { RowActions } from "./RowActions";
 
 export function CleaningServicePage() {
   const { loading, data, error } = useQuery(GET_SERVICE_LIST);
@@ -23,7 +23,7 @@ export function CleaningServicePage() {
             Pool cleaning services
           </h1>
           <button
-            className="btn btn-primary w-full md:w-auto btn-sm md:btn-md"
+            className="btn btn-info w-full md:w-auto btn-sm md:btn-md"
             onClick={() => {
               document.getElementById("my_modal_5").showModal();
             }}
@@ -60,7 +60,7 @@ export function CleaningServicePage() {
   );
 }
 
-function CleaningService({ name, description }) {
+function CleaningService({ name, description, id }) {
   const serviceName = name
     .split(" ")
     .map((word) => capitalize(word))
@@ -75,17 +75,8 @@ function CleaningService({ name, description }) {
           <p className="text-sm text-gray-500">{capitalize(description)}</p>
         </div>
       </td>
-      <Actions />
+      <RowActions serviceId={id} />
     </>
-  );
-}
-
-function Actions() {
-  return (
-    <td className="flex flex-row justify-center items-center md:justify-end gap-8 h-full">
-      <FiEdit3 className="text-xl lg:text-2xl text-gray-800 hover:text-blue-500 hover:cursor-pointer" />
-      <FiDelete className="text-xl lg:text-2xl text-gray-800 hover:text-pink-600 hover:cursor-pointer" />
-    </td>
   );
 }
 

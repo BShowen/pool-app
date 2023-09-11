@@ -42,7 +42,7 @@ import { AdminDashboard } from "./adminComponents/AdminDashboard";
 import ErrorDisplay from "../../components/ErrorDisplay";
 
 /* -------------------- Cleaning services routes -------------------- */
-import { CleaningServicePage } from "./cleaningServiceRoute/cleaningServicePage";
+import { CleaningServicePage } from "./cleaningServiceRoute/CleaningServicePage";
 
 export default {
   path: routes.adminRoot,
