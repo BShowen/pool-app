@@ -74,7 +74,7 @@ export function CleaningServicePage() {
   );
 }
 
-function CleaningService({ name, description, id }) {
+function CleaningService({ id, name, description }) {
   const serviceName = name
     .split(" ")
     .map((word) => capitalize(word))
@@ -89,7 +89,7 @@ function CleaningService({ name, description, id }) {
           <p className="text-sm text-gray-500">{capitalize(description)}</p>
         </div>
       </td>
-      <RowActions serviceId={id} />
+      <RowActions service={{ id, name, description }} />
     </>
   );
 }
