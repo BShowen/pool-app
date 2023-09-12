@@ -9,6 +9,15 @@ import { RowActions } from "./RowActions";
 export function CleaningServicePage() {
   const { loading, data, error } = useQuery(GET_SERVICE_LIST);
 
+  // I want the new-service-modal window to be a controlled component.
+  // newServiceModalState is a boolean. true if window is open, false if
+  // window is closed
+  const [newServiceModalState, setNewServiceModalState] = useState(false);
+
+  useEffect(() => {
+    return () => {};
+  }, []);
+
   if (error) {
     return <p>Error...</p>;
   }
@@ -25,7 +34,7 @@ export function CleaningServicePage() {
           <button
             className="btn btn-info w-full md:w-auto btn-sm md:btn-md"
             onClick={() => {
-              document.getElementById("my_modal_5").showModal();
+              setNewServiceModalState(true);
             }}
           >
             Add new service
@@ -55,7 +64,12 @@ export function CleaningServicePage() {
           </tbody>
         </table>
       </div>
-      <NewServiceModal />
+      <NewServiceModal
+        state={newServiceModalState}
+        toggleState={() => {
+          setNewServiceModalState(!newServiceModalState);
+        }}
+      />
     </>
   );
 }
@@ -80,9 +94,9 @@ function CleaningService({ name, description, id }) {
   );
 }
 
-function NewServiceModal() {
+function NewServiceModal({ state, toggleState }) {
   const [values, setValues] = useState({ name: "", description: "" });
-  const [errors, setErrors] = useState({ fields: {} });
+  const [errors, setErrors] = useState({});
   const [createService, { loading, data, error }] = useMutation(
     CREATE_SERVICE,
     { refetchQueries: [{ query: GET_SERVICE_LIST }] }
@@ -92,18 +106,52 @@ function NewServiceModal() {
     // When the service has been submitted and the response is successful then
     // click the hidden button that closes the modal.
     if (data) {
-      document.getElementById("close-modal").click(); // Close the modal window.
+      toggleState(); //Close the modal window
     }
   }, [data]);
 
   useEffect(() => {
+    // Highlight any errors on the form
     if (error) {
-      setErrors({ ...error.graphQLErrors[0].extensions });
+      setErrors({ ...(error.graphQLErrors[0].extensions?.fields || {}) });
+      setValues((prevState) => {
+        return {
+          ...prevState,
+          name: prevState?.name?.trim() || "",
+          description: prevState?.description?.trim() || "",
+        };
+      });
     }
   }, [error]);
 
+  useEffect(() => {
+    // This component is not "mounted/unmounted" because it is a modal window.
+    // Rather, this component toggles between a hidden/not-hidden state.
+    // So, this useEffect hook serves as the "mount/unmount" setup/teardown method.
+    if (state) {
+      // On mount (when state is "true")
+      document.addEventListener("keydown", closeOnKeydown);
+    } else {
+      // On unmount (when state is "false")
+      document.removeEventListener("keydown", closeOnKeydown);
+      setValues({ name: "", description: "" });
+      setErrors({});
+    }
+  }, [state]);
+
+  function closeOnKeydown(e) {
+    if (e.code === "Escape") {
+      toggleState();
+    }
+  }
+
   return (
-    <dialog id="my_modal_5" className="modal modal-bottom md:modal-middle">
+    <dialog
+      id="create-service-modal"
+      className={`modal modal-bottom md:modal-middle ${
+        state ? "modal-open" : ""
+      }`}
+    >
       <div className="modal-box">
         <div className="w-full text-center">
           <h3 className="font-bold text-xl text-gray-800">Add a new service</h3>
@@ -123,7 +171,7 @@ function NewServiceModal() {
                   },
                 });
                 setValues({ name: "", description: "" });
-                setErrors({ fields: {} });
+                setErrors({});
               } catch (error) {
                 return;
               }
@@ -131,14 +179,18 @@ function NewServiceModal() {
           >
             <div>
               <label className="label">
-                <span className="label-text">Service name</span>
+                <span
+                  className={`label-text ${errors?.name ? "text-red-500" : ""}`}
+                >
+                  {errors?.name ? errors.name : "Service name"}
+                </span>
               </label>
               <input
                 type="text"
                 placeholder="Service name"
                 name="name"
                 className={`input input-bordered w-full input-md ${
-                  errors.fields?.name && "input-error"
+                  errors?.name && "input-error"
                 }`}
                 value={values.name}
                 onInput={(e) => {
@@ -146,6 +198,7 @@ function NewServiceModal() {
                     return { ...prevState, [e.target.name]: e.target.value };
                   });
                 }}
+                required
               />
             </div>
             <div>
@@ -175,10 +228,8 @@ function NewServiceModal() {
           </Form>
         </div>
       </div>
-      {/* This form enables closing the modal by clicking outside the modal */}
-      <form method="dialog" className="modal-backdrop">
-        <button id="close-modal"></button>
-      </form>
+      {/* This div enables closing the modal by clicking outside the modal */}
+      <div className="modal-backdrop" onClick={() => toggleState()}></div>
     </dialog>
   );
 }
