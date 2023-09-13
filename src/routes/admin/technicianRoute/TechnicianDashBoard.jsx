@@ -65,6 +65,7 @@ function EditTechnicianButton({ technician }) {
 }
 
 function DeleteTechnicianButton({ technician }) {
+  const navigate = useNavigate();
   const [deleteTechnician, { data, error, loading }] = useMutation(
     DELETE_TECHNICIAN,
     {
