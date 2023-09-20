@@ -1,41 +1,15 @@
 import { useState } from "react";
 import { Form, useNavigate } from "react-router-dom";
 
-export default function EditAccountForm({ customerAccount, errors, onSubmit }) {
+export default function EditAccountForm({ account, errors, onSubmit }) {
   // If a submit handler is passed in then use that to submit the form.
   // Otherwise use useSubmit() to submit the form.
   const submit = onSubmit;
-  const [state, setState] = useState(customerAccount);
   const navigate = useNavigate();
-  const [focus, setFocus] = useState(false);
 
   // If errors is undefined then assign a blank object {} to it.
   // This is because the form expects errors to always be ab object.
   errors = errors ? errors : {};
-
-  function updateState(e) {
-    const isSubForm = Object.keys(e.target.dataset).length;
-    setState((prevState) => {
-      let value =
-        e.target.type === "number"
-          ? Number.parseFloat(e.target.value)
-          : e.target.value;
-      return { ...prevState, [e.target.name]: value };
-    });
-  }
-
-  // function removeAccountOwner(itemIndex) {
-  //   setState((prevState) => {
-  //     const accountOwners = [
-  //       ...prevState.accountOwners.filter((item, index) => {
-  //         if (index === itemIndex) return;
-  //         return item;
-  //       }),
-  //     ];
-  //     const newState = { ...prevState, accountOwners };
-  //     return newState;
-  //   });
-  // }
 
   return (
     <Form
@@ -43,7 +17,7 @@ export default function EditAccountForm({ customerAccount, errors, onSubmit }) {
       onSubmit={(e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        formData.append("id", state.id);
+        formData.append("id", account?.id);
         submit({ formData });
       }}
     >
@@ -73,8 +47,7 @@ export default function EditAccountForm({ customerAccount, errors, onSubmit }) {
               className={`input input-bordered w-full focus:outline-none ${
                 errors.accountName && "input-secondary"
               }`}
-              value={state.accountName || ""}
-              onInput={updateState}
+              defaultValue={account?.accountName || ""}
               autoFocus
             />
 
@@ -92,8 +65,7 @@ export default function EditAccountForm({ customerAccount, errors, onSubmit }) {
               className={`input input-bordered w-full focus:outline-none ${
                 errors.address && "input-secondary"
               }`}
-              value={state.address || ""}
-              onInput={updateState}
+              defaultValue={account?.address || ""}
             />
 
             <label className="label">
@@ -111,106 +83,22 @@ export default function EditAccountForm({ customerAccount, errors, onSubmit }) {
               className={`input input-bordered w-full focus:outline-none ${
                 errors.price && "input-secondary"
               }`}
-              value={state.price || ""}
-              onInput={updateState}
+              defaultValue={account?.price || ""}
             />
-
-            <label className="label">
-              <span
-                className={`label-text ${
-                  errors.serviceFrequency && "text-secondary"
-                }`}
-              >
-                Service frequency {errors.serviceFrequency && " - required"}
-              </span>
-            </label>
-            <input
-              type="text"
-              placeholder="Service frequency"
-              name="serviceFrequency"
-              className={`input input-bordered w-full focus:outline-none ${
-                errors.serviceFrequency && "input-secondary"
-              }`}
-              value={state.serviceFrequency || ""}
-              onInput={updateState}
+            <ServiceFrequencySelector
+              defaultSelection={account?.serviceFrequency}
+              errors={errors?.serviceFrequency}
             />
-
-            <label className="label">
-              <span
-                className={`label-text ${
-                  errors.serviceDay && "text-secondary"
-                }`}
-              >
-                Service day {errors.serviceDay && " - required"}
-              </span>
-            </label>
-            <input
-              type="text"
-              placeholder="Service day"
-              name="serviceDay"
-              className={`input input-bordered w-full focus:outline-none ${
-                errors.serviceDay && "input-secondary"
-              }`}
-              value={state.serviceDay || ""}
-              onInput={updateState}
+            <ServiceDaySelector
+              defaultSelection={account?.serviceDay}
+              error={errors?.serviceDay}
             />
-
-            <label className="label">
-              <span
-                className={`label-text ${
-                  errors.serviceType && "text-secondary"
-                }`}
-              >
-                Service type {errors.serviceType && " - required"}
-              </span>
-            </label>
-            <input
-              type="text"
-              placeholder="Service type"
-              name="serviceType"
-              className={`input input-bordered w-full focus:outline-none ${
-                errors.serviceType && "input-secondary"
-              }`}
-              value={state.serviceType || ""}
-              onInput={updateState}
+            <ServiceTypeSelector
+              defaultSelection={account?.serviceType}
+              errors={errors?.serviceType}
             />
           </div>
-
-          {/* {state.accountOwners.map((_, index) => {
-            return (
-              <AccountOwnerForm
-                key={index}
-                index={index}
-                changeHandler={updateState}
-                values={state.accountOwners[index]}
-                errors={
-                  (errors.accountOwners && errors.accountOwners[index]) || {}
-                }
-                removeHandler={index > 0 ? removeAccountOwner : null}
-                shouldFocus={focus && index == accountOwnersCount}
-              />
-            );
-          })} */}
-
           <div className="w-full flex flex-col justify-start gap-3">
-            {/* <button
-              type="button"
-              className="btn btn-accent btn-sm"
-              onClick={() => {
-                setState((prevState) => {
-                  return {
-                    ...prevState,
-                    accountOwners: [
-                      ...prevState.accountOwners,
-                      { ...accountOwnerType },
-                    ],
-                  };
-                });
-                setFocus(true);
-              }}
-            >
-              Add contact
-            </button> */}
             <div className="divider !p-0 !m-0"></div>
             <div className="flex gap-2 justify-evenly">
               <button className="btn btn-primary w-2/4" type="submit">
@@ -230,5 +118,121 @@ export default function EditAccountForm({ customerAccount, errors, onSubmit }) {
         </div>
       </div>
     </Form>
+  );
+}
+
+export function ServiceDaySelector({ defaultSelection, error, changeHandler }) {
+  const [selection, setSelection] = useState(defaultSelection);
+
+  function updateState(e) {
+    setSelection(e.target.value);
+    if (typeof changeHandler === "function") {
+      changeHandler(e);
+    }
+  }
+  return (
+    <>
+      <label className="label">
+        <span className={`label-text ${error && "text-secondary"}`}>
+          Service day {error && " - required"}
+        </span>
+      </label>
+      <select
+        className={`input input-bordered w-full focus:outline-none ${
+          error && "input-secondary"
+        }`}
+        defaultValue={selection || "disabled"}
+        name="serviceDay"
+        onChange={updateState}
+      >
+        <option value="disabled" disabled>
+          Service day
+        </option>
+        <option value="unscheduled">Unscheduled</option>
+        <option value="sunday">Sunday</option>
+        <option value="monday">Monday</option>
+        <option value="tuesday">Tuesday</option>
+        <option value="wednesday">Wednesday</option>
+        <option value="thursday">Thursday</option>
+        <option value="friday">Friday</option>
+        <option value="saturday">Saturday</option>
+      </select>
+    </>
+  );
+}
+
+export function ServiceFrequencySelector({
+  defaultSelection,
+  error,
+  changeHandler,
+}) {
+  const [selection, setSelection] = useState(defaultSelection);
+
+  function updateState(e) {
+    setSelection(e.target.value);
+    if (typeof changeHandler === "function") {
+      changeHandler(e);
+    }
+  }
+  return (
+    <>
+      <label className="label">
+        <span className={`label-text ${error && "text-secondary"}`}>
+          Service frequency {error && " - required"}
+        </span>
+      </label>
+      <select
+        name="serviceFrequency"
+        className={`input input-bordered w-full focus:outline-none ${
+          error && "input-secondary"
+        }`}
+        defaultValue={selection || "disabled"}
+        onChange={updateState}
+      >
+        <option disabled value="disabled">
+          Service frequency
+        </option>
+        <option value="weekly">Weekly</option>
+        <option value="bi-weekly">Bi-weekly</option>
+      </select>
+    </>
+  );
+}
+
+export function ServiceTypeSelector({
+  defaultSelection,
+  error,
+  changeHandler,
+}) {
+  const [selection, setSelection] = useState(defaultSelection);
+
+  function updateState(e) {
+    setSelection(e.target.value);
+    if (typeof changeHandler === "function") {
+      changeHandler(e);
+    }
+  }
+  return (
+    <>
+      <label className="label">
+        <span className={`label-text ${error && "text-secondary"}`}>
+          Service type {error && " - required"}
+        </span>
+      </label>
+      <select
+        name="serviceType"
+        className={`input input-bordered w-full focus:outline-none ${
+          error && "input-secondary"
+        }`}
+        defaultValue={selection || "disabled"}
+        onChange={updateState}
+      >
+        <option disabled value="disabled">
+          Service type
+        </option>
+        <option value="full service">Full service</option>
+        <option value="chemical service">Chemical service</option>
+      </select>
+    </>
   );
 }

@@ -67,7 +67,7 @@ export default function EditAccount() {
     const { customerAccount } = queryData;
     return (
       <EditAccountForm
-        customerAccount={customerAccount}
+        account={customerAccount}
         errors={formErrors}
         onSubmit={({ formData }) => {
           updateCustomer(formData, sendMutation);

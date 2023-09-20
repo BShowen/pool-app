@@ -1,6 +1,12 @@
 import { Form, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
+import {
+  ServiceDaySelector,
+  ServiceFrequencySelector,
+  ServiceTypeSelector,
+} from "./EditAccountForm";
+
 export function NewAccountForm({
   errors,
   submitHandler,
@@ -93,68 +99,20 @@ export function NewAccountForm({
               value={values.account.price}
               onInput={(e) => setAccount(e)}
             />
-
-            <label className="label">
-              <span
-                className={`label-text ${
-                  errors.customerAccount?.serviceFrequency && "text-secondary"
-                }`}
-              >
-                Service frequency{" "}
-                {errors.customerAccount?.serviceFrequency && " - required"}
-              </span>
-            </label>
-            <input
-              type="text"
-              placeholder="Service frequency"
-              name="serviceFrequency"
-              className={`input input-bordered w-full focus:outline-none ${
-                errors.customerAccount?.serviceFrequency && "input-secondary"
-              }`}
-              value={values.account.serviceFrequency}
-              onInput={(e) => setAccount(e)}
+            <ServiceFrequencySelector
+              defaultSelection={values.account.serviceFrequency}
+              changeHandler={setAccount}
+              error={errors.customerAccount?.serviceFrequency}
             />
-
-            <label className="label">
-              <span
-                className={`label-text ${
-                  errors.customerAccount?.serviceDay && "text-secondary"
-                }`}
-              >
-                Service day{" "}
-                {errors.customerAccount?.serviceDay && " - required"}
-              </span>
-            </label>
-            <input
-              type="text"
-              placeholder="Service day"
-              name="serviceDay"
-              className={`input input-bordered w-full focus:outline-none ${
-                errors.customerAccount?.serviceDay && "input-secondary"
-              }`}
-              value={values.account.serviceDay}
-              onInput={(e) => setAccount(e)}
+            <ServiceDaySelector
+              defaultSelection={values.account.serviceDay}
+              changeHandler={setAccount}
+              error={errors.customerAccount?.serviceDay}
             />
-
-            <label className="label">
-              <span
-                className={`label-text ${
-                  errors.customerAccount?.serviceType && "text-secondary"
-                }`}
-              >
-                Service type{" "}
-                {errors.customerAccount?.serviceType && " - required"}
-              </span>
-            </label>
-            <input
-              type="text"
-              placeholder="Service type"
-              name="serviceType"
-              className={`input input-bordered w-full focus:outline-none ${
-                errors.customerAccount?.serviceType && "input-secondary"
-              }`}
-              value={values.account.serviceType}
-              onInput={(e) => setAccount(e)}
+            <ServiceTypeSelector
+              defaultSelection={values.account.serviceType}
+              changeHandler={setAccount}
+              error={errors.customerAccount?.serviceType}
             />
           </div>
 
