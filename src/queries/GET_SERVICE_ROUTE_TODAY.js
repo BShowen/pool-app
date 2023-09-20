@@ -25,38 +25,7 @@ export const GET_SERVICE_ROUTE_TODAY = gql`
           id
         }
         latestChemicalLog {
-          id
-          date
-          notes
-          chlorine {
-            test
-            add {
-              unit
-              quantity
-            }
-          }
-          pH {
-            test
-            add {
-              unit
-              quantity
-            }
-          }
           alkalinity {
-            test
-            add {
-              unit
-              quantity
-            }
-          }
-          stabilizer {
-            test
-            add {
-              unit
-              quantity
-            }
-          }
-          salt {
             test
             add {
               unit
@@ -70,7 +39,7 @@ export const GET_SERVICE_ROUTE_TODAY = gql`
               quantity
             }
           }
-          tablets {
+          chlorine {
             test
             add {
               unit
@@ -78,6 +47,104 @@ export const GET_SERVICE_ROUTE_TODAY = gql`
             }
           }
           customerAccountId
+          date
+          id
+          notes
+          pH {
+            test
+            add {
+              unit
+              quantity
+            }
+          }
+          salt {
+            test
+            add {
+              unit
+              quantity
+            }
+          }
+          stabilizer {
+            test
+            add {
+              unit
+              quantity
+            }
+          }
+          tablets {
+            test
+            add {
+              unit
+              quantity
+            }
+          }
+        }
+        latestPoolReport {
+          customerAccountId
+          companyId
+          date
+          chemicalLog {
+            alkalinity {
+              test
+              add {
+                unit
+                quantity
+              }
+            }
+            calcium {
+              test
+              add {
+                unit
+                quantity
+              }
+            }
+            chlorine {
+              test
+              add {
+                unit
+                quantity
+              }
+            }
+            customerAccountId
+            date
+            id
+            notes
+            pH {
+              test
+              add {
+                unit
+                quantity
+              }
+            }
+            salt {
+              test
+              add {
+                unit
+                quantity
+              }
+            }
+            stabilizer {
+              test
+              add {
+                unit
+                quantity
+              }
+            }
+            tablets {
+              test
+              add {
+                unit
+                quantity
+              }
+            }
+          }
+          workLog {
+            workLogItems {
+              name
+              description
+            }
+          }
+          notes
         }
       }
     }

@@ -53,6 +53,7 @@ export default {
     {
       element: <AdminDashboard />,
       index: true,
+      errorElement: <ErrorDisplay />,
     },
     {
       path: routes.customers,

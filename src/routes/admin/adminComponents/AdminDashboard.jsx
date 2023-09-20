@@ -5,14 +5,24 @@ import { Form } from "react-router-dom";
 import {
   CREATE_CHEMICAL_LOG,
   GET_SERVICE_ROUTE_TODAY,
+  GET_SERVICE_LIST,
+  CREATE_POOL_REPORT,
 } from "../../../queries/index.js";
-import { formatAccountName } from "../../../utils/formatters.js";
+import { capitalize, formatAccountName } from "../../../utils/formatters.js";
 import { SpinnerOverlay } from "../../../components/SpinnerOverlay.jsx";
 
 export function AdminDashboard() {
   const { loading, error, data } = useQuery(GET_SERVICE_ROUTE_TODAY, {
     fetchPolicy: "network-only",
   });
+
+  // Get the list of services that can be performed.
+  // These are toggles that populate the pool report form.
+  const {
+    loading: serviceLoading,
+    error: serviceError,
+    data: serviceData,
+  } = useQuery(GET_SERVICE_LIST);
 
   const [serviceRoute, setServiceRoute] = useState(
     data?.serviceRouteToday || {
@@ -54,19 +64,20 @@ export function AdminDashboard() {
                 key={account.id}
                 account={account}
                 index={index}
-                hideAccount={() => {
-                  // When the pool report form is submitted, remove that
-                  // customer from the state so they are removed from the UI.
-                  setServiceRoute((prevState) => {
-                    return {
-                      ...prevState,
-                      customerAccounts: prevState.customerAccounts.filter(
-                        (acc) => acc.id !== account.id
-                      ),
-                      count: prevState.count - 1,
-                    };
-                  });
-                }}
+                serviceList={serviceData?.getAllServices}
+                // hideAccount={() => {
+                //   // When the pool report form is submitted, remove that
+                //   // customer from the state so they are removed from the UI.
+                //   setServiceRoute((prevState) => {
+                //     return {
+                //       ...prevState,
+                //       customerAccounts: prevState.customerAccounts.filter(
+                //         (acc) => acc.id !== account.id
+                //       ),
+                //       count: prevState.count - 1,
+                //     };
+                //   });
+                // }}
               />
             );
           })}
@@ -76,8 +87,12 @@ export function AdminDashboard() {
   );
 }
 
-function CustomerRow({ account, index, hideAccount }) {
+function CustomerRow({ account, index, serviceList }) {
+  const [showChemicalLog, setShowChemicalLog] = useState(false);
   const [showPoolReportForm, setShowPoolReportForm] = useState(false);
+
+  const chemicalLogValues =
+    account?.latestChemicalLog || account?.latestPoolReport?.chemicalLog || {};
 
   function isDateToday(dateInMilliseconds) {
     // Return true if dateInMilliSeconds is todays date, regardless of time.
@@ -99,6 +114,9 @@ function CustomerRow({ account, index, hideAccount }) {
   }
 
   function sanitizeResponse(obj) {
+    // If the obj is false, null, or undefined, return an empty object.
+    if (!obj) return {};
+
     // obj is the raw object received from the backend.
     // Create and return a new copy of the obj with "__typename" removed,
     // "customerAccountId" removed, "id" removed, "date" removed, and null
@@ -136,8 +154,24 @@ function CustomerRow({ account, index, hideAccount }) {
             // expanded content, then do not collapse the <tr>.
             // In other words, only expand/collapse when the <tr> element itself
             // is clicked.
-            if (!e.target.closest(".expanded-content"))
-              setShowPoolReportForm((prevState) => !prevState);
+
+            // If the user is clicking on the chemicalLog - Don't collapse the <tr>
+            // If the poolReportForm is expanded - Don't collapse the <tr>
+            if (
+              !!e.target.closest(".expanded-chemical-log") ||
+              showPoolReportForm
+            ) {
+              return;
+            } else {
+              setShowChemicalLog((prevState) => !prevState);
+            }
+
+            // if (
+            //   !e.target.closest(".expanded-chemical-log") &&
+            //   !showPoolReportForm
+            // ) {
+            //   setShowChemicalLog((prevState) => !prevState);
+            // }
           }}
         >
           <div className="w-full flex flex-row justify-end items-center flex-wrap gap-2">
@@ -152,45 +186,64 @@ function CustomerRow({ account, index, hideAccount }) {
               </div>
             </div>
             {/* 
-              showPoolReportForm --> So the "Send pool report" button 
-              disappears when the pool report form is opened for editing 
+              If the latest chemical log has todays date AND the chemicalLog and poolReport are NOT showing. 
+                Show the "Send pool report button" 
+              else 
+                Show the reminder icons
             */}
-            {isDateToday(account.latestChemicalLog?.date) &&
-              !showPoolReportForm && (
-                <div className="w-full md:w-auto order-last md:order-none">
-                  <button
-                    className="btn btn-accent btn-xs w-full"
-                    onClick={(e) => {
-                      e.stopPropagation(); //Prevent the row from expanding.
-                      e.preventDefault(); //Prevent any default behavior.
-                    }}
-                  >
-                    Send pool report
-                  </button>
+            {isDateToday(account?.latestChemicalLog?.date) &&
+            !showChemicalLog &&
+            !showPoolReportForm ? (
+              <div className="w-full md:w-auto order-last md:order-none">
+                <button
+                  className="btn btn-accent btn-xs w-full"
+                  onClick={(e) => {
+                    e.stopPropagation(); //Prevent the row from expanding.
+                    e.preventDefault(); //Prevent any default behavior.
+                    setShowPoolReportForm(true);
+                  }}
+                >
+                  Send pool report
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-row justify-end gap-2">
+                <div className="badge badge-secondary text-xs font-semibold">
+                  Filter
                 </div>
-              )}
-            {!isDateToday(account.latestChemicalLog?.date) &&
-              !showPoolReportForm && (
-                <div className="flex flex-row justify-end gap-2">
-                  <div className="badge badge-secondary text-xs font-semibold">
-                    Filter
-                  </div>
-                  <div className="badge badge-secondary text-xs font-semibold">
-                    Salt Cell
-                  </div>
+                <div className="badge badge-secondary text-xs font-semibold">
+                  Salt Cell
                 </div>
-              )}
+              </div>
+            )}
           </div>
+          {showChemicalLog && (
+            <ChemicalLog
+              cancelHandler={(e) => {
+                if (e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+                setShowChemicalLog(false);
+              }}
+              customerAccountId={account.id}
+              values={sanitizeResponse(chemicalLogValues)}
+            />
+          )}
           {showPoolReportForm && (
             <PoolReportForm
-              cancelHandler={() => setShowPoolReportForm(false)}
-              customerAccountId={account.id}
-              hideAccount={hideAccount}
-              values={
-                account.latestChemicalLog
-                  ? sanitizeResponse(account.latestChemicalLog)
-                  : null
+              cancelHandler={(e) => {
+                if (e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+                setShowPoolReportForm(false);
+              }}
+              serviceList={serviceList}
+              latestValues={
+                account?.latestPoolReport?.workLog?.workLogItems || []
               }
+              account={account}
             />
           )}
         </td>
@@ -199,12 +252,7 @@ function CustomerRow({ account, index, hideAccount }) {
   );
 }
 
-function PoolReportForm({
-  cancelHandler,
-  customerAccountId,
-  hideAccount,
-  values,
-}) {
+function ChemicalLog({ cancelHandler, customerAccountId, values }) {
   const [createChemicalLog, { loading, error, data }] = useMutation(
     CREATE_CHEMICAL_LOG,
     { refetchQueries: [{ query: GET_SERVICE_ROUTE_TODAY }] }
@@ -317,7 +365,7 @@ function PoolReportForm({
   }
 
   return (
-    <div className="w-full px-0 mt-2 expanded-content flex flex-row justify-center">
+    <div className="w-full px-0 mt-2 expanded-chemical-log flex flex-row justify-center">
       <Form
         className="w-full lg:w-2/4 flex flex-col bg-slate-100 rounded-md pb-4 relative"
         onSubmit={async (e) => {
@@ -538,4 +586,126 @@ function validateInput({ value }) {
 
   // True if hasDoubleDecimal is false and isFloat is true.
   return !hasDoubleDecimal && isNumberOrDecimal;
+}
+
+function PoolReportForm({ cancelHandler, serviceList, latestValues, account }) {
+  // formValues is an object where each key is a service name and the value is a
+  // boolean indicating whether or not that service was performed.
+
+  // serviceList is an array of ALL services that this company offers.
+  // latestValues is an array of services performed during the last visit. These
+  // are the values from the previous poolReport.
+
+  // I combined both of these lists into a single object where the key is the
+  // serviceName and the value is a boolean. Any key/value pairs from the
+  // latestValues will be set to true. All other key/value pairs will be set to
+  // false;
+  const [formValues, setFormValues] = useState({
+    ...serviceList.reduce((acc, curr) => {
+      return { ...acc, [curr.name]: false };
+    }, {}),
+    ...latestValues.reduce((acc, curr) => {
+      return { ...acc, [curr.name]: true };
+    }, {}),
+  });
+
+  const [createPoolReport, { loading, error, data }] = useMutation(
+    CREATE_POOL_REPORT,
+    { refetchQueries: [{ query: GET_SERVICE_ROUTE_TODAY }] }
+  );
+
+  useEffect(() => {
+    // When the pool report is successfully submitted, call the cancelHandler
+    // in order to collapse the pool report form.
+    // if not loading, and not error and there is data
+    if (!loading && !error && data) {
+      cancelHandler();
+    }
+  }, [data]);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (
+    <div className="w-full px-0 mt-2 expanded-pool-report flex flex-row justify-center">
+      <Form
+        className="w-full lg:w-2/4 flex flex-col bg-slate-100 rounded-md pb-4 relative py-4"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          try {
+            const variables = {
+              input: {
+                chemicalLog: account.latestChemicalLog.id,
+                customerAccountId: account.id,
+                workLog: {
+                  workLogItems: [
+                    ...Object.entries(formValues)
+                      .filter((workItem) => workItem[1])
+                      .reduce((acc, curr) => {
+                        return [...acc, { name: curr[0] }];
+                      }, []),
+                  ],
+                },
+              },
+            };
+            await createPoolReport({ variables });
+          } catch (error) {
+            console.log("Error ", { error });
+          }
+        }}
+      >
+        {loading && <SpinnerOverlay />}
+        {serviceList.map((service) => (
+          <PoolReportInputToggle
+            service={service}
+            key={service.id}
+            defaultState={formValues[service.name]}
+            handleChange={(serviceName) => {
+              setFormValues((prevState) => {
+                return {
+                  ...prevState,
+                  [serviceName]: prevState[serviceName]
+                    ? !prevState[serviceName]
+                    : true,
+                };
+              });
+            }}
+          />
+        ))}
+        <div className="w-full flex flex-row gap-3 justify-center pt-4">
+          <button
+            className="btn btn-sm btn-error w-40"
+            type="button"
+            onClick={cancelHandler}
+          >
+            Cancel
+          </button>
+          <button className="btn btn-sm btn-success w-40" type="submit">
+            Save
+          </button>
+        </div>
+      </Form>
+    </div>
+  );
+}
+
+function PoolReportInputToggle({ service, defaultState, handleChange }) {
+  return (
+    <div className="form-control px-5 py-1 bg-white m-1 rounded-lg">
+      <label className="cursor-pointer label">
+        <span className="label-text font-medium">
+          {capitalize(service.name)}
+        </span>
+        <input
+          type="checkbox"
+          className="toggle toggle-primary toggle-md"
+          checked={defaultState}
+          onChange={() => {
+            handleChange(service.name);
+          }}
+        />
+      </label>
+    </div>
+  );
 }
