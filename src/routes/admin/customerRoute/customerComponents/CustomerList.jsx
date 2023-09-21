@@ -9,6 +9,7 @@ import useSorter from "../../../../hooks/useSorter";
 import {
   GET_CUSTOMER_TECHNICIAN_LIST,
   UPDATE_ACCOUNT_TECHNICIAN,
+  UPDATE_CUSTOMER_ACCOUNT_SERVICE_DAY,
 } from "../../../../queries/index";
 
 export default function CustomerList() {
@@ -64,6 +65,7 @@ export default function CustomerList() {
                     Customer
                   </span>
                 </th>
+                <th>Service day</th>
                 <th>Technician</th>
               </tr>
             </thead>
@@ -83,6 +85,9 @@ export default function CustomerList() {
                     }}
                   >
                     <td>{formatAccountName(customer.accountName)}</td>
+                    <td className="p-0 m-0 h-full">
+                      <ServiceDaySelector customerAccount={customer} />
+                    </td>
                     <td className="p-0 m-0 h-full">
                       <TechnicianSelector
                         customerAccount={customer}
@@ -290,22 +295,82 @@ function TechnicianSelector({ customerAccount, technicianId, technicianList }) {
         <form method="post">
           <input hidden readOnly name="id" value={customerAccount.id} />
           <select
-            className="select focus:outline-none focus:bg-transparent bg-transparent w-min hover:cursor-pointer px-4"
+            className="select focus:outline-none focus:bg-transparent bg-transparent w-min hover:cursor-pointer px-7"
             readOnly
             value={technicianId || 0}
             onChange={handleChange}
             name="technician"
           >
             <option disabled>Technicians</option>
+            <option value="0">Unassigned</option>
             {technicianList.map((tech) => (
               <option key={tech.id} value={tech.id}>
                 {capitalize(tech.firstName)} {capitalize(tech.lastName[0])}.
               </option>
             ))}
-            <option value="0">Unassigned</option>
           </select>
         </form>
       </div>
     </>
+  );
+}
+
+function ServiceDaySelector({ customerAccount, defaultSelection }) {
+  const [updateCustomerAccountServiceDay, { loading, error, data }] =
+    useMutation(UPDATE_CUSTOMER_ACCOUNT_SERVICE_DAY, {
+      refetchQueries: [{ query: GET_CUSTOMER_TECHNICIAN_LIST }],
+    });
+
+  async function handleChange(e) {
+    e.preventDefault();
+    const variables = {
+      input: Object.fromEntries(new FormData(e.target.parentElement)),
+    };
+
+    try {
+      await updateCustomerAccountServiceDay({
+        variables,
+        optimisticResponse: {
+          updateCustomerAccount: {
+            ...customerAccount,
+            serviceDay: variables.input.serviceDay,
+            __typename: "CustomerAccount",
+          },
+        },
+      });
+    } catch (error) {
+      console.log({ error });
+      // setErrorAlert(true);
+    }
+  }
+  return (
+    <div
+      className="h-full flex flex-col justify-center"
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
+      <form method="post">
+        <input hidden readOnly name="id" value={customerAccount.id} />
+        <select
+          className="select focus:outline-none focus:bg-transparent bg-transparent w-min hover:cursor-pointer px-6"
+          readOnly
+          // value={selection}
+          value={customerAccount.serviceDay || "unassigned"}
+          onChange={handleChange}
+          name="serviceDay"
+        >
+          <option disabled>Service days</option>
+          <option value="unassigned">Unassigned</option>
+          <option value="sunday">Sunday</option>
+          <option value="monday">Monday</option>
+          <option value="tuesday">Tuesday</option>
+          <option value="wednesday">Wednesday</option>
+          <option value="thursday">Thursday</option>
+          <option value="friday">Friday</option>
+          <option value="saturday">Saturday</option>
+        </select>
+      </form>
+    </div>
   );
 }
