@@ -113,37 +113,6 @@ function CustomerRow({ account, index, serviceList }) {
     );
   }
 
-  function sanitizeResponse(obj) {
-    // If the obj is false, null, or undefined, return an empty object.
-    if (!obj) return {};
-
-    // obj is the raw object received from the backend.
-    // Create and return a new copy of the obj with "__typename" removed,
-    // "customerAccountId" removed, "id" removed, "date" removed, and null
-    // values replaced by empty strings
-
-    // Create a new object to hold the filtered data
-    const filteredObject = {};
-
-    // Loop through the keys in the original object
-    for (const [key, value] of Object.entries(obj)) {
-      if (value !== null && typeof value === "object") {
-        filteredObject[key] = sanitizeResponse(value);
-      } else if (
-        key !== "__typename" &&
-        key !== "id" &&
-        key !== "customerAccountId" &&
-        key !== "date"
-      ) {
-        // Copy the key and its value to the filtered object
-        filteredObject[key] = obj[key]?.toString() || "";
-      }
-    }
-
-    // Return the filtered object
-    return filteredObject;
-  }
-
   return (
     <>
       <tr key={account.id} className="hover:cursor-pointer flex flex-col">
@@ -227,7 +196,7 @@ function CustomerRow({ account, index, serviceList }) {
                 setShowChemicalLog(false);
               }}
               customerAccountId={account.id}
-              values={sanitizeResponse(chemicalLogValues)}
+              prevValues={chemicalLogValues}
             />
           )}
           {showPoolReportForm && (
@@ -252,24 +221,13 @@ function CustomerRow({ account, index, serviceList }) {
   );
 }
 
-function ChemicalLog({ cancelHandler, customerAccountId, values }) {
+function ChemicalLog({ cancelHandler, customerAccountId, prevValues }) {
   const [createChemicalLog, { loading, error, data }] = useMutation(
     CREATE_CHEMICAL_LOG,
     { refetchQueries: [{ query: GET_SERVICE_ROUTE_TODAY }] }
   );
 
-  const [formValues, setFormValues] = useState(
-    values || {
-      chlorine: { test: "", add: { unit: "lb", quantity: "" } },
-      pH: { test: "", add: { unit: "cups", quantity: "" } },
-      alkalinity: { test: "", add: { unit: "lb", quantity: "" } },
-      stabilizer: { test: "", add: { unit: "lb", quantity: "" } },
-      calcium: { test: "", add: { unit: "lb", quantity: "" } },
-      tablets: { test: "", add: { quantity: "" } },
-      salt: { test: "", add: { unit: "lb", quantity: "" } },
-      notes: "",
-    }
-  );
+  const [formValues, setFormValues] = useState(getFormValues(prevValues));
 
   useEffect(() => {
     // if not loading and not error and there is data, then the pool report form
@@ -278,6 +236,33 @@ function ChemicalLog({ cancelHandler, customerAccountId, values }) {
       cancelHandler(); // Collapse the form on successful submission.
     }
   }, [data]);
+
+  function getFormValues(values) {
+    // This function is used to set the initial state of the chemicalLog form.
+    // It returns the convertNullToString() if that function returns a non-empty
+    // object. If that function returns an empty object then a formatted object
+    // is returned instead.
+    // This is because if an empty object is used as the initial form state then
+    // the ChemicalLog form is initially rendered as an uncontrolled component,
+    // but when the user fills in the form it turns into a controlled component
+    // and react displays an error message in the console.
+    const formValues = convertNullToString(values);
+
+    if (Object.keys(formValues).length === 0) {
+      return {
+        chlorine: { test: "", add: { unit: "lb", quantity: "" } },
+        pH: { test: "", add: { unit: "cups", quantity: "" } },
+        alkalinity: { test: "", add: { unit: "lb", quantity: "" } },
+        stabilizer: { test: "", add: { unit: "lb", quantity: "" } },
+        calcium: { test: "", add: { unit: "lb", quantity: "" } },
+        tablets: { test: "", add: { quantity: "" } },
+        salt: { test: "", add: { unit: "lb", quantity: "" } },
+        notes: "",
+      };
+    } else {
+      return formValues;
+    }
+  }
 
   function updateState({ name, value, action }) {
     switch (action) {
@@ -320,6 +305,36 @@ function ChemicalLog({ cancelHandler, customerAccountId, values }) {
         });
         break;
     }
+  }
+
+  function convertNullToString(obj) {
+    // If the obj is false, null, or undefined, return an empty object.
+    if (!obj) return {};
+
+    // obj is the object received from the backend. Create and return a copy of
+    // the obj with "__typename", "customerAccountId", "id", "date" removed, and
+    // null values replaced by empty strings
+
+    // Create a new object to hold the filtered data
+    const filteredObject = {};
+
+    // Loop through the keys in the original object
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== null && typeof value === "object") {
+        filteredObject[key] = convertNullToString(value);
+      } else if (
+        key !== "__typename" &&
+        key !== "id" &&
+        key !== "customerAccountId" &&
+        key !== "date"
+      ) {
+        // Copy the key and its value to the filtered object
+        filteredObject[key] = obj[key]?.toString() || "";
+      }
+    }
+
+    // Return the filtered object
+    return filteredObject;
   }
 
   function convertStringToNull(obj) {
