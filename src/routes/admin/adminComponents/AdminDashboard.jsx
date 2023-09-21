@@ -136,7 +136,7 @@ function CustomerRow({ account, index, serviceList }) {
         key !== "date"
       ) {
         // Copy the key and its value to the filtered object
-        filteredObject[key] = obj[key] || "";
+        filteredObject[key] = obj[key]?.toString() || "";
       }
     }
 
@@ -287,7 +287,7 @@ function ChemicalLog({ cancelHandler, customerAccountId, values }) {
             ...prevState,
             [name]: {
               ...prevState[name],
-              add: { ...prevState[name].add, quantity: value },
+              add: { ...(prevState[name]?.add || {}), quantity: value },
             },
           };
         });
@@ -298,7 +298,7 @@ function ChemicalLog({ cancelHandler, customerAccountId, values }) {
             ...prevState,
             [name]: {
               ...prevState[name],
-              add: { ...prevState[name].add, unit: value },
+              add: { ...(prevState[name]?.add || {}), unit: value },
             },
           };
         });
@@ -452,8 +452,6 @@ function ChemicalLog({ cancelHandler, customerAccountId, values }) {
 }
 
 function ChemicalInput({ text, formValues, inputHandler }) {
-  // const text = text.toLowerCase();
-
   return (
     <div className="flex flex-row justify-center items-center py-1">
       <div className="flex flex-row justify-end w-3/12 lg:w-1/3 pe-4">
@@ -470,7 +468,7 @@ function ChemicalInput({ text, formValues, inputHandler }) {
           // keystroke from the user and validate the input myself.
           type="text"
           inputMode="decimal"
-          placeholder={formValues[text]?.test}
+          value={formValues[text]?.test}
           onInput={(e) => {
             const value = e.target.value.trim();
             const name = e.target.name;
@@ -494,7 +492,7 @@ function ChemicalInput({ text, formValues, inputHandler }) {
           type="text"
           inputMode="decimal"
           step="0.01"
-          placeholder={formValues[text]?.add?.quantity}
+          value={formValues[text]?.add?.quantity}
           onInput={(e) => {
             const value = e.target.value.trim();
             const name = e.target.name;
