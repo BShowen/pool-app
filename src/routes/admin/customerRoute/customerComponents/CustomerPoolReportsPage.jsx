@@ -1,5 +1,6 @@
 import { useQuery } from "@apollo/client";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useOutletContext } from "react-router-dom";
+import { BsArrowsAngleExpand, BsArrowsAngleContract } from "react-icons/bs";
 
 import { SpinnerOverlay } from "../../../../components/SpinnerOverlay";
 import { GET_POOL_REPORTS_BY_CUSTOMER } from "../../../../queries/index.js";
@@ -10,6 +11,7 @@ export function loader({ params }) {
 }
 export function CustomerPoolReportsPage() {
   const customerAccountId = useLoaderData();
+  const { toggleFullScreen, isFullScreen } = useOutletContext();
   const { loading, error, data } = useQuery(GET_POOL_REPORTS_BY_CUSTOMER, {
     variables: { customerAccountId },
   });
@@ -52,40 +54,47 @@ export function CustomerPoolReportsPage() {
   );
 
   return (
-    <div className="w-full pt-5">
-      <div className="p-2">
-        <span className="badge badge-primary p-3">
-          {poolReports.length} reports
-        </span>
-      </div>
-      <table className="table w-full">
-        <thead>
-          <tr>
-            <th>Date</th>
-            {tableHeaders.map((headerValue, i) => {
-              return <TableHeader value={headerValue} key={i} />;
+    <>
+      <div className="w-full p-5">
+        <table className="table w-full">
+          <thead>
+            <tr>
+              <th>Date</th>
+              {tableHeaders.map((headerValue, i) => {
+                return <TableHeader value={headerValue} key={i} />;
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {poolReports.map((report) => {
+              return (
+                <tr key={report.id} className="hover:cursor-pointer hover">
+                  <td>{formatDate(report.date)}</td>
+                  {tableHeaders.map((headerValue, i) => {
+                    return (
+                      <TableData
+                        key={i}
+                        value={report.chemicalLog?.[headerValue]?.test}
+                      />
+                    );
+                  })}
+                </tr>
+              );
             })}
-          </tr>
-        </thead>
-        <tbody>
-          {poolReports.map((report) => {
-            return (
-              <tr key={report.id} className="hover:cursor-pointer hover">
-                <td>{formatDate(report.date)}</td>
-                {tableHeaders.map((headerValue, i) => {
-                  return (
-                    <TableData
-                      key={i}
-                      value={report.chemicalLog?.[headerValue]?.test}
-                    />
-                  );
-                })}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+          </tbody>
+        </table>
+      </div>
+      <div
+        className="hidden sm:landscape:hidden portrait:hidden md:block lg:landscape:block fixed bottom-10 right-10 z-50 p-3 rounded-full border-2 hover:cursor-pointer hover:bg-gray-100"
+        onClick={toggleFullScreen}
+      >
+        {isFullScreen ? (
+          <BsArrowsAngleContract className="text-3xl" />
+        ) : (
+          <BsArrowsAngleExpand className="text-3xl" />
+        )}
+      </div>
+    </>
   );
 }
 
