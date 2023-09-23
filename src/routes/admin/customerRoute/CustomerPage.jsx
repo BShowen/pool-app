@@ -23,11 +23,11 @@ export default function CustomerPage() {
   } else {
     const { customerAccount } = data;
     return (
-      <div className="w-full flex flex-col flex-wrap justify-start">
+      <div className="w-full flex flex-col justify-start">
         {/* Page container */}
 
         {/* Page header */}
-        <div className="w-full flex flex-col gap-5 justify-center items-center sticky top-0 bg-white z-40 p-5">
+        <div className="w-full flex flex-col gap-5 justify-center items-center sticky top-0 z-40 p-5 sm:landscape:hidden sm:portrait:block">
           <div>
             <h1 className="text-3xl mx-auto">
               {formatAccountName(customerAccount.accountName)}

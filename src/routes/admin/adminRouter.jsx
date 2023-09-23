@@ -14,6 +14,10 @@ import EditAccountOwnerPage from "./customerRoute/EditAccountOwnerPage";
 import CustomerDashboard from "./customerRoute/customerComponents/CustomerDashboard";
 import CustomerList from "./customerRoute/customerComponents/CustomerList";
 import { NewAccountOwnerPage } from "./customerRoute/NewAccountOwnerPage";
+import {
+  CustomerPoolReportsPage,
+  loader as customerPoolReportsLoader,
+} from "./customerRoute/customerComponents/CustomerPoolReportsPage";
 
 /* -------------------- Technician routes -------------------- */
 import TechniciansPage from "./technicianRoute/TechniciansPage";
@@ -95,7 +99,8 @@ export default {
             },
             {
               path: routes.customerPoolReports,
-              element: <p>Pool reports</p>,
+              element: <CustomerPoolReportsPage />,
+              loader: customerPoolReportsLoader,
             },
             {
               path: routes.customerInvoices,

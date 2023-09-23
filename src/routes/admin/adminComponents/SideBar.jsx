@@ -4,14 +4,14 @@ import routes from "../../routeDefinitions";
 
 export default function Sidebar({ isSidebarOpen, toggleSidebar }) {
   return (
-    <div className="drawer lg:drawer-open">
+    <div className="drawer lg:drawer-open h-full">
       <input
         type="checkbox"
         className="drawer-toggle"
         checked={isSidebarOpen}
         readOnly
       />
-      <div className="drawer-content flex flex-col justify-start items-center mb-20 lg:mb-0 max-w-full min-w-full w-full">
+      <div className="drawer-content flex flex-col justify-start items-center mb-20 lg:mb-0 max-w-full min-w-full w-full h-full">
         <Outlet />
       </div>
       <div className="drawer-side z-40">

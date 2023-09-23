@@ -30,3 +30,14 @@ export function capitalize(string) {
     return "";
   }
 }
+
+export function formatDate(dateInMilliseconds) {
+  const options = {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    weekday: "long",
+  };
+  const dateFormatter = new Intl.DateTimeFormat("en-US", options);
+  return dateFormatter.format(dateInMilliseconds);
+}

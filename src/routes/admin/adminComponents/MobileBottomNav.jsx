@@ -3,7 +3,7 @@ import { FaRoute, FaHome } from "react-icons/fa";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 export default function MobileBottomNav({ isSidebarOpen, toggleSidebar }) {
   return (
-    <div className="btm-nav btm-nav-lg lg:hidden bg-slate-100 z-50 h-12">
+    <div className="btm-nav btm-nav-lg lg:hidden bg-slate-100 z-50 h-12 sm:landscape:hidden">
       <Link as="button" to="/">
         <FaHome className="text-xl" />
       </Link>
