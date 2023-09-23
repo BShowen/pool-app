@@ -25,10 +25,9 @@ export default function CustomerPage() {
     return (
       <div className="w-full flex flex-col justify-start">
         {/* Page container */}
-
         {/* Page header */}
-        <div className="w-full flex flex-col gap-5 justify-center items-center sticky top-0 z-40 p-5 sm:landscape:hidden sm:portrait:block">
-          <div>
+        <div className="w-full flex flex-row flex-wrap gap-2 justify-center sticky top-0 z-40 py-2 bg-white landscape:hidden lg:landscape:block">
+          <div className="w-full flex flex-row justify-center">
             <h1 className="text-3xl mx-auto">
               {formatAccountName(customerAccount.accountName)}
             </h1>
