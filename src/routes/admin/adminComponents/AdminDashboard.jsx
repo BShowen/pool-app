@@ -643,14 +643,19 @@ function PoolReportForm({ cancelHandler, serviceList, latestValues, account }) {
   return (
     <div className="w-full px-0 mt-2 expanded-pool-report flex flex-row justify-center">
       <Form
-        className="w-full lg:w-2/4 flex flex-col bg-slate-100 rounded-md pb-4 relative py-4"
+        method="post"
+        encType="multipart/form-data"
+        className="w-full lg:w-2/4 flex flex-col bg-slate-100 rounded-md relative pt-1 pb-4 px-1"
         onSubmit={async (e) => {
           e.preventDefault();
           try {
+            const photo = formValues.photo;
+            delete formValues.photo;
             const variables = {
               input: {
                 chemicalLog: account.latestChemicalLog.id,
                 customerAccountId: account.id,
+                photo: photo,
                 workLog: {
                   workLogItems: [
                     ...Object.entries(formValues)
@@ -669,23 +674,49 @@ function PoolReportForm({ cancelHandler, serviceList, latestValues, account }) {
         }}
       >
         {loading && <SpinnerOverlay />}
-        {serviceList.map((service) => (
-          <PoolReportInputToggle
-            service={service}
-            key={service.id}
-            defaultState={formValues[service.name]}
-            handleChange={(serviceName) => {
-              setFormValues((prevState) => {
-                return {
-                  ...prevState,
-                  [serviceName]: prevState[serviceName]
-                    ? !prevState[serviceName]
-                    : true,
-                };
-              });
+        <div className="flex flex-col gap-2 justify-start items-stretch">
+          {serviceList.map((service) => (
+            <PoolReportInputToggle
+              service={service}
+              key={service.id}
+              defaultState={formValues[service.name]}
+              handleChange={(serviceName) => {
+                setFormValues((prevState) => {
+                  return {
+                    ...prevState,
+                    [serviceName]: prevState[serviceName]
+                      ? !prevState[serviceName]
+                      : true,
+                  };
+                });
+              }}
+            />
+          ))}
+
+          <input
+            type="file"
+            className="file-input file-input-sm file-input-bordered file-input-info"
+            name="photo"
+            accept="image/*"
+            // multiple
+            onChange={(e) => {
+              const file = e.target.files[0];
+              const valid = file.type.startsWith("image/");
+              if (valid) {
+                setFormValues((prevValues) => {
+                  return { ...prevValues, photo: e.target.files[0] };
+                });
+              } else {
+                // No need to show an error if the uploaded filetype is incorrect
+                // because this means the form has been intentionally compromised.
+                // Normal users will only be able to select images which will
+                // never trigger an invalid filetype error
+                e.target.value = "";
+              }
             }}
           />
-        ))}
+        </div>
+
         <div className="w-full flex flex-row gap-3 justify-center pt-4">
           <button
             className="btn btn-sm btn-error w-40"
@@ -705,7 +736,7 @@ function PoolReportForm({ cancelHandler, serviceList, latestValues, account }) {
 
 function PoolReportInputToggle({ service, defaultState, handleChange }) {
   return (
-    <div className="form-control px-5 py-1 bg-white m-1 rounded-lg">
+    <div className="form-control bg-white rounded-lg">
       <label className="cursor-pointer label">
         <span className="label-text font-medium">
           {capitalize(service.name)}

@@ -1,15 +1,12 @@
 // GraphQL packages.
-import {
-  ApolloClient,
-  createHttpLink,
-  InMemoryCache,
-  from,
-} from "@apollo/client";
+import { ApolloClient, InMemoryCache, from } from "@apollo/client";
+import { createUploadLink } from "apollo-upload-client";
 import { setContext } from "@apollo/client/link/context";
 import { removeTypenameLink } from "./utils/removeTypenameLink";
 
-const httpLink = createHttpLink({
+const uploadLink = createUploadLink({
   uri: import.meta.env.VITE_GRAPHQL_SERVER,
+  headers: { "Apollo-Require-Preflight": "true" },
 });
 
 const authLink = setContext((_, { headers }) => {
@@ -24,7 +21,8 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 export default new ApolloClient({
-  link: from([removeTypenameLink, authLink.concat(httpLink)]),
+  link: from([removeTypenameLink, authLink, uploadLink]),
+  // link: from([removeTypenameLink, authLink.concat(uploadLink)]),
   cache: new InMemoryCache({
     typePolicies: {
       Query: {

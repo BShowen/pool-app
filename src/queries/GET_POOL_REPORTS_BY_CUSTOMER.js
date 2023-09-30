@@ -3,6 +3,7 @@ import { gql } from "@apollo/client";
 export const GET_POOL_REPORTS_BY_CUSTOMER = gql`
   query GetPoolReportsByCustomer($customerAccountId: ID!) {
     getPoolReportsByCustomer(customerAccountId: $customerAccountId) {
+      photo
       id
       date
       notes

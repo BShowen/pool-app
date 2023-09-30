@@ -16,13 +16,16 @@ function omitTypename(obj) {
   if (Array.isArray(obj)) {
     return obj.map(omitTypename);
   } else if (obj !== null && typeof obj === "object") {
-    const newObj = {};
-    Object.keys(obj).forEach((key) => {
-      if (key !== "__typename") {
-        newObj[key] = omitTypename(obj[key]);
-      }
-    });
-    return newObj;
+    // Check if the object has a "__typename" key and if it's a GraphQL data object
+    if ("__typename" in obj && obj.__typename) {
+      const newObj = {};
+      Object.keys(obj).forEach((key) => {
+        if (key !== "__typename") {
+          newObj[key] = omitTypename(obj[key]);
+        }
+      });
+      return newObj;
+    }
   }
   return obj;
 }
