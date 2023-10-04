@@ -4,7 +4,7 @@ import { BsArrowsAngleExpand, BsArrowsAngleContract } from "react-icons/bs";
 import { useState, useEffect } from "react";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 
-import { SpinnerOverlay } from "../../../../components/SpinnerOverlay";
+import { SpinnerOverlay } from "../../../../components/SpinnerOverlay.jsx";
 import {
   GET_POOL_REPORTS_BY_CUSTOMER,
   GET_POOL_REPORT_PHOTO_URL,
@@ -187,7 +187,9 @@ function PoolReportModal({
 
     return (
       <tr key={i}>
-        <th className="w-1/3 text-center">{capitalize(chemicalName)}</th>
+        <th className="w-1/3 text-center text-xs font-semi-bold text-slate-400">
+          {capitalize(chemicalName)}
+        </th>
         <td className="w-1/3 text-center">{chemicalTest}</td>
         <td className="w-1/3 text-center">
           {`${chemicalAddValue} ${chemicalAddUnit}`}
@@ -199,11 +201,11 @@ function PoolReportModal({
   return (
     <dialog
       id="poolReportModal"
-      className="modal modal-open modal-bottom sm:modal-middle"
+      className="modal modal-open modal-bottom sm:modal-middle backdrop-blur-sm"
       onClick={closeHandler}
     >
       <div
-        className="modal-box h-5/6 p-1 flex flex-col items-stretch md:max-w-full md:h-3/4 md:w-4/5 md:max-h-full resize lg:w-4/5 xl:w-4/5 2xl:w-3/5"
+        className="modal-box h-5/6 p-1 pb-10 md:pb-1 flex flex-col items-stretch md:max-w-full md:h-3/4 md:max-h-full lg:h-3/5 md:w-11/12 lg:w-10/12 xl:w-4/5 2xl:w-6/12 bg-slate-100"
         onClick={(e) => {
           // Prevent modal from closing when clicking inside the modal.
           e.preventDefault();
@@ -218,31 +220,89 @@ function PoolReportModal({
             className="btn btn-sm btn-circle btn-ghost flex-none absolute right-4 text-xl"
             onClick={closeHandler}
           >
-            <AiOutlineCloseCircle className="text-3xl" />
+            <AiOutlineCloseCircle className="text-3xl text-error" />
           </button>
         </div>
-        <div>
-          <table className="table">
-            <thead>
-              <tr>
-                <th className="w-1/3 text-center">Chemical</th>
-                <th className="w-1/3 text-center">Test</th>
-                <th className="w-1/3 text-center">Add</th>
-              </tr>
-            </thead>
-            <tbody>{tableBody}</tbody>
-          </table>
-          <hr className="m-4" />
-          <div className="grid grid-cols-2 md:grid-cols-4 py-5 pb-5 gap-2">
-            <PoolReportPhoto
-              poolReportId={poolReport.id}
-              customerAccountId={poolReport.customerAccountId}
-              showFullImageHandler={showFullImageHandler}
-            />
+        <div className="w-full max-w-6xl mx-auto">
+          <div className="flex flex-col gap-3 lg:flex-row justify-between pb-5">
+            <ModalCard>
+              <div className="text-start p-2 pt-0">
+                <h2 className="text-lg font-bold">Chemical log</h2>
+              </div>
+              <div className="border-2 rounded-xl md:rounded-3xl w-full border-slate-100">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th className="w-1/3 text-center">Chemical</th>
+                      <th className="w-1/3 text-center">Test</th>
+                      <th className="w-1/3 text-center">Add</th>
+                    </tr>
+                  </thead>
+                  <tbody>{tableBody}</tbody>
+                </table>
+              </div>
+            </ModalCard>
+
+            <div className="w-full max-w-xl flex flex-col gap-3 mx-auto">
+              <ModalCard>
+                <PoolReportNotes
+                  noteType="Customer notes"
+                  noteValue={poolReport.customerNotes || "No customer notes."}
+                />
+              </ModalCard>
+              <ModalCard>
+                <PoolReportNotes
+                  noteType="Technician notes"
+                  noteValue={
+                    poolReport.technicianNotes || "No technician notes."
+                  }
+                />
+              </ModalCard>
+            </div>
           </div>
+
+          <PoolReportModalPhotosContainer>
+            <div className="text-start w-full">
+              <h2 className="text-lg font-bold">Photos</h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <PoolReportPhoto
+                poolReportId={poolReport.id}
+                customerAccountId={poolReport.customerAccountId}
+                showFullImageHandler={showFullImageHandler}
+              />
+            </div>
+          </PoolReportModalPhotosContainer>
         </div>
       </div>
     </dialog>
+  );
+}
+
+function ModalCard(props) {
+  return (
+    <div className="w-full max-w-xl bg-white rounded-xl md:rounded-3xl p-3 shadow mx-auto">
+      {props.children}
+    </div>
+  );
+}
+
+function PoolReportModalPhotosContainer(props) {
+  return (
+    <div className="w-full max-w-7xl mx-auto bg-white rounded-xl md:rounded-3xl p-3 shadow">
+      {props.children}
+    </div>
+  );
+}
+
+function PoolReportNotes({ noteType, noteValue }) {
+  return (
+    <div>
+      <h2 className="text-lg font-semibold">{noteType}</h2>
+      <div className="bg-slate-100 rounded-lg md:rounded-xl p-2">
+        <p>{noteValue}</p>
+      </div>
+    </div>
   );
 }
 
