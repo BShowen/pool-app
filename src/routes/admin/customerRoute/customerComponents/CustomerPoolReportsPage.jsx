@@ -9,7 +9,11 @@ import {
   GET_POOL_REPORTS_BY_CUSTOMER,
   GET_POOL_REPORT_PHOTO_URL,
 } from "../../../../queries/index.js";
-import { capitalize, formatDate } from "../../../../utils/formatters.js";
+import {
+  capitalize,
+  capitalizeName,
+  formatDate,
+} from "../../../../utils/formatters.js";
 
 export function loader({ params }) {
   return params.customerId || "";
@@ -80,6 +84,7 @@ export function CustomerPoolReportsPage() {
           <thead>
             <tr>
               <th>Date</th>
+              <th>Technician</th>
               {tableHeaders.map((headerValue, i) => {
                 return <TableHeader value={headerValue} key={i} />;
               })}
@@ -98,6 +103,12 @@ export function CustomerPoolReportsPage() {
                   }}
                 >
                   <td>{formatDate(report.date)}</td>
+                  <td>
+                    {capitalizeName(
+                      report?.technician?.firstName,
+                      report?.technician?.lastName
+                    )}
+                  </td>
                   {tableHeaders.map((headerValue, i) => {
                     return (
                       <TableData

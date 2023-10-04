@@ -18,6 +18,7 @@ export function formatAccountName(accountName) {
 export function capitalizeName(firstName, lastName) {
   return [firstName, lastName]
     .map((name) => {
+      if (!name) return "";
       return name.trim().split("")[0].toUpperCase() + name.trim().slice(1);
     })
     .join(" ");

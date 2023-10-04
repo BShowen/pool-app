@@ -7,6 +7,12 @@ export const GET_POOL_REPORTS_BY_CUSTOMER = gql`
       date
       customerNotes
       technicianNotes
+      technician {
+        id
+        firstName
+        emailAddress
+        lastName
+      }
       workLog {
         workLogItems {
           name
