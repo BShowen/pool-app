@@ -24,7 +24,9 @@ export function capitalizeName(firstName, lastName) {
 }
 
 export function capitalize(string) {
-  if (string) {
+  if (string.toLowerCase() === "ph") {
+    return "pH";
+  } else if (string) {
     return string.trim().split("")[0].toUpperCase() + string.trim().slice(1);
   } else {
     return "";

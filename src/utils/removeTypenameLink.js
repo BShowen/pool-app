@@ -12,7 +12,7 @@ function sanitizeVars(variables) {
   return variables;
 }
 
-function omitTypename(obj) {
+export function omitTypename(obj) {
   if (Array.isArray(obj)) {
     return obj.map(omitTypename);
   } else if (obj !== null && typeof obj === "object") {

@@ -20,7 +20,7 @@ export function SpinnerOverlay() {
         leaveTo="bg-opacity-0"
         className="absolute left-0 top-0 right-0 bottom-0 flex flex-row justify-center items-center"
       >
-        <div className="animate-spin text-7xl lg:text-5xl border-4 border-transparent border-t-primary border-b-primary w-28 h-28 rounded-full"></div>
+        <div className="animate-spin text-7xl lg:text-5xl border-4 border-transparent border-t-primary border-b-primary w-28 h-28 rounded-full z-50"></div>
       </Transition>
     </div>
   );

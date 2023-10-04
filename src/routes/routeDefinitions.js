@@ -1,35 +1,41 @@
+// prettier-ignore
 const cleaningServices = {
   cleaningServices: "/admin/cleaningServices",
 };
 
+// prettier-ignore
 const customerRoutes = {
-  customers: "/admin/customers",
-  newCustomer: "/admin/customers/new",
-  customer: "/admin/customers/:customerId",
-  editAccount: "/admin/customers/:customerId/editAccount",
-  editAccountOwner: "/admin/customers/:customerId/editAccountOwner/:ownerId",
-  newAccountOwner: "/admin/customers/:customerId/newAccountOwner",
+  customers:           "/admin/customers",
+  newCustomer:         "/admin/customers/new",
+  customer:            "/admin/customers/:customerId",
+  editAccount:         "/admin/customers/:customerId/editAccount",
+  editAccountOwner:    "/admin/customers/:customerId/editAccountOwner/:ownerId",
+  newAccountOwner:     "/admin/customers/:customerId/newAccountOwner",
   customerPoolReports: "/admin/customers/:customerId/pool-reports",
-  customerInvoices: "/admin/customers/:customerId/invoices",
+  customerPoolReport:  "/admin/customers/:customerId/pool-report/:poolReportId",
+  customerInvoices:    "/admin/customers/:customerId/invoices",
 };
 
+// prettier-ignore
 const technicianRoutes = {
-  technicians: "/admin/technicians",
-  technician: "/admin/technicians/:technicianId",
-  editTechnician: "/admin/technicians/:technicianId/edit",
-  technicianRoutes: "/admin/technicians/:technicianId/routes",
-  newTechnician: "/admin/technicians/new",
+  technicians:        "/admin/technicians",
+  technician:         "/admin/technicians/:technicianId",
+  editTechnician:     "/admin/technicians/:technicianId/edit",
+  technicianRoutes:   "/admin/technicians/:technicianId/routes",
+  newTechnician:      "/admin/technicians/new",
   registerTechnician: "/technicians/register",
 };
 
+// prettier-ignore
 const serviceDays = {
   serviceDays: "/admin/service-days",
 };
 
+// prettier-ignore
 const rootRoutes = {
   logout: "/logout",
-  login: "/login",
-  root: "/",
+  login:  "/login",
+  root:   "/",
 };
 
 const adminRoutes = {

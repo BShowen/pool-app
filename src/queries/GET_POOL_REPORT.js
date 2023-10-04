@@ -1,20 +1,25 @@
 import { gql } from "@apollo/client";
 
-export const GET_POOL_REPORTS_BY_CUSTOMER = gql`
-  query GetPoolReportsByCustomer($customerAccountId: ID!) {
-    getPoolReportsByCustomer(customerAccountId: $customerAccountId) {
-      id
+export const GET_POOL_REPORT = gql`
+  query GetPoolReport($poolReportId: ID!, $customerAccountId: ID!) {
+    getPoolReport(
+      poolReportId: $poolReportId
+      customerAccountId: $customerAccountId
+    ) {
+      customerAccountId
+      companyId
       date
-      notes
       workLog {
         workLogItems {
           name
           description
         }
       }
-      customerAccountId
-      companyId
+      notes
+      id
+      photo
       chemicalLog {
+        id
         alkalinity {
           test
           add {
@@ -38,7 +43,6 @@ export const GET_POOL_REPORTS_BY_CUSTOMER = gql`
         }
         customerAccountId
         date
-        id
         notes
         pH {
           test
