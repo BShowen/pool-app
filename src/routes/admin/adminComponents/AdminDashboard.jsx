@@ -257,7 +257,7 @@ function ChemicalLog({ cancelHandler, customerAccountId, prevValues }) {
         calcium: { test: "", add: { unit: "lb", quantity: "" } },
         tablets: { test: "", add: { quantity: "" } },
         salt: { test: "", add: { unit: "lb", quantity: "" } },
-        notes: "",
+        // notes: "",
       };
     } else {
       return formValues;
@@ -296,14 +296,14 @@ function ChemicalLog({ cancelHandler, customerAccountId, prevValues }) {
           };
         });
         break;
-      case "notes":
-        setFormValues((prevState) => {
-          return {
-            ...prevState,
-            [name]: value,
-          };
-        });
-        break;
+      // case "notes":
+      //   setFormValues((prevState) => {
+      //     return {
+      //       ...prevState,
+      //       [name]: value,
+      //     };
+      //   });
+      //   break;
     }
   }
 
@@ -446,9 +446,9 @@ function ChemicalLog({ cancelHandler, customerAccountId, prevValues }) {
           formValues={formValues}
           inputHandler={updateState}
         />
-        <div className="flex flex-row w-full justify-center mt-2 px-1">
+        {/* <div className="flex flex-row w-full justify-center mt-2 px-1">
           <TextArea value={formValues.notes} inputHandler={updateState} />
-        </div>
+        </div> */}
         <div className="w-full flex flex-row gap-3 justify-center pt-4">
           <button
             className="btn btn-sm btn-error w-40"

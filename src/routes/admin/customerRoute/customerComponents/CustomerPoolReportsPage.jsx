@@ -239,11 +239,6 @@ function PoolReportModal({
               customerAccountId={poolReport.customerAccountId}
               showFullImageHandler={showFullImageHandler}
             />
-            <PoolReportPhoto
-              poolReportId={poolReport.id}
-              customerAccountId={poolReport.customerAccountId}
-              showFullImageHandler={showFullImageHandler}
-            />
           </div>
         </div>
       </div>
