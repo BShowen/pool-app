@@ -15,9 +15,10 @@ export const GET_POOL_REPORT = gql`
           description
         }
       }
-      notes
+      customerNotes
+      technicianNotes
       id
-      photo
+      # photo
       chemicalLog {
         id
         alkalinity {

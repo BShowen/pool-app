@@ -165,7 +165,7 @@ function CustomerRow({ account, index, serviceList }) {
             !showPoolReportForm ? (
               <div className="w-full md:w-auto order-last md:order-none">
                 <button
-                  className="btn btn-accent btn-xs w-full"
+                  className="btn btn-accent btn-sm w-full"
                   onClick={(e) => {
                     e.stopPropagation(); //Prevent the row from expanding.
                     e.preventDefault(); //Prevent any default behavior.
@@ -209,9 +209,6 @@ function CustomerRow({ account, index, serviceList }) {
                 setShowPoolReportForm(false);
               }}
               serviceList={serviceList}
-              latestValues={
-                account?.latestPoolReport?.workLog?.workLogItems || []
-              }
               account={account}
             />
           )}
@@ -380,7 +377,7 @@ function ChemicalLog({ cancelHandler, customerAccountId, prevValues }) {
   }
 
   return (
-    <div className="w-full px-0 mt-2 expanded-chemical-log flex flex-row justify-center">
+    <div className="w-full max-w-4xl mx-auto px-0 mt-2 expanded-chemical-log flex flex-row justify-center">
       <Form
         className="w-full lg:w-2/4 flex flex-col bg-slate-100 rounded-md pb-4 relative"
         onSubmit={async (e) => {
@@ -546,28 +543,19 @@ function ChemicalInput({ text, formValues, inputHandler }) {
   );
 }
 
-function TextArea({ value, inputHandler }) {
+function TextArea({ value, inputHandler, placeholder }) {
   // A textarea component that clears the value on the first onFocus event only.
   const [firstFocus, setFirstFocus] = useState(true);
   return (
     <textarea
       name="notes"
       className="textarea textarea-bordered w-full"
-      placeholder={value || "Customer notes"}
-      onInput={(e) =>
-        inputHandler({
-          name: e.target.name.toLowerCase(),
-          value: e.target.value,
-          action: "notes",
-        })
-      }
+      placeholder={placeholder || ""}
+      value={value}
+      onInput={inputHandler}
       onFocus={(e) => {
         if (firstFocus) {
-          inputHandler({
-            name: e.target.name,
-            value: "",
-            action: "notes",
-          });
+          inputHandler({ target: { value: "" } });
           setFirstFocus(false);
         }
       }}
@@ -601,25 +589,31 @@ function validateInput({ value }) {
   return !hasDoubleDecimal && isNumberOrDecimal;
 }
 
-function PoolReportForm({ cancelHandler, serviceList, latestValues, account }) {
-  // formValues is an object where each key is a service name and the value is a
-  // boolean indicating whether or not that service was performed.
-
+function PoolReportForm({ cancelHandler, serviceList, account }) {
   // serviceList is an array of ALL services that this company offers.
   // latestValues is an array of services performed during the last visit. These
   // are the values from the previous poolReport.
 
-  // I combined both of these lists into a single object where the key is the
-  // serviceName and the value is a boolean. Any key/value pairs from the
-  // latestValues will be set to true. All other key/value pairs will be set to
-  // false;
+  // I merge serviceList with the previous pool report's serviceList into a
+  // single object where the key is the serviceName and the value is a boolean.
+  // Any key / value pairs from the previous pool report will be set to true.
+  // All other key / value pairs will be set to false.
   const [formValues, setFormValues] = useState({
-    ...serviceList.reduce((acc, curr) => {
-      return { ...acc, [curr.name]: false };
-    }, {}),
-    ...latestValues.reduce((acc, curr) => {
-      return { ...acc, [curr.name]: true };
-    }, {}),
+    technicianNotes: "",
+    customerNotes: "",
+    workLog: {
+      workLogItems: {
+        ...serviceList.reduce((acc, curr) => {
+          return { ...acc, [curr.name]: false };
+        }, {}),
+        ...(account?.latestPoolReport?.workLog?.workLogItems || []).reduce(
+          (acc, curr) => {
+            return { ...acc, [curr.name]: true };
+          },
+          {}
+        ),
+      },
+    },
   });
 
   const [createPoolReport, { loading, error, data }] = useMutation(
@@ -641,24 +635,22 @@ function PoolReportForm({ cancelHandler, serviceList, latestValues, account }) {
   }
 
   return (
-    <div className="w-full px-0 mt-2 expanded-pool-report flex flex-row justify-center">
+    <div className="w-full max-w-4xl mx-auto px-0 mt-2 expanded-pool-report flex flex-row justify-center">
       <Form
         method="post"
         encType="multipart/form-data"
-        className="w-full lg:w-2/4 flex flex-col bg-slate-100 rounded-md relative pt-1 pb-4 px-1"
+        className="w-full lg:w-2/4 flex flex-col bg-slate-100 rounded-md relative pt-1 pb-4 px-1 gap-2"
         onSubmit={async (e) => {
           e.preventDefault();
           try {
-            const photo = formValues.photo;
-            delete formValues.photo;
             const variables = {
               input: {
+                ...formValues,
                 chemicalLog: account.latestChemicalLog.id,
                 customerAccountId: account.id,
-                photo: photo,
                 workLog: {
                   workLogItems: [
-                    ...Object.entries(formValues)
+                    ...Object.entries(formValues.workLog.workLogItems)
                       .filter((workItem) => workItem[1])
                       .reduce((acc, curr) => {
                         return [...acc, { name: curr[0] }];
@@ -674,24 +666,60 @@ function PoolReportForm({ cancelHandler, serviceList, latestValues, account }) {
         }}
       >
         {loading && <SpinnerOverlay />}
+
         <div className="flex flex-col gap-2 justify-start items-stretch">
           {serviceList.map((service) => (
             <PoolReportInputToggle
               service={service}
               key={service.id}
-              defaultState={formValues[service.name]}
+              defaultState={formValues.workLog.workLogItems[service.name]}
               handleChange={(serviceName) => {
                 setFormValues((prevState) => {
                   return {
                     ...prevState,
-                    [serviceName]: prevState[serviceName]
-                      ? !prevState[serviceName]
-                      : true,
+                    workLog: {
+                      ...prevState.workLog,
+                      workLogItems: {
+                        ...prevState.workLog.workLogItems,
+                        [serviceName]: prevState.workLog.workLogItems[
+                          serviceName
+                        ]
+                          ? !prevState.workLog.workLogItems[serviceName]
+                          : true,
+                      },
+                    },
                   };
                 });
               }}
             />
           ))}
+
+          {/* Customer notes */}
+          <TextArea
+            placeholder="Customer notes."
+            value={formValues.customerNotes || ""}
+            inputHandler={(e) => {
+              setFormValues((prevState) => {
+                return { ...prevState, customerNotes: e.target.value };
+              });
+            }}
+          />
+
+          {/* Technician notes */}
+          <div className="pb-2">
+            <TextArea
+              placeholder="Technician notes."
+              value={formValues.technicianNotes || ""}
+              inputHandler={(e) => {
+                setFormValues((prevState) => {
+                  return { ...prevState, technicianNotes: e.target.value };
+                });
+              }}
+            />
+            <div className="flex flex-row justify-start gap-1 items-center px-1 text-xs text-slate-500 font-bold">
+              <p className="">*Customers cannot view technician notes.</p>
+            </div>
+          </div>
 
           <input
             type="file"
@@ -717,15 +745,15 @@ function PoolReportForm({ cancelHandler, serviceList, latestValues, account }) {
           />
         </div>
 
-        <div className="w-full flex flex-row gap-3 justify-center pt-4">
+        <div className="w-full flex flex-col gap-3">
           <button
-            className="btn btn-sm btn-error w-40"
+            className="btn btn-sm btn-error w-full"
             type="button"
             onClick={cancelHandler}
           >
             Cancel
           </button>
-          <button className="btn btn-sm btn-success w-40" type="submit">
+          <button className="btn btn-sm btn-success w-full" type="submit">
             Save
           </button>
         </div>

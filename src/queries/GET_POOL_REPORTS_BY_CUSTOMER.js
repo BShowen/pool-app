@@ -5,7 +5,8 @@ export const GET_POOL_REPORTS_BY_CUSTOMER = gql`
     getPoolReportsByCustomer(customerAccountId: $customerAccountId) {
       id
       date
-      notes
+      customerNotes
+      technicianNotes
       workLog {
         workLogItems {
           name

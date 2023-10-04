@@ -144,7 +144,8 @@ export const GET_SERVICE_ROUTE_TODAY = gql`
               description
             }
           }
-          notes
+          customerNotes
+          technicianNotes
         }
       }
     }

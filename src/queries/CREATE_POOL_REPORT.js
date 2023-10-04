@@ -6,8 +6,8 @@ export const CREATE_POOL_REPORT = gql`
       companyId
       customerAccountId
       date
-      notes
-      # photo
+      customerNotes
+      technicianNotes
       workLog {
         workLogItems {
           name
