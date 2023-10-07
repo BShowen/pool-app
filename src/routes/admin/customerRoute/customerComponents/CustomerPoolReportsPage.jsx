@@ -8,6 +8,7 @@ import { SpinnerOverlay } from "../../../../components/SpinnerOverlay.jsx";
 import {
   GET_POOL_REPORTS_BY_CUSTOMER,
   GET_POOL_REPORT_PHOTO_URL,
+  REMOVE_PHOTO_FROM_AWS,
 } from "../../../../queries/index.js";
 import {
   capitalize,
@@ -364,7 +365,7 @@ function PoolReportPhoto({
   }
 
   return (
-    <div className="rounded-lg overflow-hidden shadow-md">
+    <div className="rounded-lg overflow-hidden shadow-md hover:cursor-pointer h-fit">
       {loading && (
         <div className="h-32 md:h-52 w-full relative">
           <SpinnerOverlay />
@@ -372,7 +373,8 @@ function PoolReportPhoto({
       )}
       {imgUrl && (
         <img
-          className="h-32 md:h-52 w-full object-cover object-center hover:cursor-pointer"
+          // className="h-32 md:h-52 w-full object-contain object-center"
+          className="object-contain object-center w-full h-full"
           onClick={() => {
             showFullImageHandler({ poolReportId, customerAccountId });
           }}
@@ -425,13 +427,18 @@ function FullSizeImageModal({
   function Error() {
     console.log("Error loading full sized photo: ", error.message);
     return (
-      <div className="rounded-lg overflow-hidden shadow-md bg-slate-100 w-full h-full">
+      <div className="rounded-lg overflow-hidden shadow-md bg-slate-100 w-full h-full p-3">
         <div className="w-full h-full flex flex-col justify-center items-center p-2 gap-3">
           <div className="w-full text-center">
-            <h3>There was an error loading this photo.</h3>
+            <h3 className="font-semibold">
+              There was an error loading this photo.
+            </h3>
           </div>
-          <div className="flex flex-row justify-center items-center">
-            <button className="btn btn-info btn-sm shadow-md" onClick={refetch}>
+          <div className="flex flex-col justify-center items-center w-full">
+            <button
+              className="btn btn-info btn-sm shadow-md"
+              onClick={() => refetch()}
+            >
               Retry
             </button>
           </div>
@@ -447,7 +454,7 @@ function FullSizeImageModal({
       onClick={closeFullImageHandler}
     >
       <div
-        className="modal-box h-5/6 p-0 flex flex-col items-stretch md:max-w-full md:h-fit md:w-4/5 md:max-h-full resize lg:w-4/5 xl:w-4/5 2xl:w-3/5 rounded-lg overflow-scroll"
+        className="rounded-lg overflow-hidden relative h-screen portrait:h-fit my-auto mx-auto"
         onClick={(e) => {
           // Prevent modal from closing when clicking inside the modal.
           e.preventDefault();
@@ -456,17 +463,21 @@ function FullSizeImageModal({
       >
         {loading && <SpinnerOverlay />}
         {error && <Error />}
-        <button
-          className="btn btn-sm btn-circle btn-ghost flex-none absolute right-4 top-4 text-xl text-error"
-          onClick={closeFullImageHandler}
-        >
-          <AiOutlineCloseCircle className="text-3xl" />
-        </button>
-        <img
-          className="object-contain w-full"
-          src={src}
-          alt="Pool report photo."
-        />
+        {!error && (
+          <>
+            <button
+              className="btn btn-sm btn-circle btn-ghost flex-none absolute right-4 top-4 text-xl text-error"
+              onClick={closeFullImageHandler}
+            >
+              <AiOutlineCloseCircle className="text-3xl" />
+            </button>
+            <img
+              className="object-contain h-full w-full landscape:w-auto"
+              src={src}
+              alt="Pool report photo."
+            />
+          </>
+        )}
       </div>
     </dialog>
   );
