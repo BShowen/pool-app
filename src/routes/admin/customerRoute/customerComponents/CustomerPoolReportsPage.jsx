@@ -443,11 +443,11 @@ function FullSizeImageModal({
   return (
     <dialog
       id="fullSizeImageModal"
-      className="modal modal-open modal-bottom sm:modal-middle"
+      className="modal modal-open modal-bottom sm:modal-middle backdrop-blur-sm"
       onClick={closeFullImageHandler}
     >
       <div
-        className="modal-box h-5/6 p-0 flex flex-col items-stretch md:max-w-full md:h-3/4 md:w-4/5 md:max-h-full resize lg:w-4/5 xl:w-4/5 2xl:w-3/5 rounded-lg overflow-scroll"
+        className="modal-box h-5/6 p-0 flex flex-col items-stretch md:max-w-full md:h-fit md:w-4/5 md:max-h-full resize lg:w-4/5 xl:w-4/5 2xl:w-3/5 rounded-lg overflow-scroll"
         onClick={(e) => {
           // Prevent modal from closing when clicking inside the modal.
           e.preventDefault();
@@ -457,12 +457,16 @@ function FullSizeImageModal({
         {loading && <SpinnerOverlay />}
         {error && <Error />}
         <button
-          className="btn btn-sm btn-circle btn-ghost flex-none absolute right-4 top-4 text-xl"
+          className="btn btn-sm btn-circle btn-ghost flex-none absolute right-4 top-4 text-xl text-error"
           onClick={closeFullImageHandler}
         >
           <AiOutlineCloseCircle className="text-3xl" />
         </button>
-        <img src={src} alt="Pool report photo." />
+        <img
+          className="object-contain w-full"
+          src={src}
+          alt="Pool report photo."
+        />
       </div>
     </dialog>
   );
