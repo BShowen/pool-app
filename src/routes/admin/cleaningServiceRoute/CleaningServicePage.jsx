@@ -148,7 +148,7 @@ function NewServiceModal({ state, toggleState }) {
   return (
     <dialog
       id="create-service-modal"
-      className={`modal modal-bottom md:modal-middle ${
+      className={`modal modal-bottom md:modal-middle backdrop-blur-sm ${
         state ? "modal-open" : ""
       }`}
     >
