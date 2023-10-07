@@ -7,6 +7,9 @@ export const GET_POOL_REPORTS_BY_CUSTOMER = gql`
       date
       customerNotes
       technicianNotes
+      img {
+        awsKey
+      }
       technician {
         id
         firstName

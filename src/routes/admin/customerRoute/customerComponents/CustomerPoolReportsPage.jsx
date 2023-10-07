@@ -1,8 +1,10 @@
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { useLoaderData, useOutletContext } from "react-router-dom";
 import { BsArrowsAngleExpand, BsArrowsAngleContract } from "react-icons/bs";
 import { useState, useEffect } from "react";
 import { AiOutlineCloseCircle } from "react-icons/ai";
+import { CgMoreO, CgTrash } from "react-icons/cg";
+import { MdOutlineModeEditOutline } from "react-icons/md";
 
 import { SpinnerOverlay } from "../../../../components/SpinnerOverlay.jsx";
 import {
@@ -22,9 +24,9 @@ export function loader({ params }) {
 export function CustomerPoolReportsPage() {
   const customerAccountId = useLoaderData();
   const { toggleFullScreen, isFullScreen } = useOutletContext();
-  const [poolReportModalState, setPoolReportModalState] = useState(false);
+  const [showPoolReportModal, setShowPoolReportModal] = useState(false);
   const [poolReportModalData, setPoolReportModalData] = useState({});
-  const [fullSizeImgSrc, setFullImageSrc] = useState(null);
+  const [fullScreenImageData, setFullScreenImageData] = useState(null);
   const { loading, error, data } = useQuery(GET_POOL_REPORTS_BY_CUSTOMER, {
     variables: { customerAccountId },
   });
@@ -66,16 +68,16 @@ export function CustomerPoolReportsPage() {
   );
 
   function poolReportModalCloseHandler() {
-    setPoolReportModalState(false);
+    setShowPoolReportModal(false);
     setPoolReportModalData({});
   }
-  function showFullImageHandler({ poolReportId, customerAccountId }) {
-    setPoolReportModalState(false);
-    setFullImageSrc({ poolReportId, customerAccountId });
+  function showFullImageHandler({ poolReport }) {
+    setShowPoolReportModal(false);
+    setFullScreenImageData({ poolReport });
   }
   function closeFullImageHandler() {
-    setFullImageSrc(null);
-    setPoolReportModalState(true);
+    setFullScreenImageData(null);
+    setShowPoolReportModal(true);
   }
 
   return (
@@ -99,7 +101,7 @@ export function CustomerPoolReportsPage() {
                   className="hover:cursor-pointer hover"
                   onClick={(e) => {
                     e.preventDefault();
-                    setPoolReportModalState(true);
+                    setShowPoolReportModal(true);
                     setPoolReportModalData(report);
                   }}
                 >
@@ -134,7 +136,7 @@ export function CustomerPoolReportsPage() {
           <BsArrowsAngleExpand className="text-3xl" />
         )}
       </div>
-      {poolReportModalState && (
+      {showPoolReportModal && (
         <PoolReportModal
           poolReport={poolReportModalData}
           closeHandler={poolReportModalCloseHandler}
@@ -142,9 +144,9 @@ export function CustomerPoolReportsPage() {
           showFullImageHandler={showFullImageHandler}
         />
       )}
-      {fullSizeImgSrc && (
+      {fullScreenImageData && (
         <FullSizeImageModal
-          {...fullSizeImgSrc}
+          poolReport={fullScreenImageData.poolReport}
           closeFullImageHandler={closeFullImageHandler}
         />
       )}
@@ -213,11 +215,11 @@ function PoolReportModal({
   return (
     <dialog
       id="poolReportModal"
-      className="modal modal-open modal-bottom sm:modal-middle backdrop-blur-sm"
+      className="modal modal-open modal-bottom sm:modal-middle backdrop-blur-sm md:border-red-500 lg:border-green-500 xl:border-purple-500 2xl:border-black border-2"
       onClick={closeHandler}
     >
       <div
-        className="modal-box h-5/6 p-1 pb-10 md:pb-1 flex flex-col items-stretch md:max-w-full md:h-3/4 md:max-h-full lg:h-3/5 md:w-11/12 lg:w-10/12 xl:w-4/5 2xl:w-6/12 bg-slate-100"
+        className="modal-box h-5/6 p-1 pb-10 md:pb-1 flex flex-col items-stretch md:max-w-full md:h-fit md:max-h-screen md:w-10/12 lg:w-10/12 xl:w-4/5 2xl:w-7/12 bg-slate-100"
         onClick={(e) => {
           // Prevent modal from closing when clicking inside the modal.
           e.preventDefault();
@@ -278,11 +280,12 @@ function PoolReportModal({
               <h2 className="text-lg font-bold">Photos</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              <PoolReportPhoto
-                poolReportId={poolReport.id}
-                customerAccountId={poolReport.customerAccountId}
-                showFullImageHandler={showFullImageHandler}
-              />
+              {poolReport.img?.awsKey && (
+                <PoolReportPhoto
+                  poolReport={poolReport}
+                  showFullImageHandler={showFullImageHandler}
+                />
+              )}
             </div>
           </PoolReportModalPhotosContainer>
         </div>
@@ -301,7 +304,7 @@ function ModalCard(props) {
 
 function PoolReportModalPhotosContainer(props) {
   return (
-    <div className="w-full max-w-7xl mx-auto bg-white rounded-xl md:rounded-3xl p-3 shadow">
+    <div className="w-full max-w-xl lg:max-w-7xl mx-auto bg-white rounded-xl md:rounded-3xl p-3 shadow">
       {props.children}
     </div>
   );
@@ -322,24 +325,26 @@ function PoolReportNotes({ noteType, noteValue }) {
  * This is the component for rendering the image inside the poolReportModal
  * component.
  */
-function PoolReportPhoto({
-  poolReportId,
-  customerAccountId,
-  showFullImageHandler,
-}) {
+function PoolReportPhoto({ poolReport, showFullImageHandler }) {
   const { loading, data, error, refetch } = useQuery(
     GET_POOL_REPORT_PHOTO_URL,
     {
       //This will update the loading variable to true when calling refetch
       notifyOnNetworkStatusChange: true,
-      variables: { poolReportId, customerAccountId },
+      variables: {
+        input: {
+          awsKey: poolReport.img.awsKey,
+          poolReportId: poolReport.id,
+          customerAccountId: poolReport.customerAccountId,
+        },
+      },
     }
   );
-  const [imgUrl, setImgUrl] = useState("");
+  const [imgUrl, setImgUrl] = useState(false);
 
   useEffect(() => {
     if (data) {
-      setImgUrl(data.getPoolReport.photo);
+      setImgUrl(data.getPoolReportPhotoUrl);
     }
   }, [data]);
 
@@ -365,7 +370,30 @@ function PoolReportPhoto({
   }
 
   return (
-    <div className="rounded-lg overflow-hidden shadow-md hover:cursor-pointer h-fit">
+    <div className="rounded-lg overflow-hidden shadow-md hover:cursor-pointer h-fit relative">
+      {!loading && imgUrl && (
+        <div className="min-h-[40px] p-3 dropdown dropdown-bottom dropdown-end absolute top-0 w-full flex flex-row items-center justify-end">
+          <label tabIndex={0} className="btn btn-ghost btn-sm btn-circle">
+            <CgMoreO className="hover:cursor-pointer text-info text-2xl" />
+          </label>
+          <div className="dropdown-content z-[1] w-full flex flex-row justify-center px-2">
+            <ul tabIndex={0} className="menu shadow bg-white rounded-lg w-full">
+              <li>
+                <DeleteImageButton
+                  poolReport={poolReport}
+                  deleteHandler={() => setImgUrl(false)}
+                />
+              </li>
+              <li>
+                <a className="flex flex-row justify-start items-center">
+                  <MdOutlineModeEditOutline className="text-xl" />
+                  <h2 className="font-semibold">Replace</h2>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      )}
       {loading && (
         <div className="h-32 md:h-52 w-full relative">
           <SpinnerOverlay />
@@ -376,7 +404,7 @@ function PoolReportPhoto({
           // className="h-32 md:h-52 w-full object-contain object-center"
           className="object-contain object-center w-full h-full"
           onClick={() => {
-            showFullImageHandler({ poolReportId, customerAccountId });
+            showFullImageHandler({ poolReport });
           }}
           src={imgUrl}
           alt="Pool report photo."
@@ -386,23 +414,80 @@ function PoolReportPhoto({
   );
 }
 
+function DeleteImageButton({ poolReport, deleteHandler }) {
+  const [deleteImage, { loading, error, data }] = useMutation(
+    REMOVE_PHOTO_FROM_AWS,
+    {
+      refetchQueries: [
+        {
+          query: GET_POOL_REPORTS_BY_CUSTOMER,
+          variables: { customerAccountId: poolReport.customerAccountId },
+        },
+      ],
+      variables: {
+        input: {
+          awsKey: poolReport.img.awsKey,
+          poolReportId: poolReport.id,
+          customerAccountId: poolReport.customerAccountId,
+        },
+      },
+    }
+  );
+
+  useEffect(() => {
+    if (data && Object.keys(data).length) {
+      if (data.removePhotoFromAWS) {
+        deleteHandler();
+      } else {
+        console.log("There was an error deleting your photo.");
+      }
+    }
+  }, [data]);
+
+  if (error) {
+    console.log(error);
+  }
+
+  return (
+    <a
+      className="flex flex-row justify-start items-center"
+      onClick={async () => {
+        try {
+          await deleteImage();
+        } catch (error) {
+          console.log(error);
+        }
+      }}
+    >
+      {loading ? (
+        <span className="loading loading-spinner loading-sm" />
+      ) : (
+        <CgTrash className="text-error text-xl" />
+      )}
+      <h2 className="font-semibold">Delete</h2>
+    </a>
+  );
+}
+
 /**
  * This is the modal window that renders the full sized image.
  * Open a pool report, click on an image, that image is shown in a larger
  * standalone modal. This is that modal.
  */
-function FullSizeImageModal({
-  closeFullImageHandler,
-  poolReportId,
-  customerAccountId,
-}) {
+function FullSizeImageModal({ closeFullImageHandler, poolReport }) {
   const [src, setSrc] = useState("");
   const { loading, error, data, refetch } = useQuery(
     GET_POOL_REPORT_PHOTO_URL,
     {
       //This will update the loading variable to true when calling refetch
       notifyOnNetworkStatusChange: true,
-      variables: { poolReportId, customerAccountId },
+      variables: {
+        input: {
+          awsKey: poolReport.img.awsKey,
+          poolReportId: poolReport.id,
+          customerAccountId: poolReport.customerAccountId,
+        },
+      },
     }
   );
 
@@ -420,7 +505,7 @@ function FullSizeImageModal({
 
   useEffect(() => {
     if (data && !loading && !error) {
-      setSrc(data.getPoolReport.photo);
+      setSrc(data.getPoolReportPhotoUrl);
     }
   }, [data]);
 
