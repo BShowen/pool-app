@@ -215,7 +215,7 @@ function PoolReportModal({
   return (
     <dialog
       id="poolReportModal"
-      className="modal modal-open modal-bottom sm:modal-middle backdrop-blur-sm md:border-red-500 lg:border-green-500 xl:border-purple-500 2xl:border-black border-2"
+      className="modal modal-open modal-bottom sm:modal-middle backdrop-blur-sm"
       onClick={closeHandler}
     >
       <div
@@ -326,25 +326,28 @@ function PoolReportNotes({ noteType, noteValue }) {
  * component.
  */
 function PoolReportPhoto({ poolReport, showFullImageHandler }) {
-  const { loading, data, error, refetch } = useQuery(
-    GET_POOL_REPORT_PHOTO_URL,
-    {
-      //This will update the loading variable to true when calling refetch
-      notifyOnNetworkStatusChange: true,
-      variables: {
-        input: {
-          awsKey: poolReport.img.awsKey,
-          poolReportId: poolReport.id,
-          customerAccountId: poolReport.customerAccountId,
-        },
+  const { data, error, refetch } = useQuery(GET_POOL_REPORT_PHOTO_URL, {
+    //This will update the loading variable to true when calling refetch
+    notifyOnNetworkStatusChange: true,
+    variables: {
+      input: {
+        awsKey: poolReport.img.awsKey,
+        poolReportId: poolReport.id,
+        customerAccountId: poolReport.customerAccountId,
       },
-    }
-  );
-  const [imgUrl, setImgUrl] = useState(false);
+    },
+  });
+
+  const [image, _] = useState(new Image());
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (data) {
-      setImgUrl(data.getPoolReportPhotoUrl);
+      const src = data.getPoolReportPhotoUrl;
+      image.onload = function () {
+        setLoading(false);
+      };
+      image.src = src;
     }
   }, [data]);
 
@@ -371,7 +374,7 @@ function PoolReportPhoto({ poolReport, showFullImageHandler }) {
 
   return (
     <div className="rounded-lg overflow-hidden shadow-md hover:cursor-pointer h-fit relative">
-      {!loading && imgUrl && (
+      {!loading && (
         <div className="min-h-[40px] p-3 dropdown dropdown-bottom dropdown-end absolute top-0 w-full flex flex-row items-center justify-end">
           <label tabIndex={0} className="btn btn-ghost btn-sm btn-circle">
             <CgMoreO className="hover:cursor-pointer text-info text-2xl" />
@@ -399,14 +402,13 @@ function PoolReportPhoto({ poolReport, showFullImageHandler }) {
           <SpinnerOverlay />
         </div>
       )}
-      {imgUrl && (
+      {!loading && (
         <img
-          // className="h-32 md:h-52 w-full object-contain object-center"
           className="object-contain object-center w-full h-full"
           onClick={() => {
             showFullImageHandler({ poolReport });
           }}
-          src={imgUrl}
+          src={image.src}
           alt="Pool report photo."
         />
       )}
