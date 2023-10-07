@@ -351,7 +351,10 @@ function PoolReportPhoto({
             <h3>There was an error loading this photo.</h3>
           </div>
           <div className="flex flex-row justify-center items-center">
-            <button className="btn btn-info btn-sm shadow-md" onClick={refetch}>
+            <button
+              className="btn btn-info btn-sm shadow-md"
+              onClick={() => refetch()}
+            >
               Retry
             </button>
           </div>
