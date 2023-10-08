@@ -31,6 +31,36 @@ export function CustomerPoolReportsPage() {
     variables: { customerAccountId },
   });
 
+  useEffect(() => {
+    // This useEffect will ensure that when a photo is deleted, it is properly
+    // removed form the DOM. Without this useEffect, a photo that gets deleted
+    // by the user will still persist in the DOM with an invalid src attribute
+    // and the image.alt is shown - not good.
+
+    // If poolReportModalData has a poolReport inside of it then verify that the
+    // report is not stale. This ensures that PoolReportModal always has non-stale
+    // data in the event of a child component triggering a refetchQuery.
+
+    // If poolReportModalData is an empty object then theres nothing to do.
+    if (Object.keys(poolReportModalData).length === 0) return;
+
+    // Get the id from the potentially stale pool report.
+    const poolReportModalId = poolReportModalData.id;
+    // Find the matching pool report from data that was just received from the DB.
+    const nonStalePoolReport = (data?.getPoolReportsByCustomer || []).find(
+      (item) => item.id.toString() === poolReportModalId.toString()
+    );
+    // If old pool report img key is the same as new pool report img key then
+    // the data in poolReportModalData is not stale.
+    if (poolReportModalData.img.awsKey === nonStalePoolReport.img.awsKey) {
+      return;
+    }
+
+    // If process reaches this state, then data in poolReportModalData is indeed
+    // stale. Update the data with a new poolReport.
+    setPoolReportModalData(nonStalePoolReport);
+  }, [data]);
+
   if (loading) {
     return (
       <div className="w-full h-40 relative">
@@ -280,7 +310,8 @@ function PoolReportModal({
               <h2 className="text-lg font-bold">Photos</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {poolReport.img?.awsKey && (
+              {/* {reportHasImage && ( */}
+              {!!poolReport.img.awsKey && (
                 <PoolReportPhoto
                   poolReport={poolReport}
                   showFullImageHandler={showFullImageHandler}
@@ -338,17 +369,19 @@ function PoolReportPhoto({ poolReport, showFullImageHandler }) {
     },
   });
 
-  const [image, _] = useState(new Image());
+  const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (data) {
-      const src = data.getPoolReportPhotoUrl;
-      image.onload = function () {
+    (async () => {
+      if (data?.getPoolReportPhotoUrl) {
+        const img = new Image(); //Image is used in order to pre-load the image.
+        img.src = data.getPoolReportPhotoUrl;
+        await img.decode(); //Preload and decode the image
+        setImage(img);
         setLoading(false);
-      };
-      image.src = src;
-    }
+      }
+    })();
   }, [data]);
 
   if (error) {
@@ -382,10 +415,7 @@ function PoolReportPhoto({ poolReport, showFullImageHandler }) {
           <div className="dropdown-content z-[1] w-full flex flex-row justify-center px-2">
             <ul tabIndex={0} className="menu shadow bg-white rounded-lg w-full">
               <li>
-                <DeleteImageButton
-                  poolReport={poolReport}
-                  deleteHandler={() => setImgUrl(false)}
-                />
+                <DeleteImageButton poolReport={poolReport} />
               </li>
               <li>
                 <a className="flex flex-row justify-start items-center">
@@ -402,7 +432,7 @@ function PoolReportPhoto({ poolReport, showFullImageHandler }) {
           <SpinnerOverlay />
         </div>
       )}
-      {!loading && (
+      {!loading && image && (
         <img
           className="object-contain object-center w-full h-full"
           onClick={() => {
@@ -416,31 +446,32 @@ function PoolReportPhoto({ poolReport, showFullImageHandler }) {
   );
 }
 
-function DeleteImageButton({ poolReport, deleteHandler }) {
-  const [deleteImage, { loading, error, data }] = useMutation(
-    REMOVE_PHOTO_FROM_AWS,
-    {
-      refetchQueries: [
-        {
-          query: GET_POOL_REPORTS_BY_CUSTOMER,
-          variables: { customerAccountId: poolReport.customerAccountId },
-        },
-      ],
-      variables: {
-        input: {
-          awsKey: poolReport.img.awsKey,
-          poolReportId: poolReport.id,
-          customerAccountId: poolReport.customerAccountId,
-        },
+function DeleteImageButton({ poolReport }) {
+  // I want to manually handle the loading state for a slightly better UI.
+  const [loading, setLoading] = useState(false);
+  const [deleteImage, { error, data }] = useMutation(REMOVE_PHOTO_FROM_AWS, {
+    refetchQueries: [
+      {
+        query: GET_POOL_REPORTS_BY_CUSTOMER,
+        variables: { customerAccountId: poolReport.customerAccountId },
       },
-    }
-  );
+    ],
+    variables: {
+      input: {
+        awsKey: poolReport.img.awsKey,
+        poolReportId: poolReport.id,
+        customerAccountId: poolReport.customerAccountId,
+      },
+    },
+  });
 
   useEffect(() => {
     if (data && Object.keys(data).length) {
       if (data.removePhotoFromAWS) {
-        deleteHandler();
+        // Delete was successful
       } else {
+        setLoading(false);
+        // There was an error deleting the photo.
         console.log("There was an error deleting your photo.");
       }
     }
@@ -455,6 +486,7 @@ function DeleteImageButton({ poolReport, deleteHandler }) {
       className="flex flex-row justify-start items-center"
       onClick={async () => {
         try {
+          setLoading(true);
           await deleteImage();
         } catch (error) {
           console.log(error);
