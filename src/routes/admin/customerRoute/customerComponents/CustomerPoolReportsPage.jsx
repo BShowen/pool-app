@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { useLoaderData, useOutletContext } from "react-router-dom";
 import { BsArrowsAngleExpand, BsArrowsAngleContract } from "react-icons/bs";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import { CgMoreO, CgTrash } from "react-icons/cg";
 import { MdOutlineModeEditOutline } from "react-icons/md";
@@ -371,15 +371,20 @@ function PoolReportPhoto({ poolReport, showFullImageHandler }) {
 
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [imageBlur, setImageBlur] = useState(false);
 
   useEffect(() => {
     (async () => {
       if (data?.getPoolReportPhotoUrl) {
         const img = new Image(); //Image is used in order to pre-load the image.
         img.src = data.getPoolReportPhotoUrl;
-        await img.decode(); //Preload and decode the image
-        setImage(img);
-        setLoading(false);
+        try {
+          await img.decode(); //Preload and decode the image
+          setImage(img);
+          setLoading(false);
+        } catch (error) {
+          console.log(error);
+        }
       }
     })();
   }, [data]);
@@ -408,24 +413,7 @@ function PoolReportPhoto({ poolReport, showFullImageHandler }) {
   return (
     <div className="rounded-lg overflow-hidden shadow-md hover:cursor-pointer h-fit relative">
       {!loading && (
-        <div className="min-h-[40px] p-3 dropdown dropdown-bottom dropdown-end absolute top-0 w-full flex flex-row items-center justify-end">
-          <label tabIndex={0} className="btn btn-ghost btn-sm btn-circle">
-            <CgMoreO className="hover:cursor-pointer text-info text-2xl" />
-          </label>
-          <div className="dropdown-content z-[1] w-full flex flex-row justify-center px-2">
-            <ul tabIndex={0} className="menu shadow bg-white rounded-lg w-full">
-              <li>
-                <DeleteImageButton poolReport={poolReport} />
-              </li>
-              <li>
-                <a className="flex flex-row justify-start items-center">
-                  <MdOutlineModeEditOutline className="text-xl" />
-                  <h2 className="font-semibold">Replace</h2>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
+        <PhotoActions poolReport={poolReport} setImageBlur={setImageBlur} />
       )}
       {loading && (
         <div className="h-32 md:h-52 w-full relative">
@@ -434,7 +422,9 @@ function PoolReportPhoto({ poolReport, showFullImageHandler }) {
       )}
       {!loading && image && (
         <img
-          className="object-contain object-center w-full h-full"
+          className={`object-contain object-center w-full h-full ${
+            imageBlur ? "blur-sm" : ""
+          }`}
           onClick={() => {
             showFullImageHandler({ poolReport });
           }}
@@ -442,6 +432,53 @@ function PoolReportPhoto({ poolReport, showFullImageHandler }) {
           alt="Pool report photo."
         />
       )}
+    </div>
+  );
+}
+
+function PhotoActions({ poolReport, setImageBlur }) {
+  const ref = useRef(document.getElementById("poolReportModal"));
+
+  useEffect(() => {
+    function photoActionHandler(e) {
+      // If the user clicks on dropdown-content - do nothing.
+      if (!e.target.closest(".dropdown")) {
+        // If the user clicks on something other than dropdown-content - toggle open/close state
+        setImageBlur(false);
+      }
+    }
+    // Add DOM click event listener.
+    ref.current.addEventListener("click", photoActionHandler);
+
+    return () => {
+      ref.current.removeEventListener("click", photoActionHandler);
+    };
+  }, []);
+
+  return (
+    <div className="min-h-[40px] p-3 dropdown dropdown-bottom dropdown-end absolute top-0 w-full flex flex-row items-center justify-end z-50">
+      <label
+        tabIndex={0}
+        className="btn btn-ghost btn-sm btn-circle"
+        onClick={() => {
+          setImageBlur(true);
+        }}
+      >
+        <CgMoreO className="hover:cursor-pointer text-info text-2xl" />
+      </label>
+      <div className="dropdown-content z-[1] w-full flex flex-row justify-center px-2">
+        <ul tabIndex={0} className="menu shadow bg-white rounded-lg w-full">
+          <li>
+            <DeleteImageButton poolReport={poolReport} />
+          </li>
+          <li>
+            <a className="flex flex-row justify-start items-center">
+              <MdOutlineModeEditOutline className="text-xl" />
+              <h2 className="font-semibold">Replace</h2>
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }
