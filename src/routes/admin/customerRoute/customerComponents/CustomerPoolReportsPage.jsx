@@ -11,6 +11,7 @@ import {
   GET_POOL_REPORTS_BY_CUSTOMER,
   GET_POOL_REPORT_PHOTO_URL,
   REMOVE_PHOTO_FROM_AWS,
+  DELETE_POOL_REPORT,
 } from "../../../../queries/index.js";
 import {
   capitalize,
@@ -115,12 +116,13 @@ export function CustomerPoolReportsPage() {
       <div className="w-full p-5">
         <table className="table w-full">
           <thead>
-            <tr>
+            <tr className="text-center">
               <th>Date</th>
               <th>Technician</th>
               {tableHeaders.map((headerValue, i) => {
                 return <TableHeader value={headerValue} key={i} />;
               })}
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -128,7 +130,7 @@ export function CustomerPoolReportsPage() {
               return (
                 <tr
                   key={report.id}
-                  className="hover:cursor-pointer hover"
+                  className="hover:cursor-pointer hover text-center"
                   onClick={(e) => {
                     e.preventDefault();
                     setShowPoolReportModal(true);
@@ -150,6 +152,9 @@ export function CustomerPoolReportsPage() {
                       />
                     );
                   })}
+                  <td>
+                    <TableRowAction poolReport={report} />
+                  </td>
                 </tr>
               );
             })}
@@ -181,6 +186,47 @@ export function CustomerPoolReportsPage() {
         />
       )}
     </>
+  );
+}
+
+function TableRowAction({ poolReport }) {
+  const [loading, setLoading] = useState(false);
+  const [deletePoolReport, { error, data }] = useMutation(DELETE_POOL_REPORT, {
+    refetchQueries: [
+      {
+        query: GET_POOL_REPORTS_BY_CUSTOMER,
+        variables: { customerAccountId: poolReport.customerAccountId },
+      },
+    ],
+  });
+  return (
+    <button
+      className="btn btn-ghost btn-sm text-red-500 lg:hover:text-red-700 py-1 px-2"
+      onClick={async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setLoading(true);
+        const confirmation = confirm(
+          "Are you sure you want to delete this pool report?"
+        );
+        if (confirmation) {
+          try {
+            await deletePoolReport({
+              variables: { poolReportId: poolReport.id },
+            });
+          } catch (error) {
+            setLoading(false);
+            console.log(error);
+          }
+        }
+      }}
+    >
+      {loading ? (
+        <span className="loading loading-spinner loading-sm text-slate-800"></span>
+      ) : (
+        <CgTrash className="text-lg mx-auto" />
+      )}
+    </button>
   );
 }
 
