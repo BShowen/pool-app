@@ -205,11 +205,11 @@ function TableRowAction({ poolReport }) {
       onClick={async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        setLoading(true);
         const confirmation = confirm(
           "Are you sure you want to delete this pool report?"
         );
         if (confirmation) {
+          setLoading(true);
           try {
             await deletePoolReport({
               variables: { poolReportId: poolReport.id },
