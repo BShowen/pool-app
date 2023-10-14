@@ -395,24 +395,22 @@ function PoolReportModalPhotoList({ poolReport, showFullImageHandler }) {
     };
   });
 
-  const imageList = (data?.getImages || poolReport.images).map(
-    (imageMeta, i) => {
-      const { key, url } = imageMeta;
-      const isBlurred = blurredImageKey === key;
-      return (
-        <PoolReportPhoto
-          key={i}
-          poolReport={poolReport}
-          showFullImageHandler={showFullImageHandler}
-          isLoading={loading}
-          src={url}
-          error={error}
-          awsImageKey={key}
-          isBlurred={isBlurred}
-        />
-      );
-    }
-  );
+  const imageList = (data?.getImages || poolReport.images).map((imageMeta) => {
+    const { key, url } = imageMeta;
+    const isBlurred = blurredImageKey === key;
+    return (
+      <PoolReportPhoto
+        key={key}
+        poolReport={poolReport}
+        showFullImageHandler={showFullImageHandler}
+        isLoading={loading}
+        src={url}
+        error={error}
+        awsImageKey={key}
+        isBlurred={isBlurred}
+      />
+    );
+  });
 
   return (
     <div className="w-full max-w-xl lg:max-w-7xl mx-auto bg-white rounded-xl md:rounded-3xl p-3 shadow">
@@ -563,8 +561,7 @@ function DeleteImageButton({ poolReport, awsImageKey }) {
   useEffect(() => {
     if (data && Object.keys(data).length) {
       if (data) {
-        // setLoading(false);
-        console.log(data);
+        setLoading(false);
         // Delete was successful
       } else {
         setLoading(false);
