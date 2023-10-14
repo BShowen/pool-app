@@ -726,14 +726,28 @@ function PoolReportForm({ cancelHandler, serviceList, account }) {
             className="file-input file-input-sm file-input-bordered file-input-info"
             name="photo"
             accept="image/*"
-            // multiple
+            multiple
             onChange={(e) => {
-              const file = e.target.files[0];
-              const valid = file.type.startsWith("image/");
-              if (valid) {
+              const fileList = e.target.files;
+              const validFileTypes = Array.from(fileList).every((file) =>
+                file.type.startsWith("image/")
+              );
+              const withinSelectionLimit = fileList.length <= 2;
+              const withinSizeLimit =
+                Array.from(fileList).reduce((acc, file) => {
+                  return acc + file.size;
+                }, 0) <= 10000000;
+
+              if (validFileTypes && withinSelectionLimit && withinSizeLimit) {
                 setFormValues((prevValues) => {
-                  return { ...prevValues, photo: e.target.files[0] };
+                  return { ...prevValues, images: fileList };
                 });
+              } else if (!withinSelectionLimit) {
+                alert("Please select up to 2 images.");
+                e.target.value = "";
+              } else if (!withinSizeLimit) {
+                alert("File size cannot exceed 10mb.");
+                e.target.value = "";
               } else {
                 // No need to show an error if the uploaded filetype is incorrect
                 // because this means the form has been intentionally compromised.
