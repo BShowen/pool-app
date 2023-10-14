@@ -294,16 +294,8 @@ function PoolReportModal({
     <dialog
       id="poolReportModal"
       className="modal modal-open modal-bottom sm:modal-middle backdrop-blur-sm"
-      onClick={closeHandler}
     >
-      <div
-        className="modal-box h-5/6 p-1 pb-10 md:pb-1 flex flex-col items-stretch md:max-w-full md:h-fit md:max-h-screen md:w-10/12 lg:w-10/12 xl:w-4/5 2xl:w-7/12 bg-slate-100"
-        onClick={(e) => {
-          // Prevent modal from closing when clicking inside the modal.
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-      >
+      <div className="modal-box h-5/6 p-1 pb-10 md:pb-1 flex flex-col items-stretch md:max-w-full md:h-fit md:max-h-screen md:w-10/12 lg:w-10/12 xl:w-4/5 2xl:w-7/12 bg-slate-100">
         <div className="flex flex-row px-1 py-5 items-center ">
           <div className="grow text-center">
             <h3 className="font-bold text-lg">{formatDate(poolReport.date)}</h3>
@@ -359,6 +351,7 @@ function PoolReportModal({
           />
         </div>
       </div>
+      <div className="modal-backdrop" onClick={closeHandler} />
     </dialog>
   );
 }
@@ -379,43 +372,47 @@ function PoolReportModalPhotoList({ poolReport, showFullImageHandler }) {
     },
   });
 
-  const [imageList, setImageList] = useState(
-    poolReport.images.map((imageMeta, i) => {
-      const { key } = imageMeta;
+  const [blurredImageKey, setBlurredImageKey] = useState(null);
+
+  useEffect(() => {
+    // This useEffect adds a click handler to the dom when pool report images
+    // are rendered. Then, when the user clicks on a pool report photo action,
+    // the image is blurred. When the user clicks away from the action, the
+    // image is un-blurred.
+
+    function handleActionClick(e) {
+      if (e.target.closest(".dropdown")) {
+        // If the user is clicking within the pool report image dropdown.
+        setBlurredImageKey(e.target.closest(".dropdown").dataset.id);
+      } else {
+        // If the use is not clicking within the pool report image dropdown.
+        setBlurredImageKey(null);
+      }
+    }
+    document.addEventListener("click", handleActionClick);
+    return () => {
+      document.removeEventListener("click", handleActionClick);
+    };
+  });
+
+  const imageList = (data?.getImages || poolReport.images).map(
+    (imageMeta, i) => {
+      const { key, url } = imageMeta;
+      const isBlurred = blurredImageKey === key;
       return (
         <PoolReportPhoto
           key={i}
           poolReport={poolReport}
           showFullImageHandler={showFullImageHandler}
-          isLoading={true}
-          src={undefined}
-          error={false}
+          isLoading={loading}
+          src={url}
+          error={error}
           awsImageKey={key}
+          isBlurred={isBlurred}
         />
       );
-    })
-  );
-
-  useEffect(() => {
-    if (data?.getImages) {
-      setImageList(
-        (data?.getImages || poolReport.images).map((imageMeta, i) => {
-          const { key, url } = imageMeta;
-          return (
-            <PoolReportPhoto
-              key={i}
-              poolReport={poolReport}
-              showFullImageHandler={showFullImageHandler}
-              isLoading={loading}
-              src={url}
-              error={error}
-              awsImageKey={key}
-            />
-          );
-        })
-      );
     }
-  }, [data]);
+  );
 
   return (
     <div className="w-full max-w-xl lg:max-w-7xl mx-auto bg-white rounded-xl md:rounded-3xl p-3 shadow">
@@ -449,10 +446,10 @@ function PoolReportPhoto({
   src,
   error,
   awsImageKey,
+  isBlurred,
 }) {
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(isLoading);
-  const [imageBlur, setImageBlur] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -493,11 +490,7 @@ function PoolReportPhoto({
   return (
     <div className="rounded-lg overflow-hidden shadow-md hover:cursor-pointer h-fit relative">
       {!loading && (
-        <PhotoActions
-          poolReport={poolReport}
-          setImageBlur={setImageBlur}
-          awsImageKey={awsImageKey}
-        />
+        <PhotoActions poolReport={poolReport} awsImageKey={awsImageKey} />
       )}
       {loading && (
         <div className="h-32 md:h-52 w-full relative">
@@ -507,7 +500,7 @@ function PoolReportPhoto({
       {!loading && image && (
         <img
           className={`object-contain object-center w-full h-full ${
-            imageBlur ? "blur-sm" : ""
+            isBlurred ? "blur-sm" : ""
           }`}
           onClick={() => {
             showFullImageHandler({ poolReport, awsImageKey });
@@ -520,34 +513,13 @@ function PoolReportPhoto({
   );
 }
 
-function PhotoActions({ poolReport, setImageBlur, awsImageKey }) {
-  const ref = useRef(document.getElementById("poolReportModal"));
-
-  useEffect(() => {
-    function photoActionHandler(e) {
-      // If the user clicks on dropdown-content - do nothing.
-      if (!e.target.closest(".dropdown")) {
-        // If the user clicks on something other than dropdown-content - toggle open/close state
-        setImageBlur(false);
-      }
-    }
-    // Add DOM click event listener.
-    ref.current.addEventListener("click", photoActionHandler);
-
-    return () => {
-      ref.current.removeEventListener("click", photoActionHandler);
-    };
-  }, []);
-
+function PhotoActions({ poolReport, awsImageKey }) {
   return (
-    <div className="min-h-[40px] p-3 dropdown dropdown-bottom dropdown-end absolute top-0 w-full flex flex-row items-center justify-end z-50">
-      <label
-        tabIndex={0}
-        className="btn btn-ghost btn-sm btn-circle"
-        onClick={() => {
-          setImageBlur(true);
-        }}
-      >
+    <div
+      className="min-h-[40px] p-3 dropdown dropdown-bottom dropdown-end absolute top-0 w-full flex flex-row items-center justify-end z-50"
+      data-id={awsImageKey}
+    >
+      <label tabIndex={0} className="btn btn-ghost btn-sm btn-circle">
         <CgMoreO className="hover:cursor-pointer text-info text-2xl" />
       </label>
       <div className="dropdown-content z-[1] w-full flex flex-row justify-center px-2">
@@ -591,6 +563,7 @@ function DeleteImageButton({ poolReport, awsImageKey }) {
   useEffect(() => {
     if (data && Object.keys(data).length) {
       if (data) {
+        // setLoading(false);
         console.log(data);
         // Delete was successful
       } else {
