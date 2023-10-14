@@ -9,8 +9,8 @@ import { MdOutlineModeEditOutline } from "react-icons/md";
 import { SpinnerOverlay } from "../../../../components/SpinnerOverlay.jsx";
 import {
   GET_POOL_REPORTS_BY_CUSTOMER,
-  GET_POOL_REPORT_PHOTO_URL,
-  REMOVE_PHOTO_FROM_AWS,
+  GET_IMAGES,
+  DELETE_IMAGES,
   DELETE_POOL_REPORT,
 } from "../../../../queries/index.js";
 import {
@@ -33,32 +33,28 @@ export function CustomerPoolReportsPage() {
   });
 
   useEffect(() => {
-    // This useEffect will ensure that when a photo is deleted, it is properly
-    // removed form the DOM. Without this useEffect, a photo that gets deleted
-    // by the user will still persist in the DOM with an invalid src attribute
-    // and the image.alt is shown - not good.
+    // This useEffect will ensure that when a photo is deleted it is removed
+    // from the DOM. Without this useEffect a photo that gets deleted by the
+    // user will still persist in the DOM with an invalid src attribute and the
+    // image.alt is shown - not good.
 
     // If poolReportModalData has a poolReport inside of it then verify that the
-    // report is not stale. This ensures that PoolReportModal always has non-stale
-    // data in the event of a child component triggering a refetchQuery.
+    // report is not stale. This ensures that PoolReportModal always has
+    // non - stale data in the event of a child component triggering a
+    // refetchQuery.
 
     // If poolReportModalData is an empty object then theres nothing to do.
     if (Object.keys(poolReportModalData).length === 0) return;
 
-    // Get the id from the potentially stale pool report.
+    // Get the id from the modal pool report.
     const poolReportModalId = poolReportModalData.id;
+
     // Find the matching pool report from data that was just received from the DB.
     const nonStalePoolReport = (data?.getPoolReportsByCustomer || []).find(
       (item) => item.id.toString() === poolReportModalId.toString()
     );
-    // If old pool report img key is the same as new pool report img key then
-    // the data in poolReportModalData is not stale.
-    if (poolReportModalData.img.awsKey === nonStalePoolReport.img.awsKey) {
-      return;
-    }
 
-    // If process reaches this state, then data in poolReportModalData is indeed
-    // stale. Update the data with a new poolReport.
+    // Update the modal pool report data with the non-stale poolReport.
     setPoolReportModalData(nonStalePoolReport);
   }, [data]);
 
@@ -99,14 +95,19 @@ export function CustomerPoolReportsPage() {
   );
 
   function poolReportModalCloseHandler() {
+    // Close the pool report modal.
     setShowPoolReportModal(false);
+    // Reset the data used in the pool report modal.
     setPoolReportModalData({});
   }
-  function showFullImageHandler({ poolReport }) {
+  function showFullImageHandler({ poolReport, awsImageKey }) {
+    //Close the pool report modal so the full screen image modal can open.
     setShowPoolReportModal(false);
-    setFullScreenImageData({ poolReport });
+    // This is the data needed in order to download the full sized image.
+    setFullScreenImageData({ poolReport, awsImageKey });
   }
   function closeFullImageHandler() {
+    // Reset the full size image modal.
     setFullScreenImageData(null);
     setShowPoolReportModal(true);
   }
@@ -183,6 +184,7 @@ export function CustomerPoolReportsPage() {
         <FullSizeImageModal
           poolReport={fullScreenImageData.poolReport}
           closeFullImageHandler={closeFullImageHandler}
+          awsImageKey={fullScreenImageData.awsImageKey}
         />
       )}
     </>
@@ -351,20 +353,10 @@ function PoolReportModal({
             </div>
           </div>
 
-          <PoolReportModalPhotosContainer>
-            <div className="text-start w-full">
-              <h2 className="text-lg font-bold">Photos</h2>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {/* {reportHasImage && ( */}
-              {!!poolReport.img.awsKey && (
-                <PoolReportPhoto
-                  poolReport={poolReport}
-                  showFullImageHandler={showFullImageHandler}
-                />
-              )}
-            </div>
-          </PoolReportModalPhotosContainer>
+          <PoolReportModalPhotoList
+            poolReport={poolReport}
+            showFullImageHandler={showFullImageHandler}
+          />
         </div>
       </div>
     </dialog>
@@ -379,10 +371,58 @@ function ModalCard(props) {
   );
 }
 
-function PoolReportModalPhotosContainer(props) {
+function PoolReportModalPhotoList({ poolReport, showFullImageHandler }) {
+  const { loading, error, data } = useQuery(GET_IMAGES, {
+    variables: {
+      awsKeyList: (poolReport.images || []).map((imageMeta) => imageMeta.key),
+      poolReportId: poolReport.id,
+    },
+  });
+
+  const [imageList, setImageList] = useState(
+    poolReport.images.map((imageMeta, i) => {
+      const { key } = imageMeta;
+      return (
+        <PoolReportPhoto
+          key={i}
+          poolReport={poolReport}
+          showFullImageHandler={showFullImageHandler}
+          isLoading={true}
+          src={undefined}
+          error={false}
+          awsImageKey={key}
+        />
+      );
+    })
+  );
+
+  useEffect(() => {
+    if (data?.getImages) {
+      setImageList(
+        (data?.getImages || poolReport.images).map((imageMeta, i) => {
+          const { key, url } = imageMeta;
+          return (
+            <PoolReportPhoto
+              key={i}
+              poolReport={poolReport}
+              showFullImageHandler={showFullImageHandler}
+              isLoading={loading}
+              src={url}
+              error={error}
+              awsImageKey={key}
+            />
+          );
+        })
+      );
+    }
+  }, [data]);
+
   return (
     <div className="w-full max-w-xl lg:max-w-7xl mx-auto bg-white rounded-xl md:rounded-3xl p-3 shadow">
-      {props.children}
+      <div className="text-start w-full">
+        <h2 className="text-lg font-bold">Photos</h2>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">{imageList}</div>
     </div>
   );
 }
@@ -402,38 +442,32 @@ function PoolReportNotes({ noteType, noteValue }) {
  * This is the component for rendering the image inside the poolReportModal
  * component.
  */
-function PoolReportPhoto({ poolReport, showFullImageHandler }) {
-  const { data, error, refetch } = useQuery(GET_POOL_REPORT_PHOTO_URL, {
-    //This will update the loading variable to true when calling refetch
-    notifyOnNetworkStatusChange: true,
-    variables: {
-      input: {
-        awsKey: poolReport.img.awsKey,
-        poolReportId: poolReport.id,
-        customerAccountId: poolReport.customerAccountId,
-      },
-    },
-  });
-
+function PoolReportPhoto({
+  poolReport,
+  showFullImageHandler,
+  isLoading,
+  src,
+  error,
+  awsImageKey,
+}) {
   const [image, setImage] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(isLoading);
   const [imageBlur, setImageBlur] = useState(false);
 
   useEffect(() => {
     (async () => {
-      if (data?.getPoolReportPhotoUrl) {
-        const img = new Image(); //Image is used in order to pre-load the image.
-        img.src = data.getPoolReportPhotoUrl;
-        try {
-          await img.decode(); //Preload and decode the image
-          setImage(img);
-          setLoading(false);
-        } catch (error) {
-          console.log(error);
-        }
+      if (!src) return; //If no src, return.
+      const img = new Image(); //Image is used in order to pre-load the image.
+      img.src = src;
+      try {
+        await img.decode(); //Preload and decode the image
+        setImage(img);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
       }
     })();
-  }, [data]);
+  }, [src]);
 
   if (error) {
     console.log("Error loading photo: ", error.message);
@@ -459,7 +493,11 @@ function PoolReportPhoto({ poolReport, showFullImageHandler }) {
   return (
     <div className="rounded-lg overflow-hidden shadow-md hover:cursor-pointer h-fit relative">
       {!loading && (
-        <PhotoActions poolReport={poolReport} setImageBlur={setImageBlur} />
+        <PhotoActions
+          poolReport={poolReport}
+          setImageBlur={setImageBlur}
+          awsImageKey={awsImageKey}
+        />
       )}
       {loading && (
         <div className="h-32 md:h-52 w-full relative">
@@ -472,7 +510,7 @@ function PoolReportPhoto({ poolReport, showFullImageHandler }) {
             imageBlur ? "blur-sm" : ""
           }`}
           onClick={() => {
-            showFullImageHandler({ poolReport });
+            showFullImageHandler({ poolReport, awsImageKey });
           }}
           src={image.src}
           alt="Pool report photo."
@@ -482,7 +520,7 @@ function PoolReportPhoto({ poolReport, showFullImageHandler }) {
   );
 }
 
-function PhotoActions({ poolReport, setImageBlur }) {
+function PhotoActions({ poolReport, setImageBlur, awsImageKey }) {
   const ref = useRef(document.getElementById("poolReportModal"));
 
   useEffect(() => {
@@ -515,7 +553,10 @@ function PhotoActions({ poolReport, setImageBlur }) {
       <div className="dropdown-content z-[1] w-full flex flex-row justify-center px-2">
         <ul tabIndex={0} className="menu shadow bg-white rounded-lg w-full">
           <li>
-            <DeleteImageButton poolReport={poolReport} />
+            <DeleteImageButton
+              poolReport={poolReport}
+              awsImageKey={awsImageKey}
+            />
           </li>
           <li>
             <a className="flex flex-row justify-start items-center">
@@ -529,10 +570,10 @@ function PhotoActions({ poolReport, setImageBlur }) {
   );
 }
 
-function DeleteImageButton({ poolReport }) {
+function DeleteImageButton({ poolReport, awsImageKey }) {
   // I want to manually handle the loading state for a slightly better UI.
   const [loading, setLoading] = useState(false);
-  const [deleteImage, { error, data }] = useMutation(REMOVE_PHOTO_FROM_AWS, {
+  const [deleteImage, { error, data }] = useMutation(DELETE_IMAGES, {
     refetchQueries: [
       {
         query: GET_POOL_REPORTS_BY_CUSTOMER,
@@ -541,16 +582,16 @@ function DeleteImageButton({ poolReport }) {
     ],
     variables: {
       input: {
-        awsKey: poolReport.img.awsKey,
+        awsKeyList: [awsImageKey],
         poolReportId: poolReport.id,
-        customerAccountId: poolReport.customerAccountId,
       },
     },
   });
 
   useEffect(() => {
     if (data && Object.keys(data).length) {
-      if (data.removePhotoFromAWS) {
+      if (data) {
+        console.log(data);
         // Delete was successful
       } else {
         setLoading(false);
@@ -591,22 +632,21 @@ function DeleteImageButton({ poolReport }) {
  * Open a pool report, click on an image, that image is shown in a larger
  * standalone modal. This is that modal.
  */
-function FullSizeImageModal({ closeFullImageHandler, poolReport }) {
-  const [src, setSrc] = useState("");
-  const { loading, error, data, refetch } = useQuery(
-    GET_POOL_REPORT_PHOTO_URL,
-    {
-      //This will update the loading variable to true when calling refetch
-      notifyOnNetworkStatusChange: true,
-      variables: {
-        input: {
-          awsKey: poolReport.img.awsKey,
-          poolReportId: poolReport.id,
-          customerAccountId: poolReport.customerAccountId,
-        },
-      },
-    }
-  );
+function FullSizeImageModal({
+  closeFullImageHandler,
+  poolReport,
+  awsImageKey,
+}) {
+  const [src, setSrc] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { error, data, refetch } = useQuery(GET_IMAGES, {
+    //This will update the loading variable to true when calling refetch
+    notifyOnNetworkStatusChange: true,
+    variables: {
+      awsKeyList: [awsImageKey],
+      poolReportId: poolReport.id,
+    },
+  });
 
   useEffect(() => {
     function closeOnEscapeKeydown({ key }) {
@@ -621,8 +661,20 @@ function FullSizeImageModal({ closeFullImageHandler, poolReport }) {
   });
 
   useEffect(() => {
-    if (data && !loading && !error) {
-      setSrc(data.getPoolReportPhotoUrl);
+    if (data) {
+      (async () => {
+        const presignedUrl = data?.getImages[0]?.url;
+        if (!presignedUrl) return; //If no src, return.
+        const img = new Image(); //Image is used in order to pre-load the image.
+        img.src = presignedUrl;
+        try {
+          await img.decode(); //Preload and decode the image
+          setSrc(presignedUrl);
+          setLoading(false);
+        } catch (error) {
+          console.log(error);
+        }
+      })();
     }
   }, [data]);
 
@@ -656,7 +708,7 @@ function FullSizeImageModal({ closeFullImageHandler, poolReport }) {
       onClick={closeFullImageHandler}
     >
       <div
-        className="rounded-lg overflow-hidden relative h-screen portrait:h-fit my-auto mx-auto"
+        className="rounded-lg overflow-hidden relative h-screen portrait:h-fit my-auto mx-auto min-w-fit w-52"
         onClick={(e) => {
           // Prevent modal from closing when clicking inside the modal.
           e.preventDefault();
@@ -665,7 +717,7 @@ function FullSizeImageModal({ closeFullImageHandler, poolReport }) {
       >
         {loading && <SpinnerOverlay />}
         {error && <Error />}
-        {!error && (
+        {!error && src && (
           <>
             <button
               className="btn btn-sm btn-circle btn-ghost flex-none absolute right-4 top-4 text-xl text-error"
