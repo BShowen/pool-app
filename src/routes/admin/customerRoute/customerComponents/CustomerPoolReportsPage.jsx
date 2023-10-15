@@ -10,7 +10,7 @@ import { SpinnerOverlay } from "../../../../components/SpinnerOverlay.jsx";
 import {
   GET_POOL_REPORTS_BY_CUSTOMER,
   GET_IMAGES,
-  DELETE_IMAGES,
+  DELETE_SOME_IMAGES,
   DELETE_POOL_REPORT,
 } from "../../../../queries/index.js";
 import {
@@ -543,7 +543,7 @@ function PhotoActions({ poolReport, awsImageKey }) {
 function DeleteImageButton({ poolReport, awsImageKey }) {
   // I want to manually handle the loading state for a slightly better UI.
   const [loading, setLoading] = useState(false);
-  const [deleteImage, { error, data }] = useMutation(DELETE_IMAGES, {
+  const [deleteImage, { error, data }] = useMutation(DELETE_SOME_IMAGES, {
     refetchQueries: [
       {
         query: GET_POOL_REPORTS_BY_CUSTOMER,
