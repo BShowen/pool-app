@@ -6,7 +6,8 @@ import routes from "./routeDefinitions";
 import { SpinnerOverlay } from "../components/SpinnerOverlay.jsx";
 import { LOGIN } from "../queries/index";
 
-export function loader() {
+export function loader({ client }) {
+  client.resetStore(); //Reset cache after login.
   // Redirect the user if they are already logged in.
   const apiToken = window.localStorage.getItem("apiToken") || false;
   if (apiToken) {

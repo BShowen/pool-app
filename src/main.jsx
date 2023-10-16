@@ -28,12 +28,12 @@ const router = createBrowserRouter([
   { ...adminRoutes },
   {
     path: routes.logout,
-    loader: logoutLoader,
+    loader: logoutLoader.bind(null, { client }),
   },
   {
     path: routes.login,
     element: <Login />,
-    loader: loginLoader,
+    loader: loginLoader.bind(null, { client }),
   },
   {
     path: routes.registerTechnician,
